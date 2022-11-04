@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>商品现货</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">						
+			#towriter{				
+				border: 1px solid #555555;
+				white-space: normal;											
+			}
+			.fixedBox{					
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 8px;     
+				height: 8px;				
+			}					  
+			/*#towrite1 {margin-top:3px}
+			towrite2 {margin:-10px}			
+			p {margin:0px}
+			ul {margin:0px}			
+			h4 {margin-top:0px}*/
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script>
+		<script>
+		
+			var dt = "";
+			var tt = "";
+			var gt = "";
+			var k = "0";
+					
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+			dt = tt;
+						
+			<!-- var day1 = new Date(); -->
+			<!-- gt1 = day1.getTime(); -->
+			<!-- tt1 = day1.getFullYear() + "-" + (day1.getMonth()+1) + "-" + day1.getDate(); -->
+			<!-- dt1 = tt1; -->
+			
+			getSource();
+			changeStyle();			
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+					if(k == "0")
+					{
+						time_range("9:00","15:15")	
+					}												
+				},
+				60000);
+			})
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+						
+			function changeStyle() {
+				var obj = document.getElementById("towriter");				
+				obj.style.left= "0px"; 				
+				obj.style.width= "510px";	
+				obj.style.height= "630px";		
+				
+				var obj1 = document.getElementById("towrite1");				
+				obj1.style.width= "280px";	//左侧宽度
+				obj1.style.fontSize="12px";	//左侧字体
+				
+				var obj2 = document.getElementById("towrite2");
+				obj2.style.left= "250px";   //右侧左边位置
+				obj2.style.width= "250px";  //右侧宽度
+				obj2.style.fontSize="12px";	//右侧字体		  		  			  
+			}					
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp1 = new XMLHttpRequest();
+				xmlHttp2 = new XMLHttpRequest();
+				//xmlHttp3 = new XMLHttpRequest();
+				} else {
+				xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+				//xmlHttp3 = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			function getSource() {	
+				div = document.getElementById('towrite1');
+				div.innerHTML = '<font size="3">商品现货&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';						
+							
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?Order=2&st=20&a=AllXianHuo&c=XianHuoData&apiv=w25&Type=2&IsJX=1"; 
+				var url2 = "https://apphis.longhuvip.com/w1/api/index.php?Order=2&a=AllXianHuo&st=20&c=XianHuoHistory&Index=0&apiv=w25&Type=2&IsJX=1&Date=" + tt; 			
+				var url = url1;
+				if(k == "1")
+				{
+					url = url2;
+				}				
+				createXmlHttp();				
+				xmlHttp1.onreadystatechange = writeSource;
+				xmlHttp1.open("GET", url, true);
+				xmlHttp1.send(null);				
+			}
+			
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			
+			function BookingRmk(date){         
+				tt = date;
+				var date1 = new Date(tt);
+				var date2 = new Date(dt);						
+				k = 0;
+				if(date1.getTime() < date2.getTime()){			
+					k = 1;
+					tradeday();
+				}								
+				getSource();						
+			}
+
+			function tradeday() {  //判断最后交易日
+				var day = new Date(tt);							
+				for (i = 1; i < 100; i++){	//节假日																										
+					if(i > 1){
+						day.setTime(day.getTime() - 24*60*60*1000);							
+					}	
+					tt = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=2&a=AllXianHuo&st=20&c=XianHuoHistory&Index=0&apiv=w25&Type=2&IsJX=1&Date=" + tt; 			
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data = xhr.responseText;
+					//document.write(data);
+					if(data.indexOf("MYSQL数据库链接出错!") == -1){						
+						break;
+					}
+				}
+			}
+			
+			
+			function UnUnicode(str) {
+				return unescape(str.replace(/\\/g, "%"));
+			}
+			
+
+			function writeSource() { 
+				if (xmlHttp1.readyState == 4) { 
+					div1 = document.getElementById('towrite1');										
+					var data1 = xmlHttp1.responseText								
+					//document.write(data1);
+					if(k == 0){
+						tt = data1.match(/{"Date":"(\S*)","List"/)[1];						
+						dt = tt;
+					}
+					
+					data1 = data1.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+					data1 = data1.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"fl":'+str.split(',')[2]+',"zf":'+str.split(',')[3];});
+					data1 = data1.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]}");
+					//document.write(data1);
+					
+					var transform_aa = [           
+					{"tag":"p", children:function(){return(json2html.transform(this.List, transform_bb));}}
+					];
+
+					var transform_bb= 
+					{"tag":"p", children:[
+					{"tag":"p", children:[
+					{"tag": "li", "html":"<a href='javascript:void(0)' onclick='changeCss(this,\"towrite1\");update(\"${code}\"+\"##\"+\"${name}\")'>${name}&nbsp;&nbsp;（${fl}）&nbsp;&nbsp;涨幅：${zf}%</a>"}
+					]}]};
+
+					var html = json2html.transform(data1, transform_aa);							
+					div1.innerHTML = div1.innerHTML + html;						
+					$("div a:first").click();						
+				}
+				document.getElementById("PriceDate").value = tt;				
+			}
+			
+			
+			function cDayFunc1(dp1) 
+			{ 
+				var date1 = dp1.cal.getNewDateStr();            
+				BookingRmk1(date1);//调用其它函数并带上参数                
+			}			
+			
+			function BookingRmk1(date){         
+				tt1 = date;
+				var date1 = new Date(tt1);
+				var date2 = new Date(dt1);						
+				k1 = 0;
+				if(date1.getTime() < date2.getTime()){			
+					k1 = 1;
+					tradeday1();
+				}								
+				update("");					
+			}
+
+			function tradeday1() {  //判断最后交易日
+				var day = new Date(tt1);							
+				for (i = 1; i < 100; i++){	//节假日																										
+					if(i > 1){
+						day.setTime(day.getTime() - 24*60*60*1000);							
+					}	
+					tt1 = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=XianHuoStockList&st=30&c=XianHuoHistory&apiv=w26&Type=6&ID=" + dm + "&Date=" + tt1;			
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data = xhr.responseText;
+					//document.write(data);
+					if(data.indexOf("MYSQL数据库链接出错!") == -1){						
+						break;
+					}
+				}
+			}
+			
+			var dt1 = "";
+			var tt1 = "";
+			var gt1 = "";
+			var k1 = "0";
+			var dm = "";
+			function update(ss) {				
+				//alert(ss);
+				if(ss != "")
+				{
+					var dms=ss.split('##');
+					dm = dms[0];
+					bk = dms[1];
+					
+					//重置
+					var day1 = new Date();
+					gt1 = day1.getTime();
+					mymonth1 = day1.getMonth()+1;
+					myday1 = day1.getDate();
+					if(mymonth1 >= 10){mymonth1 = mymonth1;}else{mymonth1 = "0" + mymonth1;}
+					if(myday1 >= 10){myday1 = myday1;}else{myday1 = "0" + myday1;}
+					tt1 = day1.getFullYear() + "-" + mymonth1 + "-" + myday1;	
+					dt1 = tt1;
+					k1 = "0";
+				}
+				
+				div2 = document.getElementById('towrite2');
+				div2.innerHTML = '<font size="3">' + bk + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 100px;" type="text" id="PriceDate1" name="PriceDate1" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc1})" />';						
+				
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=XianHuoStockList&st=20&c=XianHuoData&Index=0&apiv=w25&Type=6&ID=" + dm; 								
+				var url2 = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=XianHuoStockList&st=30&c=XianHuoHistory&apiv=w26&Type=6&ID=" + dm + "&Date=" + tt1 + "&"				
+				var url = url1;
+				if(k1 == "1"){
+					url = url2;	
+				}
+				
+				createXmlHttp();
+				xmlHttp2.onreadystatechange = writeSource2;				
+				xmlHttp2.open("GET", url, true);
+				xmlHttp2.send(null);
+				
+			}
+			
+			function writeSource2() { 			
+				if (xmlHttp2.readyState == 4) {                  	
+				var data2 = xmlHttp2.responseText
+				//document.write(data2);
+				if(k1 == 0){
+					tt1 = data2.match(/"Date":"(\S*)","DStart"/)[1];						
+					dt1 = tt1;
+				}
+				if(data2.indexOf("MYSQL数据库链接出错!") == -1)	{
+						//data2 = data2.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';	
+						//data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"zf":'+str.split(',')[6];});
+						data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+						str = word.match(/\[(\S*)/)[1]; 
+						return '{"code":' + str.split(',')[0] + 
+						',"name":' + str.split(',')[1] +
+						',"zf":'+str.split(',')[6];});
+						
+						data2 = '{\"list\":' + data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+						//data2 = data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]");					
+						//document.write(data2);
+						
+						var transform_aa2 = [           
+						{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb2));}}
+						];
+						
+						var transform_bb2= 
+						{"tag":"p", children:[
+						{"tag":"p", children:[							
+						//{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' >${code} ${name}&nbsp;&nbsp;涨幅：${zf}%</a>"}, 											
+						{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' onclick='changeCss(this,\"towrite2\")'>${code}&nbsp;&nbsp;${name}&nbsp;&nbsp;涨幅：${zf}%</a>"}, 
+						]}]}; 
+						
+						
+						var html2 = json2html.transform(data2, transform_aa2);		
+						div2 = document.getElementById('towrite2');
+						div2.innerHTML = div2.innerHTML + html2.replace(/\[\]/g,"");
+						div2.style.whiteSpace = "nowrap";						
+					}	
+					document.getElementById("PriceDate1").value = tt1;					
+				}
+			}			
+		</script>
+	</head>
+	<body>		
+		<div id="towriter" class="fixedBox">			
+			<div id="towrite1" ></div>		
+			<div id="towrite2" class="fixedBox" ></div>
+		</div>
+	</body>
+</html>

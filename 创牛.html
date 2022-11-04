@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>创牛</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}					  
+			#towrite {margin-top:-10px}		  
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script> 
+		<script>			
+			var tt = "";
+			var gt = "";
+			var jt = "";
+			var dt = "";
+			var k = "0";			
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();			
+			jt = Math.round(gt/1000);
+			//dt = jt;
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+			dt = tt;			
+			getSource();
+			changeStyle();
+			}
+								
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj	 = document.getElementById("towrite");	
+				obj.style.left= "0px"; 				
+				obj.style.width= "100%";
+				obj.style.height= "100%";						
+				obj.style.fontSize="12px";
+			}
+			
+						
+			function UnUnicode(str) {
+					return unescape(str.replace(/\\/g, "%"));
+				}
+					
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			
+			function BookingRmk(date)
+			{         
+				tt = date;
+				gt = new Date(tt).getTime();
+				jt = Math.round(gt/1000);
+				k = 0;
+				if(dt != tt)
+				{			
+					k = 1;
+				}				
+				getSource();
+			}
+								
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			
+			function keepTwoDecimal(num) {  
+				   var result = parseFloat(num);  
+				   if (isNaN(result)) {  
+					   //alert('传递参数错误，请检查！');  
+					   return false;  
+				   }  
+				   result = Math.round(num * 100) / 100;  
+				   return result;  
+			};
+		
+			function getSource() {
+			div = document.getElementById('towrite');																
+			div.innerHTML = '<font size="3">热点解读 + 精选板块&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';		
+						
+			//热点解读
+			var url11 = "https://flash-api.xuangubao.cn/api/surge_stock/stocks?normal=true&uplimit=true"; 
+			var url12 = "https://flash-api.xuangubao.cn/api/surge_stock/stocks?date=" + tt.replace(/-/g,"") + "&normal=true&uplimit=true";	
+			var url1 = url11;
+			
+			//精选板块
+			var url21 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w21&Type=1&c=ZhiShuRanking&PhoneOSNew=1&ZSType=7&"; 
+			var url22 = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w26&Type=1&c=ZhiShuRanking&ZSType=7&Date=" + tt + "&"; 			
+			var url2 = url21;
+			
+			if(k == "1")
+			{
+				url1 = url12;
+				url2 = url22;				
+			}				
+			
+			if (window.XMLHttpRequest) {
+					xmlHttp1 = new XMLHttpRequest();				
+				} else {
+					xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}				
+				xmlHttp1.onreadystatechange = writeSource;
+				xmlHttp1.open("GET", url1, true);
+				xmlHttp1.send(null);
+
+			if (window.XMLHttpRequest) {				
+					xmlHttp2 = new XMLHttpRequest();
+				} else {				
+					xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				xmlHttp2.onreadystatechange = writeSource;
+				xmlHttp2.open("GET", url2, true);
+				xmlHttp2.send(null);			
+			}
+			
+			function writeSource() { 
+				if (xmlHttp1.readyState == 4 && xmlHttp2.readyState == 4) {         
+					
+					//精选板块
+					var data2 = xmlHttp2.responseText
+					//document.write(data2);
+					var bk = "";
+					var tj = 0;
+					var dms = "";	
+					if(data2.indexOf("MYSQL数据库链接出错!") == -1)	{
+						data2 = data2.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+str.split(',')[3];});
+						data2 = data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]}");
+						//document.write(data2);
+						ss = data2.split('},{');
+										
+						//for (i = 0; i < ss.length; i++)
+						for (i = 0; i < 10; i++)
+						{
+							var code = ss[i].match(/\"code\":\"(\S*)\",\"name/)[1];
+							var name = ss[i].match(/\"name\":\"(\S*)\",\"qd/)[1];
+							var bkm = UnUnicode(name); 
+							if(code != "801366" && code != "801250" &&code != "801314")  //排除ST、重组、业绩
+							{
+								var url1 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&st=30&a=ZhiShuStockList_W8&c=ZhiShuRanking&PhoneOSNew=1&old=1&apiv=w21&Type=6&PlateID=" + code + "&"; 								
+								var url2 = "https://apphis.longhuvip.com/w1/api/index.php?st=30&Index=0&old=1&Order=1&a=ZhiShuStockList_W8&apiv=w26&Type=6&c=ZhiShuRanking&PlateID=" + code + "&Date=" + tt + "&"				
+								var url = url1;
+								if(k == "1")
+								{
+									url = url2;
+								}			
+								var xhr = new XMLHttpRequest();	
+								xhr.open("GET", url, false);//同步 
+								xhr.send(null)																										
+								var data3 = xhr.responseText;
+								data3 = data3.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';								
+								data3 = data3.replace(/(\[\").*?(?=\])/g,function(word){ 
+								str = word.match(/\[(\S*)/)[1]; 
+								return '{"code":' + str.split(',')[0] + 
+								',"name":' + str.split(',')[1]});							
+								data3 = '{\"list\":' + data3.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+								//document.write(data3);
+								ss3 = data3.split('},{');				
+								for (j = 0; j < ss3.length; j++)							
+								{
+									var jcode = ss3[j].match(/\"code\":\"(\S*)\",\"name/)[1];
+									if(jcode.substr(0,1)=="3")
+									{
+										dms += jcode + "|" + bkm + ";";
+									}
+								}
+								
+								tj++;
+								if(tj == 3){
+								break;}
+							}						
+						}
+					}
+					
+					//热点解读
+					var data1 = xmlHttp1.responseText							
+					var html1 = "";
+					var id = "";
+					if(data1.indexOf('"items":null') == -1)	
+					{				
+						data1 = data1.replace(/\\"/g,"")
+						data1 = data1.replace(/ /g,"").replace(/(.SZ\")|(.SS\")/g,"\"");
+						//document.write(data1);
+						data1 = data1.replace(/(\[\[).*?(?=\],\[)/g,
+						function(word){ 
+							str = word.match(/\[\[(\S*)/)[1];													
+							ss = str.replace(/\[\{.*?\}\]/,"");							
+							return '[{' + '"code":' + ss.split(',')[0] + ',"prod_name":' + ss.split(',')[1] + ',"zf":' + ss.split(',')[3] + ',"xq":' + '"' + ss.split(',"')[2].match(/(\S*)\",/)[1] + '"' + ',"lb":' + '"' + ss.split(',"')[3].match(/(\S*)\",/)[1] + '"';					
+						});
+						
+						data1 = data1.replace(/(\],\[).*?((?=\],\[)|(?=\]\]))/g,
+						function(word){ 
+							str = word.match(/\[(\S*)/)[1];																
+							ss = str.replace(/\[\{.*?\}\]/,"");
+							return '},{' + '"code":' + ss.split(',')[0] + ',"prod_name":' + ss.split(',')[1] + ',"zf":' + ss.split(',')[3] + ',"xq":' + '"' + ss.split(',"')[2].match(/(\S*)\",/)[1] + '"' + ',"lb":' + '"' + ss.split(',"')[3].match(/(\S*)\",/)[1] + '"';										
+						});
+						data1 = data1.replace(/\]\]\}\}/g,"}]}}").replace(/:\},/g,":[");
+						
+						//涨幅				
+						data1 = data1.replace(/(\"zf\":).*?(?=,)/g, function(word){ 				
+							str = word.match(/\"zf\":(\S*)/)[1]; 					
+							return '\"zf\":"' + keepTwoDecimal(str*100) + '"';
+						});												
+						//document.write(data1);
+						
+						data1 = data1.match(/\"items\":(\S*)}}/)[1];
+						//document.write(data1);
+						var result = JSON.parse(data1); //JSON字符串转换为对象
+						function up(a,b){
+							return b.zf - a.zf
+						}
+						result.sort(up);
+						result = JSON.stringify( result );
+						//document.write(result);
+						
+						div = document.getElementById('towrite');													
+						//var Back = "<a href='javascript:void(0)' onclick='getDate(" + "-1" + ")'>＜</a>";
+						//var Forward = "<a href='javascript:void(0)' onclick='getDate(" + "1" + ")'>＞</a>";
+						//div.innerHTML = "<nav><h4>热点解读 + 精选板块" + Back + tt + Forward + "</h4></nav>";							
+					
+						ss1 = result.split('},{');				
+						for (i = 0; i < ss1.length; i++)							
+						{											
+							var code = ss1[i].match(/"code":"(\S*)","prod_name/)[1];
+							var name = ss1[i].match(/"prod_name":"(\S*)","zf/)[1];
+							var zf = ss1[i].match(/"zf":"(\S*)","xq/)[1];
+							var xq = ss1[i].match(/"xq":"(\S*)","lb/)[1];
+							var lb = ss1[i].match(/"lb":"(\S*)"/)[1];													
+							if(dms.indexOf(code) != -1){
+								var m = dms.split(code+"|")[1];
+								var jxbk = m.split(";")[0];	
+								var jxq = "<a href='javascript:void(0)' onclick='updates(" + "\"" + code + "\"" + ")'>" + "详情" + "</a>";									
+								var jd = "<a href='https://m.10jqka.com.cn/stockpage/hs_" + code + "/' target=_blank onclick='changeCss(this,\"towrite\")'>" + 
+										code + "&nbsp;&nbsp;" + name + "&nbsp;&nbsp;涨幅："+ zf + "%&nbsp;&nbsp;" + 
+										lb + "&nbsp;&nbsp;精选板块：" + jxbk + "</a><a style='color:#FFA500' href='基本面(定).html##" + code + "##" + name + "'>亮点</a>";
+								div.innerHTML = div.innerHTML + "<ul><li>" + jd + "&nbsp;&nbsp;" + jxq + "</li></ul>";		
+								
+								//添加分类Div
+								var newDiv1 = document.createElement("div");
+								newDiv1.id = code;
+								newDiv1.style = "display:none;";								
+								document.getElementById("towrite").appendChild(newDiv1);
+								div1 = document.getElementById(code);
+								//div1.style.left= "0px";
+								div1.style.marginTop= "100px";								
+								div1.innerHTML = div1.innerHTML + "<p style=\"width:330px;\">" + xq + "</p>" ;
+							}
+						}				
+					}
+					document.getElementById("PriceDate").value = tt;
+				}
+			}	
+
+			var temp = "";			
+			function updates(ss) {				
+				if(document.getElementById(ss))
+				{					
+					div1 = document.getElementById(ss);
+					if(temp.indexOf(ss) == -1)
+					{
+						temp += ss + ";";
+						div1.style.display = "block";
+						div1.style.marginTop= "-10px";
+						div1.style.marginLeft= "5px";						
+					}
+					else
+					{
+						temp = temp.replace(ss + ";" , "");
+						div1.style.display = "none";
+					}
+				}										
+			}			
+		</script>
+	</head>
+
+	<body>
+		<div id="towrite" class="fixedBox" ></div>	
+	</body>
+</html>

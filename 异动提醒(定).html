@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>异动提醒</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			//p {margin:5px}
+			//ul {margin:1px}			
+			//h4 {margin:1px}	
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource();
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","11:35")
+                time_range("12:55","15:15")				
+				},
+				10000);
+			})
+			
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "480px";	
+				obj1.style.height= "620px";		
+				obj1.style.fontSize="12px";				 
+			}
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			function getSource() {	    							
+				var url = "https://flash-api.xuangubao.cn/api/event/history?count=100&types=10001,10005,10003,10007,10002,10006,10004,10008,10012,10014,10009,10010,11000,11001"; 	                
+				//var url = "https://flash-api.xuangubao.cn/api/event/history?count=100&types=11000,11001"; 	//板块                
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+			
+			function writeSource() { 
+			if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText					
+				data = data.replace(/\.SS"/g,"\"").replace(/\.SZ"/g,"\"");	
+				
+				data = data.replace(/(\"event_type\":).*?(?=,)/g, function(word){ 				
+					str = word.match(/\"event_type\":(\S*)/)[1]; 
+					str = str.replace(/10001/g,"封涨停板").replace(/10002/g,"封跌停板").replace(/10003/g,"打开涨停板").replace(/10004/g,"打开跌停板").replace(/10005/g,"逼近涨停");
+					str = str.replace(/10006/g,"逼近跌停").replace(/10007/g,"即将打开涨停").replace(/10008/g,"即将打开跌停").replace(/10009/g,"大幅拉升").replace(/10010/g,"快速跳水");
+					str = str.replace(/11000/g,"板块拉升").replace(/11001/g,"板块跳水");
+					return '\"event_type\":"' + str + '"';					
+				});  	
+							
+				//时间					
+				data = data.replace(/(\"event_timestamp\":).*?(?=,)/g, function(word){ 				
+					str = word.match(/\"event_timestamp\":(\S*)/)[1]; 					
+					return '\"event_timestamp\":"' + getLocalTime(str) + '"';
+				});  				
+                //涨幅				
+				data = data.replace(/(\"pcp\":).*?(?=,)/g, function(word){ 						
+				str = word.match(/\"pcp\":(\S*)/)[1]; 
+					if(str.indexOf("}") > 0)
+					{
+						var w = str.indexOf("}");
+						fs = str.substring(w);
+						str = str.substring(0 , w);						
+						return '\"pcp\":' + keepTwoDecimal(str*100) + fs;
+					}
+					else
+					{					
+						return '\"pcp\":' + keepTwoDecimal(str*100) ;
+					}
+				});  
+				data = data.replace(/(\"plate_pcp\":).*?(?=})/g, function(word){ 						
+					str = word.match(/\"plate_pcp\":(\S*)/)[1]; 					
+					return '\"plate_pcp\":' + keepTwoDecimal(str*100) ;					
+				});  							
+				//document.write(data);				
+				
+				var transform_aa = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb));}}
+				];
+				
+				var transform_bb = [  
+				{"tag":"p", children:[								
+				{"tag":"p", children:function(){				
+					if(this.stock_abnormal_event_data.symbol != undefined && this.stock_abnormal_event_data.name.indexOf("ST") == -1)
+						{
+						return("<li><a href=https://m.10jqka.com.cn/stockpage/hs_" + 
+						this.stock_abnormal_event_data.symbol + " onclick='changeCss(this,\"towrite\")'>" + 
+						"【" + this.event_timestamp + "】" + 
+						this.stock_abnormal_event_data.symbol + "&nbsp;&nbsp;" + 
+						this.stock_abnormal_event_data.name + "&nbsp;&nbsp;" + 
+						this.event_type +  "&nbsp;&nbsp;涨幅：" + this.stock_abnormal_event_data.pcp + "%" + "</a>");							
+						}
+					}},				
+				{"tag":"p", children:function(){				
+					if(this.plate_abnormal_event_data.plate_name != undefined)
+						{
+							return("【" + this.event_timestamp + "】" + 
+							this.plate_abnormal_event_data.plate_name + 
+							"&nbsp;&nbsp;" + this.event_type + 
+							"&nbsp;&nbsp;涨幅：" + this.plate_abnormal_event_data.pcp + "%" + 
+							json2html.transform(this.plate_abnormal_event_data, transform_ee));
+						}
+					}}				
+				]}];
+								
+				var transform_cc= 					
+				{"tag":"ul", children:[	               
+				{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${symbol}' onclick='changeCss(this,\"towrite\")'>${symbol} ${name} &nbsp;&nbsp;涨幅：${pcp}%</a>"},
+				//{"tag":"p", children:function(){return(json2html.transform(this.related_plates, transform_dd));}}
+				]};  
+				
+				
+				var transform_dd= 				
+				{"tag":"p", children:[				
+				{"tag": "p","html":"${plate_name} &nbsp;&nbsp;涨幅：${plate_pcp}%"},					
+				]}											
+				
+				var transform_ee=
+				{"tag":"ul", children:[				
+				{"tag":"p", children:function(){return(json2html.transform(this.related_stocks, transform_ff));}}
+				]}
+				
+				var transform_ff= 				
+				{"tag":"ul", children:[				
+				{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${symbol}' onclick='changeCss(this,\"towrite\")'>${symbol} ${name} &nbsp;&nbsp;涨幅：${pcp}%</a>"},	
+				//{"tag": "b","html":"${plate_reason}"},
+				]}
+				
+				var html = json2html.transform(data, transform_aa);		
+				div=document.getElementById('towrite');
+				var myDate = new Date();
+				div.innerHTML = '<h2>异动提醒&nbsp;&nbsp;&nbsp;&nbsp;' + myDate.Format("hh:mm:ss") + '</h2>' + html;												
+				
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title> 综合人气榜</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			//p {margin:5px}
+			//ul {margin:1px}			
+			//h4 {margin:1px}	
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}
+			.res
+			{
+				color: Red;
+			}
+			.result{
+				background: Yellow;
+			}						
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			start();			
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					dms = "";
+					datas = "";	
+					datasyx1 = "";
+					datasyx2 = "";					
+					start();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+						
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "100%";	
+				//obj1.style.height= "620px";		
+				obj1.style.fontSize="12px";				  			 
+			}	
+						
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}						
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};	
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}				
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+					if(alist[i].name == "yx"){
+						alist[i].style.color = "#FF69B4";
+					}
+					
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			function start() {	
+				getSource1();
+				getSource3();
+				getSource4();
+				getSource5();
+			}
+			
+			function getSource1() {	    							
+				var url = "https://emappdata.eastmoney.com/stockrank/getAllCurrentList"; 	                			
+				createXmlHttp();
+				var array = {"appId":"appId01","globalId":"786e4c21-70dc-435a-93bb-38","pageNo":1,"pageSize":100}
+				xmlHttp.onreadystatechange = writeSource1;
+				xmlHttp.open("POST", url, true);
+				xmlHttp.setRequestHeader("Content-Type","application/json");
+				xmlHttp.withCredentials = true
+				//xmlHttp.send(null);
+				xmlHttp.send(JSON.stringify(array)) ; 
+			}
+								
+			var dms = "";
+			function writeSource1() { 
+			if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText	
+				//document.write(data);
+				 ss = data.split('},{');				
+				for (i = 0; i < ss.length; i++)
+				{
+				//alert(ss[i]);
+					dms += ss[i].match(/\"sc\":\"(\S*)\",/)[1].replace("SH","1.").replace("SZ","0.") + ",";
+				
+				}
+				dms = dms.substring(0,dms.length - 1);
+				//document.write(dms);
+				getSource2();				
+				}
+			}
+			
+			function getSource2() {	    							
+				var url = "https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&np=3&ut=a79f54e3d4c8d44e494efb8f748db291&invt=2&secids=" + dms + "&fields=f2,f3,f12,f14"; 	                							
+				createXmlHttp();				
+				xmlHttp.onreadystatechange = writeSource2;
+				xmlHttp.open("GET", url, true);				
+				//xmlHttp.withCredentials = true
+				xmlHttp.send(null);				
+			}
+			
+			//人气榜
+			function getSource3() {	    							
+				var url = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=GetHotPHB&st=50&apiv=w21&Type=1&c=StockBidYiDong&PhoneOSNew=1"; 				
+				if (window.XMLHttpRequest) {
+				xmlHttp2 = new XMLHttpRequest();
+				} else {
+				xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+				}			
+				xmlHttp2.onreadystatechange = writeSource2;
+				xmlHttp2.open("GET", url, true);
+				xmlHttp2.send(null);
+			}
+			
+			//热门股票
+			function getSource4() {	    							
+				// var url = "https://www.aigupiao.com/Quote/get_hot_stock_list?number=100"; 	
+				var url = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=GetHotPHB&st=50&apiv=w21&Type=1&c=StockBidYiDong&PhoneOSNew=1";
+				if (window.XMLHttpRequest) {
+				xmlHttp3 = new XMLHttpRequest();
+				} else {
+				xmlHttp3 = new ActiveXObject("Microsoft.XMLHTTP");
+				}			
+				xmlHttp3.onreadystatechange = writeSource2;
+
+				xmlHttp3.open("GET", url, true);
+				
+				xmlHttp3.send(null);
+			}
+			
+			//BBD
+			function getSource55() {	    							
+				var url = "http://www.dingniugu.com/ddxdata/ddedatatop.php?pid=6&p=5000&order=-1"; 				
+				if (window.XMLHttpRequest) {
+				xmlHttp4 = new XMLHttpRequest();
+				} else {
+				xmlHttp4 = new ActiveXObject("Microsoft.XMLHTTP");
+				}			
+				xmlHttp4.onreadystatechange = writeSource2;
+				xmlHttp4.open("GET", url, true);
+				xmlHttp4.send(null);
+			}
+			
+			//东财个股资金流
+			function getSource5() {	    							
+				var url = "http://push2.eastmoney.com/api/qt/clist/get?cb=jQuery112304741865099328959_1633581130706&fid=f62&po=1&pz=5000&pn=1&np=1&fltt=2&invt=2&ut=b2884a393a59ad64002292a3e90d46a5&fs=m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2&fields=f12,f14,f2,f3,f62,f184,f66,f69"; 	                							
+				if (window.XMLHttpRequest) {
+				xmlHttp4 = new XMLHttpRequest();				
+				} else {
+				xmlHttp4 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}					
+				xmlHttp4.onreadystatechange = writeSource2;
+				xmlHttp4.open("GET", url, true);								
+				xmlHttp4.send(null);				
+			}
+			
+			function decodeUnicode(str) { 
+				str = str.replace(/\\/g, "%"); return unescape(str);
+				}
+
+			var datas = "";
+			var datasyx1 = "";
+			var datasyx2 = "";
+			var tt = "";
+			function writeSource2() { 
+			if (xmlHttp.readyState == 4 && xmlHttp2.readyState == 4 && xmlHttp3.readyState == 4  && xmlHttp4.readyState == 4) {  
+							
+				var data1 = xmlHttp.responseText;
+				var data2 = xmlHttp2.responseText;				
+				data2 = data2.replace(/ /g,"").match(/(\S*)\],\"/)[1].replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1] + ',"ranking":'+str.split(',')[4] + ',"bh":'+str.split(',')[3] + ',"zf":'+str.split(',')[2];});
+				data2 = data2.replace(/\],\{/g,"},{").replace(/\]\],/g,"}],");
+				var data3 = xmlHttp3.responseText;
+				data3 = data3.replace(/ /g,"").match(/(\S*)\],\"/)[1].replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1] + ',"ranking":'+str.split(',')[4] + ',"bh":'+str.split(',')[3] + ',"zf":'+str.split(',')[2];});
+				data3 = data3.replace(/\],\{/g,"},{").replace(/\]\],/g,"}],");
+				/* var data3 = xmlHttp3.responseText;
+				var	rm = data3.split('},{');
+				var rmgsl = rm.length + 1; */
+				
+				var data4 = xmlHttp4.responseText;
+				data4 = data4.replace(/ /g,"")
+				//document.write(data4);
+				
+				data1 = data1.replace(/ /g,"").match(/\"diff\":(\S*)/)[1]				
+				var ss1 = data1.split('},{');	//以东财为基准
+				var data = "";			
+				for (i = 0; i < ss1.length; i++)
+				//for (i = 0; i < 5; i++)
+				{
+					var code = ss1[i].match(/\"f12\":\"(\S*)\",/)[1];						
+					var name = ss1[i].match(/\"f14\":\"(\S*)\"/)[1];
+					var zf = ss1[i].match(/\"f3\":(\S*),\"f12/)[1];
+					var pm1 = "1000";
+					//alert(i + "|" + code);
+					if(data2.indexOf(code) > -1)  //人气榜
+					{					
+						var reg = data2.replace(new RegExp(code,'g'),"abcde");
+						//alert(pm1);
+						var aa = reg.match(/abcde(\S*)/)[1];
+						if(aa.indexOf("}") > -1)
+						{
+							aa = aa.substring(0 , aa.indexOf("}"));	
+						}
+						else if(aa.indexOf("]") > -1)
+						{
+							aa = aa.substring(0 , aa.indexOf("]"));	
+						}
+						//alert(aa);						
+						//pm1 = aa.split(',')[4] ;
+						pm1 = aa.match(/\"ranking\":(\S*),\"bh/)[1];
+						//alert(pm1);
+					}
+					
+					var pm2 = "1000";
+				if(data3.indexOf(code) > -1)  //人气榜
+				{					
+					var reg = data3.replace(new RegExp(code,'g'),"abcde");
+					//alert(pm1);
+					var aa = reg.match(/abcde(\S*)/)[1];
+					if(aa.indexOf("}") > -1)
+					{
+						aa = aa.substring(0 , aa.indexOf("}"));	
+					}
+					else if(aa.indexOf("]") > -1)
+					{
+						aa = aa.substring(0 , aa.indexOf("]"));	
+					}
+					//alert(aa);						
+					//pm1 = aa.split(',')[4] ;
+					pm2 = aa.match(/\"ranking\":(\S*),\"bh/)[1];
+					//alert(pm1);
+				}
+					/* if(data3.indexOf(code) > -1)  //热门股票
+					{					
+						var reg = data3.replace(new RegExp(code,'g'),"abcde");
+						//alert(pm1);
+						var aa = reg.match(/abcde(\S*)/)[1];
+						var bb = aa.split('},{');					
+						pm2 = rmgsl - bb.length;
+						//alert(pm2);
+					} */
+					
+					
+					<!-- var BBD = "null"; -->
+					<!-- var DDX = "null"; -->
+					<!-- var tcl = "null"; -->
+					<!-- var dsb = "null"; -->
+					<!-- if(data4.indexOf(code) > -1)  //BBD -->
+					<!-- {					 -->
+						<!-- var reg = data4.replace(new RegExp(code,'g'),"abcde");						 -->
+						<!-- var aa = reg.match(/abcde(\S*)/)[1]; -->
+						<!-- aa = aa.substring(0 , aa.indexOf("]"));						 -->
+						<!-- BBD = aa.split(',')[6] ; -->
+						<!-- DDX = aa.split(',')[9] ; -->
+						<!-- tcl = aa.split(',')[8] ; -->
+						<!-- dsb = aa.split(',')[19] ;						 -->
+					<!-- }					 -->
+					
+					var zlje = "null";
+					var zljzb = "null";					
+					if(data4.indexOf('"' + code + '"') > -1)  //东财个股资金流
+					{					
+						var reg = data4.replace(new RegExp('"' + code + '"','g'),'"abcde"');						
+						var aa = reg.match(/abcde(\S*)/)[1];
+						aa = aa.substring(0 , aa.indexOf("}"));						
+						zlje = aa.match(/\"f62\":(\S*),"f66/)[1]; 
+						zljzb = (aa + ",").match(/\"f184\":(\S*),/)[1];	
+						cddje = aa.match(/\"f66\":(\S*),"f69/)[1]; 
+						cddjzb = (aa + ",").match(/\"f69\":(\S*),"f184/)[1];							
+					}					
+										
+					data += '{' + '\"code\":"' + code + '",\"name\":"' + name + '",\"zf\":' + zf + ',\"dcpm\":' + (i + 1) + ',\"rqbpm\":' + pm1 + ',\"rmgppm\":' + pm2 + ',\"zlje\":' + zlje + ',\"zljzb\":' + zljzb + ',\"cddje\":' + cddje + ',\"cddjzb\":' + cddjzb + '},';			
+					//alert(data);
+				}
+				//document.write(data);
+				
+				var ss2 = data2.split('},{');	//以人气榜为基准					
+				for (i = 0; i < ss2.length; i++)				
+				{				
+					var code = ss2[i].match(/\"code\":\"(\S*)\",\"name/)[1];
+					if(data.indexOf(code) == -1)
+					{					
+						var name = ss2[i].match(/\"name\":\"(\S*)\",\"ranking/)[1];
+						name = decodeUnicode(name);						
+						var pm1 = ss2[i].match(/\"ranking\":(\S*),\"bh/)[1];
+						var zf = ss2[i].match(/\"zf\":(\S*)/)[1].replace("]","");
+						//alert(code+name);
+						
+						var dcpm = "1000";					
+						
+						var pm2 = "1000";	
+						if(data3.indexOf(code) > -1)  //热门股票
+						{					
+							var reg = data3.replace(new RegExp(code,'g'),"abcde");						
+							var aa = reg.match(/abcde(\S*)/)[1];						
+							var bb = aa.split('},{');					
+				//			pm2 = rmgsl - bb.length;
+							//alert(pm2);
+						}
+						//alert(pm2);
+						
+						<!-- var BBD = "null"; -->
+						<!-- var DDX = "null"; -->
+						<!-- var tcl = "null"; -->
+						<!-- var dsb = "null"; -->
+						<!-- if(data4.indexOf(code) > -1)  //BBD -->
+						<!-- {					 -->
+							<!-- var reg = data4.replace(new RegExp(code,'g'),"abcde"); -->
+							<!-- //alert(pm1); -->
+							<!-- var aa = reg.match(/abcde(\S*)/)[1]; -->
+							<!-- aa = aa.substring(0 , aa.indexOf("]"));						 -->
+							<!-- BBD = aa.split(',')[6] ; -->
+							<!-- DDX = aa.split(',')[9] ; -->
+							<!-- tcl = aa.split(',')[8] ; -->
+							<!-- dsb = aa.split(',')[19] ; -->
+						<!-- } -->
+						
+						var zlje = "null";
+						var zljzb = "null";					
+						if(data4.indexOf('"' + code + '"') > -1)  //东财个股资金流
+						{					
+							var reg = data4.replace(new RegExp('"' + code + '"','g'),"abcde");						
+							var aa = reg.match(/abcde(\S*)/)[1];
+							aa = aa.substring(0 , aa.indexOf("}"));						
+							zlje = aa.match(/\"f62\":(\S*),"f66/)[1]; 
+							zljzb = (aa + ",").match(/\"f184\":(\S*),/)[1];	
+							cddje = aa.match(/\"f66\":(\S*),"f69/)[1]; 
+							cddjzb = (aa + ",").match(/\"f69\":(\S*),"f184/)[1];								
+						}		
+						data += '{' + '\"code\":"' + code + '",\"name\":"' + name + '",\"zf\":' + zf + ',\"dcpm\":' + dcpm + ',\"rqbpm\":' + pm1 + ',\"rmgppm\":' + pm2 + ',\"zlje\":' + zlje + ',\"zljzb\":' + zljzb + ',\"cddje\":' + cddje + ',\"cddjzb\":' + cddjzb + '},';			
+					}
+				}
+				//document.write(data);
+				var ss3 = data3.split('},{');	//以人气榜为基准
+				for (i = 0; i < ss3.length; i++)				
+				{				
+					var code = ss3[i].match(/\"code\":\"(\S*)\",\"name/)[1];
+					if(data.indexOf(code) == -1)
+					{					
+						var name = ss3[i].match(/\"name\":\"(\S*)\",\"ranking/)[1];
+						name = decodeUnicode(name);						
+						var pm1 = ss3[i].match(/\"ranking\":(\S*),\"bh/)[1];
+						var zf = ss3[i].match(/\"zf\":(\S*)/)[1].replace("]","");
+				
+				/* var ss3 = data3.split('},{');	//以热门股票为基准					
+				for (i = 0; i < ss3.length; i++)				
+				{	
+					var code = ss3[i].match(/\"code\":\"(\S*)\",\"name/)[1];
+					code = code.replace("sh","").replace("sz","");
+					if(data.indexOf(code) == -1)
+					{
+						//alert(code);
+						var name = ss3[i].match(/\"name\":\"(\S*)\",\"last/)[1];
+						name = decodeUnicode(name);												
+						var zf = ss3[i].match(/\"chg_pct\":(\S*),\"num_intro\"/)[1]; */							
+						pm2 = i + 1;
+						//alert(zf);
+						
+						var dcpm = "1000";	
+						var pm1 = "1000";	
+						
+						<!-- var BBD = "null"; -->
+						<!-- var DDX = "null"; -->
+						<!-- var tcl = "null"; -->
+						<!-- var dsb = "null"; -->
+						<!-- if(data4.indexOf(code) > -1)  //BBD -->
+						<!-- {					 -->
+							<!-- var reg = data4.replace(new RegExp(code,'g'),"abcde"); -->
+							<!-- //alert(pm1); -->
+							<!-- var aa = reg.match(/abcde(\S*)/)[1]; -->
+							<!-- aa = aa.substring(0 , aa.indexOf("]"));						 -->
+							<!-- BBD = aa.split(',')[6] ; -->
+							<!-- DDX = aa.split(',')[9] ; -->
+							<!-- tcl = aa.split(',')[8] ; -->
+							<!-- dsb = aa.split(',')[19] ; -->
+						<!-- }					 -->
+						
+						var zlje = "null";
+						var zljzb = "null";					
+						if(data4.indexOf('"' + code + '"') > -1)  //东财个股资金流
+						{							     
+							var reg = data4.replace(new RegExp('"' + code + '"','g'),"abcde");						
+							var aa = reg.match(/abcde(\S*)/)[1];
+							aa = aa.substring(0 , aa.indexOf("}"));
+							zlje = aa.match(/\"f62\":(\S*),"f66/)[1]; 
+							zljzb = (aa + ",").match(/\"f184\":(\S*),/)[1];	
+							cddje = aa.match(/\"f66\":(\S*),"f69/)[1]; 
+							cddjzb = (aa + ",").match(/\"f69\":(\S*),"f184/)[1];
+						}		
+						data += '{' + '\"code\":"' + code + '",\"name\":"' + name + '",\"zf\":' + zf + ',\"dcpm\":' + dcpm + ',\"rqbpm\":' + pm1 + ',\"rmgppm\":' + pm2 + ',\"zlje\":' + zlje + ',\"zljzb\":' + zljzb + ',\"cddje\":' + cddje + ',\"cddjzb\":' + cddjzb + '},';			
+					}				
+				}
+				//document.write(data);
+				
+				ss = data.split('},{');						
+				for (i = 0; i < ss.length; i++)
+				{
+					var shy = "1000";
+					var zf = ss[i].match(/"zf":(\S*),"dcpm"/)[1];					
+					var dcpm = ss[i].match(/"dcpm":(\S*),"rqbpm"/)[1];
+					var rqbpm = ss[i].match(/"rqbpm":(\S*),"rmgppm"/)[1];
+					var rmgppm = ss[i].match(/"rmgppm":(\S*),"zlje"/)[1];
+					var zlje = ss[i].match(/"zlje":(\S*),"zljzb"/)[1];
+					var zljzb = ss[i].match(/"zljzb":(\S*),"cddje"/)[1];
+					var cddje = ss[i].match(/"cddje":(\S*),"cddjzb"/)[1];
+					var cddjzb = ss[i].match(/"cddjzb":(\S*)/)[1];
+					if(dcpm <= 100 && rqbpm <= 50 && rmgppm <= 100)
+					{
+						shy = dcpm;					
+					}					
+					datas += '{' + ss[i] + ',\"shy\":' + shy + '},';
+					if(shy != 1000 && zf > 0 && zlje >= 20000000 && zljzb >= 10)
+					{
+						datasyx1 += '{' + ss[i] + ',\"shy\":' + shy + '},';
+					}
+					else
+					{
+						datasyx2 += '{' + ss[i] + ',\"shy\":' + shy + '},';
+					}
+				}
+				
+				datas = '[' + datas + "]";
+				datas = datas.replace("},,",",").replace("},]","}]").replace("[{{","[{");
+				
+				datasyx1 = '[' + datasyx1 + "]";
+				datasyx1 = datasyx1.replace("},,",",").replace("},]","}]").replace("[{{","[{");
+				
+				datasyx2 = '[' + datasyx2 + "]";
+				datasyx2 = datasyx2.replace("},,",",").replace("},]","}]").replace("[{{","[{");
+				
+				//document.write(datasyx1);
+				//document.write(datasyx2);				
+				getSource(k);
+				}				
+			}
+			
+			var k = 1;
+			var gl = "";  //高亮
+			function getSource(s) {				
+				var p1 = "<a href='javascript:void(0)' id='px1' onclick='getSource(" + "1" + ")'>" + "涨幅" + "</a>";
+				var p2 = "<a href='javascript:void(0)' id='px2' onclick='getSource(" + "2" + ")'>" + "东财" + "</a>";
+				var p3 = "<a href='javascript:void(0)' id='px3' onclick='getSource(" + "3" + ")'>" + "人气榜" + "</a>";
+				var p4 = "<a href='javascript:void(0)' id='px4' onclick='getSource(" + "4" + ")'>" + "热门股" + "</a>";
+				var p5 = "<a href='javascript:void(0)' id='px5' onclick='getSource(" + "5" + ")'>" + "主力净额" + "</a>";
+				var p6 = "<a href='javascript:void(0)' id='px6' onclick='getSource(" + "6" + ")'>" + "主力净占比" + "</a>";
+				var p7 = "<a href='javascript:void(0)' id='px7' onclick='getSource(" + "7" + ")'>" + "三合一" + "</a>";
+				var p8 = "<a href='javascript:void(0)' id='px8' onclick='getSource(" + "8" + ")'>" + "预选" + "</a>";
+				
+				div = document.getElementById('towrite');								
+				div.innerHTML = '<h3>综合人气榜&nbsp;&nbsp;&nbsp;&nbsp;' + '</h3>';								
+				div.innerHTML = div.innerHTML + "<b>&nbsp;&nbsp;排序（ "+ p1 + p7 + p2 + p3 + p4 + p5 + p6 + p8 + "）</b>";
+				aObj = document.getElementById('px' + s);
+				gl = aObj.innerText;
+				aObj.innerText = aObj.innerText + "↓";
+				aObj.style.color = "#FFA07A";				
+				
+				var data = "";
+				var result = "";
+				var html1 = "";
+				if(s == 8)
+				{
+					k = "8";
+					if( datasyx1 != "[]")
+					{
+						var result1 = JSON.parse(datasyx1);
+						function up1(a,b){
+								return a.shy-b.shy					
+							}
+						result1.sort(up1);
+						result1 = JSON.stringify( result1 );
+					
+						data1= '{\"list\":' + result1 + "}";
+						//document.write(datas);
+						
+						//主力净额				
+						data1 = data1.replace(/(\"zlje\":).*?(?=,\"zljzb)/g, function(word){ 						
+						str = word.match(/\"zlje\":(\S*)/)[1]; 					
+							if(keepTwoDecimal(Math.abs(str/100000000)) >= 1)
+							{
+								return '\"zlje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+							}
+							else
+							{
+								return '\"zlje\":\"' + Math.round(str/10000) + '万\"';
+							}					
+						});  	 				
+						
+						//超大单净额				
+						data1 = data1.replace(/(\"cddje\":).*?(?=,\"cddjzb)/g, function(word){ 						
+						str = word.match(/\"cddje\":(\S*)/)[1]; 					
+							if(keepTwoDecimal(Math.abs(str/100000000)) >= 1)
+							{
+								return '\"cddje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+							}
+							else
+							{
+								return '\"cddje\":\"' + Math.round(str/10000) + '万\"';
+							}					
+						});  	 	
+				
+						var transform_aa1 = [           
+						{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb1));}}
+						];
+						
+						var transform_bb1 = 				
+						{"tag":"ul", children:[	
+						{"tag":"li", children:function(){								
+							return(
+							"<a style='color: #FF69B4;' href=https://m.10jqka.com.cn/stockpage/hs_" +
+								this.code + "/ target=_blank id='gg' name='yx' onclick='changeCss(this,this.id)'>" + 
+								this.code + "&nbsp;&nbsp;" + 						
+								this.name + "&nbsp;&nbsp;涨幅:" + 
+								this.zf + "% &nbsp;&nbsp;" +
+								"东财：" + this.dcpm + "&nbsp;&nbsp;" +
+								"人气榜：" + this.rqbpm  +  "&nbsp;&nbsp;" +
+								"热门股：" + this.rmgppm  +  "&nbsp;&nbsp;" +
+								"三合一：" + this.shy  + "&nbsp;&nbsp;<br>" +								
+								"主力净额：" + this.zlje  + "&nbsp;&nbsp;" +
+								"主力净占比：" + this.zljzb  + "%&nbsp;&nbsp;" + 
+								"超大单净额：" + this.cddje  + "&nbsp;&nbsp;" +
+								"超大单净占比：" + this.cddjzb  + "%&nbsp;&nbsp;" + "</a><a style='color:#FFA500' href='基本面(定).html##" +
+							this.code + "##" + 
+							this.name + "'>亮点</a>"						
+							);
+						}}]};  
+						html1 = json2html.transform(data1, transform_aa1);	
+						//div.innerHTML = div.innerHTML + "<span id='gg'>" + html1 + "</span>";
+						//result = result1 + result2;
+						//result = result.replace('}][{','},{');
+					}
+					
+					var result2 = JSON.parse(datasyx2);
+					function up2(a,b){
+							return b.zf-a.zf
+						}
+					result2.sort(up2);
+					result2 = JSON.stringify( result2 );
+					result = result2;
+					//document.write(result);
+				}
+				else
+				{
+					data = datas;
+					result = JSON.parse(data); //JSON字符串转换为对象
+					function up(a,b){
+						if(s == 1)
+						{
+							k = "1";
+							return b.zf-a.zf
+						}
+						if(s == 2)
+						{
+							k = "2";
+							return a.dcpm-b.dcpm
+						}
+						if(s == 3)
+						{	
+							k = "3";
+							return a.rqbpm-b.rqbpm
+						}
+						if(s == 4)
+						{
+							k = "4";
+							return a.rmgppm-b.rmgppm
+						}
+						if(s == 5)
+						{
+							k = "5";
+							return b.zlje-a.zlje
+						}
+						if(s == 6)
+						{
+							k = "6";
+							return b.zljzb-a.zljzb
+						}	
+						if(s == 7)
+						{
+							k = "7";
+							return a.shy-b.shy
+						}									
+					}
+					result.sort(up);
+					result = JSON.stringify( result );					
+				}
+				result = result.replace(/\"dcpm\":1000/g,"\"dcpm\":\"无\"").replace(/\"rqbpm\":1000/g,"\"rqbpm\":\"无\"").replace(/\"rmgppm\":1000/g,"\"rmgppm\":\"无\"").replace(/\"shy\":1000/g,"\"shy\":\"无\"");
+				data= '{\"list\":' + result + "}";
+				//document.write(datas);
+				
+				//主力净额				
+				data = data.replace(/(\"zlje\":).*?(?=,\"zljzb)/g, function(word){ 						
+				str = word.match(/\"zlje\":(\S*)/)[1]; 					
+					if(keepTwoDecimal(Math.abs(str/100000000)) >= 1)
+					{
+						return '\"zlje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+					}
+					else
+					{
+						return '\"zlje\":\"' + Math.round(str/10000) + '万\"';
+					}					
+				});  	 				
+				
+				//超大单净额				
+				data = data.replace(/(\"cddje\":).*?(?=,\"cddjzb)/g, function(word){ 						
+				str = word.match(/\"cddje\":(\S*)/)[1]; 					
+					if(keepTwoDecimal(Math.abs(str/100000000)) >= 1)
+					{
+						return '\"cddje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+					}
+					else
+					{
+						return '\"cddje\":\"' + Math.round(str/10000) + '万\"';
+					}					
+				});  	 	
+				
+				var transform_aa = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb));}}
+				];
+				
+				var transform_bb= 				
+				{"tag":"ul", children:[	
+				{"tag":"li", children:function(){								
+					return(
+					"<a href=https://m.10jqka.com.cn/stockpage/hs_" +
+						this.code + "/ target=_blank id='gg' onclick='changeCss(this,this.id)'>" + 
+						this.code + "&nbsp;&nbsp;" + 						
+						this.name + "&nbsp;&nbsp;涨幅:" + 
+						this.zf + "% &nbsp;&nbsp;" +
+						"东财：" + this.dcpm + "&nbsp;&nbsp;" +
+						"人气榜：" + this.rqbpm  +  "&nbsp;&nbsp;" +
+						"热门股：" + this.rmgppm  +  "&nbsp;&nbsp;" + 
+						"三合一：" + this.shy  + "&nbsp;&nbsp;<br>" + 
+						"主力净额：" + this.zlje  + "&nbsp;&nbsp;" +
+						"主力净占比：" + this.zljzb  + "%&nbsp;&nbsp;" + 
+						"超大单净额：" + this.cddje  + "&nbsp;&nbsp;" +
+						"超大单净占比：" + this.cddjzb  + "%&nbsp;&nbsp;" + "</a><a style='color:#FFA500' href='基本面(定).html##" +
+							this.code + "##" + 
+							this.name + "'>亮点</a>"						
+					);
+				}}]};  
+				var html = json2html.transform(data, transform_aa);	
+				div.innerHTML = div.innerHTML + "<span id='gg'>" + html1 + html +"</span>";
+				
+				//高亮
+				var content = document.getElementById("gg").innerHTML;
+				//var s = "三合一";
+				var reg = new RegExp("(" + gl + ")", "g");  
+				var str = content;  
+				var newstr = str.replace(reg, "<font color=#FF6633>$1</font>");
+				document.getElementById("gg").innerHTML = newstr;
+
+			}
+			
+		</script>
+		<script>
+			var oldKey = "";
+			var index = -1;
+			var pos = new Array();
+			var oldCount = 0;
+
+			<!-- function previous(){ -->
+			<!-- index--; -->
+			<!-- index = index < 0 ? oldCount - 1 : index; -->
+			<!-- search(); -->
+			<!-- } -->
+			function gotop(){							
+				$(".fixedBox").scrollTop(0);
+			}
+			
+			function next(){			
+			index++;
+			//index = index == oldCount ? 0 : index;
+			if(index==oldCount){
+				index = 0 ;
+			}
+			search();
+			}
+
+			function search() {
+				$(".result").removeClass("res");
+				var key = $("#key").val(); 
+				//alert(key);
+				if (!key) {
+					console.log("key为空则退出");
+					$(".result").each(function () {
+					$(this).replaceWith($(this).html());
+					});
+					oldKey = "";
+					return; 
+				}
+				//if (oldKey != key) {
+				//alert(key);
+					console.log("进入重置方法");
+					//重置
+					$(".fixedBox").scrollTop(0);
+					index = 0;
+					$(".result").each(function () {
+					$(this).replaceWith($(this).html());
+					});
+					pos = new Array();
+					var regExp = new RegExp(key+'(?!([^<]+)?>)', 'ig');//正则表达式匹配
+					//$("body").html($("body").html().replace(regExp, "<span id='result" + index + "' class='result'>" + key + "</span>")); // 高亮操作
+					$(".fixedBox").html($(".fixedBox").html().replace(regExp, "<span id='result" + index + "' class='result'>" + key + "</span>")); // 高亮操作
+					$("#key").val(key);
+					oldKey = key;
+					$(".result").each(function () {
+					pos.push($(this).offset().top);
+					});
+					oldCount = $(".result").length;
+					console.log("oldCount值：",oldCount);
+				//}
+
+				$(".result:eq(" + index + ")").addClass("res");
+				$(".fixedBox").scrollTop(pos[index] - 100);
+			}
+		</script>	
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>
+		<div style="position: fixed; left: 280px; top: 35;">
+			<input id="key" type="text" style="width: 90px;"/>
+			<input type="button" value="检索" style="font-family: Microsoft YaHei;" onclick="next()" />
+			<input type="button" value="Top" style="font-family: Microsoft YaHei;" onclick="gotop()" />			
+		</div>	
+	</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title></title>
+	</head>
+	<body>
+		<div id="autore" onclick="gotopage();">		
+			<a href="公司亮点(定).html##xxxxxx" target="mapIframe">公司亮点</a>
+			<a href="选股宝.html##xxxxxx##SC##" target="mapIframe">选股宝</a>
+			<a href="开盘啦.html##xxxxxx" target="mapIframe">开盘啦</a>
+
+			<a href="http://hot.icfqs.com:7615/site/tdx-pc-find/page_yzfp.html" target="mapIframe">游资复盘</a>
+			<a href="龙头股.html" target="mapIframe">龙头股</a>
+			<a href="同花顺概念.html" target="mapIframe">同花顺概念</a>
+			<a href="https://www.xilimao.com/tdx/xxxxxx/" target="mapIframe">犀利猫</a>
+			<a href="https://www.xilimao.com/jj/xxxxxx/" target="mapIframe">犀利猫竞价</a>
+			<a href="http://page.tdx.com.cn:7615/site/kggx/tk_ygzl_lhb.html?info=xxxxxx&amp;pageId=dpyd&amp;color=0&amp;bkcolor=000000" target="mapIframe">龙虎榜</a>
+			<a href="http://page1.tdx.com.cn:7615/site/pcwebcall_static/bxb/bxb.html?code=xxxxxx&amp;color=0" target="mapIframe">扫雷</a>			
+			<a href="https://emweb.eastmoney.com/PC_HSF10/OperationsRequired/Index?code=SC##xxxxxx" target="mapIframe">东财F10</a>
+			<a href="http://basic.10jqka.com.cn/xxxxxx/" target="mapIframe">同花顺F10</a>
+			<a href="http://webf10.gw.com.cn/SC##/B1/SC##xxxxxx_B1.html" target="mapIframe">智慧F10</a>	
+			<a href="http://vis.10jqka.com.cn/free/jgpj/index/stockCode/xxxxxx" target="mapIframe">机构评级</a>
+			<a href="ggxqa.html##xxxxxx##STOCKNAME" target="mapIframe">个股详情</a>							
+			<a href="同花顺可比公司.html##xxxxxx##STOCKNAME" target="mapIframe">可比公司</a>						
+			<a href="javascript:replaceDoc();" style="color:#fff">刷新</a>
+			<a href="javascript:clearstorage();" style="color:#fff">清除缓存</a>
+			<a href="index.html">直播</a>
+			<a href="javascript:window.top.frames['mapIframe'].history.back();" style="float:right">返回上一级</a>			
+			
+		</div>
+		<button type="button" id="btn" onclick="javascript:changeFrameHeight()">刷新</button>
+		<link href="css/text.css" rel="stylesheet" type="text/css">			
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<iframe width="100%" height="200" id="mapIframe" name="mapIframe" src=""></iframe>		
+		<script>		
+			var dm = "";
+			var sc = "";
+			var mc = "";
+			window.onload = function() {				
+				var u = decodeURI(window.location.href);
+				
+				gp = u.split('##');					
+				dm = gp[1];
+				sc = gp[2];
+				mc = gp[3];				
+				var ss = storage.datas;
+				//alert(ss);
+				var iframe = document.getElementById('mapIframe');
+				if(ss == undefined){
+					iframe.src = '公司亮点.html##' + gp[1];
+				}				
+				document.body.innerHTML = document.body.innerHTML.replace(/xxxxxx/g, gp[1]).replace(/SC##/g, sc).replace(/sc##/g, sc.toLowerCase()).replace(/STOCKNAME/g, mc);											
+				var alist = document.getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){
+					//alert(alist[i].href)				
+					if(alist[i].innerText == ss){
+						alist[i].click();	
+						//$("a")[i].click();						
+						break;
+					}										
+				}				
+			}
+			
+			
+			function clearstorage(){
+				storage.removeItem('datas'); //清除缓存localStorage
+			}
+			
+			//切换股票可自动刷新
+			$(function() {
+				setInterval(function() {
+					if(t == 0 && isMinStatus()==false) {
+						var zdsx = document.getElementById('mapIframe').contentWindow.z;  //获取子页面变量值						
+						if(zdsx != 0){
+							replaceDoc();
+						}						
+					}					
+				},
+				500);
+			})
+			
+			//最小化
+			function isMinStatus() {
+			  var isMin = false;
+			  if (window.outerWidth != undefined) {
+				 isMin = window.outerWidth <= 160 && window.outerHeight <= 27;
+			  } else {
+				 isMin = window.screenTop < -30000 && window.screenLeft < -30000;
+			  }
+			 
+				 return isMin;
+			}
+
+
+			var storage = window.localStorage;  //localStorage			
+			var t = 0;
+			$(document).on("click", "a", function () {
+				var href = $(this).attr("href");				
+				var datas = $(this).text();				
+				if(datas != "刷新" && datas != "直播" && datas != "返回上一级"){
+					storage.datas = datas;
+				}				
+				if(href.indexOf("龙头股") > -1 || href.indexOf("同花顺概念") > -1 || datas == "游资复盘"){
+					t = 1;
+				} else {
+				    t = 0;										
+				}				
+			});
+			
+			function replaceDoc() {
+				window.location.replace("#")				
+			}
+			
+			function changeFrameHeight() {
+				var ifm = document.getElementById("mapIframe");
+				ifm.height = document.documentElement.clientHeight - ifm.offsetTop - 20;
+			}
+			
+			document.getElementById('btn').style.display = 'none';
+	
+			function setRem() {
+				var width = document.getElementById('autore').offsetWidth;
+				var htmlFont = document.getElementById('autore');
+				if (width > 700) {
+						htmlFont.style.fontSize = "16px";
+				}
+				if (width > 500 && width < 700) {
+						htmlFont.style.fontSize = "14px";
+				}
+				if (width < 500) {
+						htmlFont.style.fontSize = "12px";
+				}
+			}
+			setRem();
+	
+			window.onresize = function() {
+					changeFrameHeight();
+					setRem();
+			}
+			$(function() {
+					changeFrameHeight();
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>抢筹</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			//p {margin:5px}
+			//ul {margin:1px}			
+			//h4 {margin:1px}	
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}
+			table{
+			width:100%; 
+			border-collapse:collapse; 
+			text-align:center;
+			}
+			td,th{border:1px solid #696969}	
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>		   
+			window.onload = function() {						
+			getSource("0","1");
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource("0",px);					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","10:00")									
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "100%";	
+				//obj1.style.height= "620px";		
+				obj1.style.fontSize="12px";				  			 
+			}	
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}						
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+			
+			var trid = "";
+			function changeCss(obj,hid,id){						
+				var tlist = document.getElementById(id).getElementsByTagName("tr");					
+				for(var i = 0; i < tlist.length; i++){														
+					tlist[i].style.backgroundColor = "#252528"; 					
+				}
+				trid = hid;
+				var tr = document.getElementById(hid);				
+				tr.style.backgroundColor = "#483D8B";						
+			}
+			
+			function hover(){  //鼠标经过
+				var rows = document.getElementsByTagName('tr');
+				for(var i=0;i<rows.length;i++){
+					rows[i].onmouseover=function(){						
+						if(this.id != ""){  //过滤表头
+							this.style.background="#800000";
+						}
+					}
+					rows[i].onmouseout=function(){
+						if(this.id != ""){  //过滤表头
+							if(this.id != trid){  //过滤选中行
+								this.style.background="#252528";
+							}else{
+								this.style.background="#483D8B";
+							}
+						}						
+					}					
+				}
+			}			
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}				
+			}
+			
+			var t = "";
+			var px = "1";
+			var gl = "";  //高亮
+			function getSource(ss,pp) {
+				t = ss;
+				px = pp;
+				var zp = "<a href='javascript:void(0)' id='bt1' onclick='getSource(" + "\"0\"" + "," + px + ")'>" + "早盘抢筹" + "</a>";
+				var wp = "<a href='javascript:void(0)' id='bt2' onclick='getSource(" + "\"1\"" + "," + px + ")'>" + "尾盘抢筹" + "</a>";	
+				var p1 = "<a href='javascript:void(0)' id='px1' onclick='getSource(" + t + "," + "\"1\"" + ")'>" + "按抢筹委托金额排序" + "</a>";
+				var p2 = "<a href='javascript:void(0)' id='px2' onclick='getSource(" + t + "," + "\"2\"" + ")'>" + "按抢筹成交金额排序" + "</a>";					
+				var p30 = "<a href='javascript:void(0)' id='px3' onclick='getSource(" + t + "," + "\"3\"" + ")'>" + "按开盘金额排序" + "</a>";
+				var p31 = "<a href='javascript:void(0)' id='px3' onclick='getSource(" + t + "," + "\"3\"" + ")'>" + "按收盘金额排序" + "</a>";
+				if(t == "0"){							
+					p3 = p30;
+				}else if(t == "1"){							
+					p3 = p31;
+				}				
+				var p4 = "<a href='javascript:void(0)' id='px4' onclick='getSource(" + t + "," + "\"4\"" + ")'>" + "按抢筹幅度排序" + "</a>";
+				div1 = document.getElementById('towrite');
+				div1.innerHTML = "<h4>" + zp + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + wp + "</h4><p>" + p3 + p4 + p1 + p2 + "</p>";
+				
+				if(t == "0"){
+					aObj = document.getElementById('bt1');				
+					aObj.style.color = "#FFA07A";
+				}
+				
+				if(t == "1"){
+					aObj = document.getElementById('bt2');				
+					aObj.style.color = "#FFA07A"; 
+				}
+				
+				aObj1 = document.getElementById('px' + pp);
+				gl = aObj1.innerText;
+				gl = gl.replace("按","").replace("排序","");				
+				aObj1.innerText = aObj1.innerText + "↓";
+				aObj1.style.color = "#FFA07A"; 
+				
+				var url = "http://excalc.icfqs.com:7616/TQLEX?Entry=HQServ.hq_nlp"; 	                			
+				createXmlHttp();
+				//早盘				
+				var array1 = '[{"funcId":20,"offset":0,"count":50,"sort":' + px + ',"period":0,"Token":"6679f5cadca97d68245a086793fc1bfc0a50b487487c812f","modname":"JJQC"}]';
+				array1 = eval(array1);
+				
+				//尾盘				
+				var array2 = '[{"funcId":20,"offset":0,"count":50,"sort":' + px + ',"period":1,"Token":"6679f5cadca97d68245a086793fc1bfc0a50b487487c812f","modname":"JJQC"}]';
+				array2 = eval(array2);				
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("POST", url, true);				
+				xmlHttp.setRequestHeader("User-Agent","TdxW");
+				
+				if(ss == "0"){	
+					xmlHttp.send(JSON.stringify(array1)) ;						
+				}
+				if(ss == "1"){											
+					xmlHttp.send(JSON.stringify(array2)) ; 						
+				}						
+			}
+								
+			var dms = "";
+			function writeSource() { 			
+				if (xmlHttp.readyState == 4) { 	
+					var data = xmlHttp.responseText						
+					//document.write(data);					
+					var html = "";												
+					if(data.indexOf("\"datas\": []") == -1)
+					{											
+						data = data.replace(/ /g,"").match(/\"datas\":\[(\S*)\]\}/)[1];	
+						data = data.replace(/(\[).*?(?=\])/g,function(word){ 
+						str = word.match(/\[(\S*)/)[1]; 
+						return '{"code":' + str.split(',')[0] + 
+						',"name":' + str.split(',')[1] + 
+						',"kpje":' + str.split(',')[4] + 
+						',"fd":' + str.split(',')[5] +
+						',"wtje":' + str.split(',')[6] +
+						',"cjje":' + str.split(',')[7];
+						});
+						//data = "{\"data\":[" + data.replace(/\],\{/g,"},{").replace(/\]/g,"}]}");
+						data = "[" + data.replace(/\],\{/g,"},{").replace(/\]/g,"}]");
+						//document.write(data);
+						//开盘金额				
+						data = data.replace(/(\"kpje\":).*?(?=,)/g, function(word){ 						
+						str = word.match(/\"kpje\":(\S*)/)[1];
+							if(keepTwoDecimal(str/100000000) >= 1)
+							{
+								return '\"kpje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+							}
+							else
+							{
+								return '\"kpje\":\"' + Math.round(str/10000) + '万\"';
+							}
+													
+						}); 
+						
+						//抢筹委托金额				
+						data = data.replace(/(\"wtje\":).*?(?=,)/g, function(word){ 						
+						str = word.match(/\"wtje\":(\S*)/)[1];
+							if(keepTwoDecimal(str/100000000) >= 1)
+							{
+								return '\"wtje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+							}
+							else
+							{
+								return '\"wtje\":\"' + Math.round(str/10000) + '万\"';
+							}
+													
+						});
+						
+						//抢筹成交金额				
+						data = data.replace(/(\"cjje\":).*?(?=})/g, function(word){ 						
+						str = word.match(/\"cjje\":(\S*)/)[1];
+							if(keepTwoDecimal(str/100000000) >= 1)
+							{
+								return '\"cjje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+							}
+							else
+							{
+								return '\"cjje\":\"' + Math.round(str/10000) + '万\"';
+							}
+													
+						});
+
+						//抢筹幅度				
+						data = data.replace(/(\"fd\":).*?(?=,)/g, function(word){ 				
+							str = word.match(/\"fd\":(\S*)/)[1]; 					
+							return '\"fd\":"' + keepTwoDecimal(str*100) + '%"';
+						});  				
+						
+						//document.write(data);
+						
+						var json = JSON.parse(data);
+						//创建table					
+						var table=document.createElement("table");										
+						var thead=document.createElement("thead");
+						table.appendChild(thead);					
+						var tr=document.createElement("tr");
+						thead.appendChild(tr);					
+						
+						var m = 0;
+						var n = 0;
+						var b = 0;
+						for(var key in json[0]){  //表头
+							key = key.replace('code','代码').replace('name','名称').replace('fd','抢筹幅度').replace('wtje','抢筹委托金额').replace('cjje','抢筹成交金额');							
+							var ks = "";
+							if(t == "0"){
+								key = key.replace('kpje','开盘金额');															
+							}
+							else{
+								key = key.replace('kpje','收盘金额')															
+							}									
+							var th=document.createElement("th");						
+							th.innerHTML=key;						
+							tr.appendChild(th);
+							if(gl == key.replace("%","")){
+								n = m;
+								th.style.color = "#FF6633";	
+							}							
+							m++;
+						}
+											
+						var tbody=document.createElement("tbody");					
+						table.appendChild(tbody);
+						
+						//遍历json
+						for(var i = 0; i < json.length; i++){					
+							var tr=document.createElement("tr");						
+							var p = 1;
+							var dm = "";
+							var mc = "";
+							for(var key in json[i]){ //行元素遍历						
+								var td=document.createElement("td");							
+								
+								var rc = json[i][key];
+								if(p == 1){  //代码列
+									dm = rc;
+									tr.id = dm;									 			td.innerHTML = "<a href=ggxqa.html##" + dm + " id='" + p + "' onclick='changeCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";
+								}else if(p == 2){  //名称列
+									mc = rc;												td.innerHTML = "<a href=https://m.10jqka.com.cn/stockpage/hs_" + dm + "/ target=_blank id='" + p + "' onclick='changeCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";			
+								}else	{				
+								td.innerHTML = "<a href=https://m.10jqka.com.cn/stockpage/hs_" + dm + "/ target=_blank id='" + p + "' onclick='changeCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";
+							    }
+								if(p == n + 1){							
+									//td.style.color = "#FF6633";	
+									td.getElementsByTagName("a")[0].style.color = "#FF6633";									
+								}								
+								tr.appendChild(td);
+								p++;
+							}						
+							if(mc.indexOf("ST") == -1 && dm.substr(0,3) != "688"){		//过滤ST、科创板										
+								tbody.appendChild(tr);
+							}	
+						}					
+						var div = document.getElementById("towrite");									
+						div.appendChild(table);
+						table.id = "gg";
+						hover();
+					}
+					else
+					{						
+						div1.innerHTML += "暂无数据";
+					}									
+															
+				}				
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

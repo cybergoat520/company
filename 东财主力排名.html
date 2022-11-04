@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>东财主力排名</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			//p {margin:5px}
+			//ul {margin:1px}			
+			//h4 {margin:1px}	
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			start(1);			
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					start(y);					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+						
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "100%";	
+				obj1.style.height= "100%";		
+				obj1.style.fontSize="12px";						
+			}	
+						
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}						
+			
+			var y = 1;			
+			function start(s) {				
+				div = document.getElementById('towrite');								
+				var	hs = "<a href='javascript:void(0)'  id='bt1' onclick='start(1)'>沪深A股</a>";
+				var	cy = "<a href='javascript:void(0)'  id='bt2' onclick='start(2)'>创业板</a>";
+				div.innerHTML = '<h4>东财主力排名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + hs + '&nbsp;&nbsp;' + cy + '</h4>';
+				if(s == 1){
+					aObj = document.getElementById('bt1');				
+					aObj.style.color = "#FFA07A";
+					getSource();
+					y = 1;
+				}
+				if(s == 2){
+					aObj = document.getElementById('bt2');				
+					aObj.style.color = "#FFA07A";
+					getSource2();
+					y = 2;
+				}				
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			function getSource() {	    							
+				var url = "http://push2.eastmoney.com/api/qt/clist/get?cb=jQuery112308980107330704572_1632445353427&fid=f184&po=1&pz=100&pn=1&np=1&fltt=2&invt=2&fields=f2,f3,f12,f14,f100,f184,f225&ut=b2884a393a59ad64002292a3e90d46a5&fs=m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2"; 	                							
+				if (window.XMLHttpRequest) {
+				xmlHttp1 = new XMLHttpRequest();				
+				} else {
+				xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}					
+				xmlHttp1.onreadystatechange = writeSource;
+				xmlHttp1.open("GET", url, true);				
+				//xmlHttp.withCredentials = true
+				xmlHttp1.send(null);				
+			}
+						
+			function writeSource() { 
+			if (xmlHttp1.readyState == 4) {         
+				var data = xmlHttp1.responseText	
+				//document.write(data);
+				data = data.replace(/ /g,"").match(/\"diff\":(\S*)\}\]\}\}\);/)[1];	
+				data = "{\"data\":" + data + "}]}";
+				//document.write(data);
+				
+				var transform_aa = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb));}}
+				];				
+				
+				m = 0;
+				var transform_bb= 				
+				{"tag":"ul", children:[	
+				{"tag":"li", children:function(){
+					m++;				
+					return(
+					"<a href=https://m.10jqka.com.cn/stockpage/hs_" +
+						this.f12 + "/ target=_blank id='gg' onclick='changeCss(this,this.id)'>" + m + ". " + 						
+						this.f12 + "&nbsp;&nbsp;" + 
+						this.f14 + "&nbsp;&nbsp;" +
+						"现价：" + this.f2 + "&nbsp;&nbsp;" +
+						"主力净占比：" + this.f184 + "%" + "&nbsp;&nbsp;" +
+						"排名：" + this.f225 + "&nbsp;&nbsp;<br>" +
+						"涨跌：" + this.f3 + "%" + "&nbsp;&nbsp;" +
+						"所属板块：" + this.f100  +
+						 "</a><a style='color:#FFA500' href='基本面(定).html##" +
+							this.f12 + "##" + 
+							this.f14 + "'>亮点</a>" 					
+					);
+				}}			
+				//{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${f12}' id='gg' onclick='changeCss(this,this.id)' >${f12}&nbsp;&nbsp;${f14}&nbsp;涨幅：${f3}% </a>"}, 							
+				]};  
+				
+				var html = json2html.transform(data, transform_aa);		
+				div = document.getElementById('towrite');				
+				//div.innerHTML = '<h4>东财主力排名</h4>' + html;
+				div.innerHTML = div.innerHTML + "<span id='gg'>" + html + "</span>";
+				}
+			}
+			
+			function getSource2() {	    							
+				var url = "http://push2.eastmoney.com/api/qt/clist/get?cb=jQuery1123009706366557087875_1632575677122&fid=f184&po=1&pz=50&pn=1&np=1&fltt=2&invt=2&fields=f2,f3,f12,f14,f100,f184,f225&ut=b2884a393a59ad64002292a3e90d46a5&fs=m:0+t:80+f:!2"; 	                							
+				if (window.XMLHttpRequest) {				
+				xmlHttp2 = new XMLHttpRequest();
+				} else {				
+				xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+				}					
+				xmlHttp2.onreadystatechange = writeSource2;
+				xmlHttp2.open("GET", url, true);				
+				//xmlHttp.withCredentials = true
+				xmlHttp2.send(null);				
+			}
+						
+			function writeSource2() { 
+			if (xmlHttp2.readyState == 4) {         
+				var data = xmlHttp2.responseText	
+				//document.write(data);
+				data = data.replace(/ /g,"").match(/\"diff\":(\S*)\}\]\}\}\);/)[1];	
+				data = "{\"data\":" + data + "}]}";
+				//document.write(data);
+				
+				var transform_aa = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb));}}
+				];				
+				
+				m = 0;
+				var transform_bb= 				
+				{"tag":"ul", children:[	
+				{"tag":"li", children:function(){
+					m++;				
+					return(
+					"<a href=https://m.10jqka.com.cn/stockpage/hs_" +
+						this.f12 + " id='gg' onclick='changeCss(this,this.id)'>" + m + ". " + 						
+						this.f12 + "&nbsp;&nbsp;" + 
+						this.f14 + "&nbsp;&nbsp;" +
+						"现价：" + this.f2 + "&nbsp;&nbsp;" +
+						"主力净占比：" + this.f184 + "%" + "&nbsp;&nbsp;" +
+						"排名：" + this.f225 + "&nbsp;&nbsp;<br>" +
+						"涨跌：" + this.f3 + "%" + "&nbsp;&nbsp;" +
+						"所属板块：" + this.f100  +
+						 "</a><a style='color:#FFA500' href='基本面(定).html##" +
+							this.f12 + "##" + 
+							this.f14 + "'>亮点</a>" 					
+					);
+				}}			
+				//{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${f12}' >${f12}&nbsp;&nbsp;${f14}&nbsp;涨幅：${f3}% </a>"}, 							
+				]};  
+				
+				var html = json2html.transform(data, transform_aa);		
+				div = document.getElementById('towrite');				
+				div.innerHTML = div.innerHTML + "<span id='gg'>" + html+"</span>";
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>		
+	</body>
+</html>

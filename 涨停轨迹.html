@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=gbk">
+		<title>涨停轨迹</title>
+		<style type="text/css">						
+		  .fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 12px;     
+				height: 12px;				
+			}			
+		</style>		
+	</head>
+	<body>			
+		<link href="css/text.css" rel="stylesheet" type="text/css">			
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		
+		<div id="towrite" class="fixedBox">
+			<a href="javascript:zxt();" style="float:right; margin:5px;">折线图</a><p id="dm" ></p>
+			<iframe width="99%" height="600" id="mapIframe" name="mapIframe" style="float:left;" src=""></iframe>
+		</div>				
+		<script>		
+			var dm = "";
+			var iframe = document.getElementById('mapIframe');
+			window.onload = function() {			
+			changeStyle()
+			}
+			
+			function changeStyle() {
+				var obj = document.getElementById("towrite");				
+				obj.style.left= "0px"; 				
+				obj.style.width= "760px";	
+				//obj1.style.height= "620px";									 
+			}
+			
+			$(function() {
+				setInterval(function() {				
+				var u = decodeURI(window.location.href);				
+				gp = u.split('##');					
+				var dms = gp[1];
+				var mc = gp[2];
+				//var url	= 'http://page.tdx.com.cn:7615/site/pcwebcall/html/pc_tclt_tcltmx.html?ztbkcode=' + dms + '&color=0&nomenu=1';					
+				var url	= 'ZTGJ.html?ztbkcode=' + dms + '&color=0&nomenu=1';				
+				if(dms != dm && dms.substr(0,2)=='88'){
+					iframe.src = url;
+					dm = dms;					
+					$("#dm").text(dms + "\xa0\xa0\xa0\xa0" + mc);
+				}},
+				500);
+			})
+			
+			var t = 1;  //默认打开折线图
+			function zxt() {
+				t = t == 1 ? 0 : 1;
+				document.getElementById('mapIframe').contentWindow.hide();				
+			}
+			
+		</script>
+	</body>
+</html>

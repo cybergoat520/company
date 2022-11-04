@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>个股详情</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			p {margin:0px;}					
+			ul {margin:0px;}			
+			h4 {margin:0px}	
+			#towriter{
+				margin-top:-15px;
+				border: 1px solid #555555;
+				white-space: normal;											
+			}
+			.fixedBox{					
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 8px;     
+				height: 8px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		
+		<!-- 显示犀利猫 -->
+		<iframe width="39%" height="550" id="mapIframe" name="mapIframe" src="" style="float:right"></iframe> 	
+		<script>
+			var ztxq = 0;  //默认显示涨停原因(0:不显示；1:显示)
+			var sdxq = 0;  //默认显示同花顺速递(0:不显示；1:显示)
+
+			var dt = "";
+			var tt = "";
+			var gt = "";			
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+			dt = tt;
+			getSource();
+			changeStyle();
+			
+									
+			}
+			
+			var z = "1";
+			$(function() {
+				setInterval(function() {
+					if(z == "1")
+					{					
+						getSource();										
+					}					
+				},
+				500);
+			})
+			
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					hqsx();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+			
+			//同股状态下刷新
+			$(function() {
+				setInterval(function() {
+					if(z == "1" && k == 0 && q == 0)
+					{	
+						time_range("9:00","15:15")					
+						hqsx();										
+					}					
+				},
+				60000);
+			})
+			
+			var ds = 0;
+			function hqsx() {
+				ds = 1;
+			}
+			
+			function changeStyle() {
+				var obj = document.getElementById("towriter");				
+				obj.style.left= "0px"; 				
+				obj.style.width= "800px";	
+				//obj.style.height= "630px";		
+								
+				var obj1 = document.getElementById("towrite1");	//上部				
+				obj1.style.fontSize="13px";	
+				obj1.style.minHeight= "10px";  //最小高度，自动高度						
+				
+				var obj2 = document.getElementById("towrite2"); //左下
+				obj2.style.left= "0px"; 				
+				obj2.style.width= "200px";	
+				obj2.style.height= "500px";	
+				obj2.style.fontSize="12px";	
+				obj2.style.marginTop= "-10px";
+				
+				var obj3 = document.getElementById("towrite3"); //中下
+				obj3.style.left= "0px"; 
+				obj3.style.width= "230px";
+				obj3.style.height= "500px";
+				obj3.style.fontSize ="12px";
+				obj3.style.marginTop= "-10px";
+				obj3.style.marginLeft = "2px"; 
+
+				var obj4 = document.getElementById("towrite4"); //右下
+				obj4.style.left= "0px"; 
+				obj4.style.width= "300px";
+				obj4.style.height= "500px";
+				obj4.style.fontSize ="12px";
+				obj4.style.marginTop= "-10px";
+				obj4.style.marginLeft = "2px";  					
+			}			
+			
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				ranking();
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			//js日期比较( 要求日期格式：yyyy-mm-dd)
+			 function DateBiJiao(firstDate, lastDate) {
+				var arr = firstDate.split("-");
+				var firsttime = new Date(arr[0], arr[1], arr[2]);
+				var firsttimes = firsttime.getTime();
+
+				var arrs = lastDate.split("-");
+				var  lasttime = new Date(arrs[0], arrs[1], arrs[2]);
+				var  lasttimes =  lasttime.getTime();
+
+				if (firsttimes> lasttimes) {
+					return false;
+				}
+				else
+					return true;
+			}
+			
+			var k = 0;
+			var gpdm = "";
+			var gpmc = "";				
+			function getSource() {	    
+				var u = decodeURI(window.location.href);				
+				<!-- gp = u.split('##');					 -->
+				<!-- dm = gp[1]; -->
+				<!-- gpmc = gp[2];					 -->
+				<!-- //alert(gp);				 -->
+				<!-- if(dm == gpdm){ -->
+					<!-- k = 0; -->
+				<!-- }else{ -->
+					<!-- k = 1; -->
+					<!-- temp1 = "";	 -->
+					<!-- temp2 = ""; -->
+				<!-- } -->
+				
+				if(u.indexOf("##") > -1){
+					var gp = u.split('##');				
+					dm = gp[1];
+					gpmc = gp[2];					
+					//alert(dm);
+					if(dm == gpdm){
+						k = 0;
+					}else{
+						k = 1;
+						temp1 = "";	
+						temp2 = "";
+					}				
+				}else{
+					dm = "600000";
+					gpmc = "浦发银行";
+					k = 1;
+					temp1 = "";	
+					temp2 = "";
+				}
+				
+				if(dm != gpdm){	
+					gpdm = dm;
+					var dms = "";
+					var dmt = "";
+					if(dm.substr(0,1)=="6"){
+						dms = "SH" + dm;
+						dmt = "1." + dm;
+					}else{
+						dms = "SZ" + dm;
+						dmt = "0." + dm;
+					}
+					
+					
+				
+					if(k == 1 || ds == 1){
+						ds = 0;	
+						var url11 = "https://apphq.longhuvip.com/w1/api/index.php?a=GetKLineZhangTing&apiv=w26&c=StockLineData&StockID=" + gpdm; 														
+						var url12 = "https://apphis.longhuvip.com/w1/api/index.php?a=GetDayZhangTing&st=1&apiv=w26&c=HisLimitResumption&StockID=" + gpdm;
+						
+						var url21 = "https://apphq.longhuvip.com/w1/api/index.php?a=GetFeaturedSection&c=StockL2Data&apiv=w26&StockID=" + gpdm + "&";
+						var url22 = "https://apparticle.longhuvip.com/w1/api/index.php?a=GetConceptJXBKw23&apiv=w24&c=StockF10Basic&StockID=" + gpdm;
+						var url23 = "https://apparticle.longhuvip.com/w1/api/index.php?a=GetConceptw23&c=StockF10Basic&apiv=w29&StockID=" + gpdm;
+						var sc = "";
+						if(gpdm.substr(0 , 1) == "6"){
+							//sc = ".SH";
+							sc = "17";
+						}
+						else{
+							//sc = ".SZ";
+							sc = "33";
+						}
+						//var url3 = "https://datacenter.eastmoney.com/securities/api/data/get?source=SECURITIES&p=1&type=RTP_F10_SUMMARYDETAIL&params=" + gpdm + sc;					
+						var url3 = "https://eq.10jqka.com.cn/stockCourier/api/courier/eventData/" + sc + "/" + gpdm + ".txt";					
+						
+						if (window.XMLHttpRequest) {					
+						xmlHttp11 = new XMLHttpRequest();
+						} else {					
+							xmlHttp11 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp11.onreadystatechange = writeSource1;
+						xmlHttp11.open("GET", url11, true);
+						xmlHttp11.send(null);
+						
+						if (window.XMLHttpRequest) {					
+						xmlHttp12 = new XMLHttpRequest();
+						} else {					
+							xmlHttp12 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp12.onreadystatechange = writeSource1;
+						xmlHttp12.open("GET", url12, true);
+						xmlHttp12.send(null);
+						
+						if (window.XMLHttpRequest) {					
+						xmlHttp13 = new XMLHttpRequest();
+						} else {					
+							xmlHttp13 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp13.onreadystatechange = writeSource1;
+						xmlHttp13.open("GET", url3, true);
+						xmlHttp13.send(null);
+						
+						if (window.XMLHttpRequest) {
+						xmlHttp21 = new XMLHttpRequest();
+						} else {					
+							xmlHttp21 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp21.onreadystatechange = writeSource2;
+						xmlHttp21.open("GET", url21, true);
+						xmlHttp21.send(null);
+						
+						if (window.XMLHttpRequest) {
+						xmlHttp22 = new XMLHttpRequest();
+						} else {					
+							xmlHttp22 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp22.onreadystatechange = writeSource2;
+						xmlHttp22.open("GET", url22, true);
+						xmlHttp22.send(null);
+						
+						if (window.XMLHttpRequest) {
+							xmlHttp23 = new XMLHttpRequest();
+						} else {					
+							xmlHttp23 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp23.onreadystatechange = writeSource2;
+						xmlHttp23.open("GET", url23, true);
+						xmlHttp23.send(null);
+						
+						var url31 = "https://emappdata.eastmoney.com/stockrank/getCurrentLatest";									
+						var url32 = "http://push2.eastmoney.com/api/qt/ulist.np/get?cb=jQuery1123022062381139471432_1633842668576&fltt=2&secids=" + dmt +"&fields=f62,f184,f66,f69,f72,f75,f78,f81,f84,f87,f164,f165,f166,f167,f168,f169,f170,f171,f172,f173";
+						if (window.XMLHttpRequest) {
+							xmlHttp31 = new XMLHttpRequest();
+						} else {					
+							xmlHttp31 = new ActiveXObject("Microsoft.XMLHTTP");
+						}						
+						var array = {"appId":"appId01","globalId":"786e4c21-70dc-435a-93bb-38","marketType":"","srcSecurityCode":dms}; //可直接加变量
+						xmlHttp31.onreadystatechange = writeSource6;
+						xmlHttp31.open("POST", url31, true);
+						xmlHttp31.setRequestHeader("Content-Type","application/json");
+						xmlHttp31.withCredentials = true										
+						xmlHttp31.send(JSON.stringify(array));
+						
+						if (window.XMLHttpRequest) {
+							xmlHttp32 = new XMLHttpRequest();
+						} else {					
+							xmlHttp32 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp32.onreadystatechange = writeSource6;
+						xmlHttp32.open("GET", url32, true);
+						xmlHttp32.send(null);	
+						
+						//最后交易日
+						var url = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w21&Type=1&c=ZhiShuRanking&PhoneOSNew=1&ZSType=7&"; 	
+						if (window.XMLHttpRequest) {
+							xmlHttp = new XMLHttpRequest();								
+						} else {
+							xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");							
+						}
+						xmlHttp.open("GET", url, false);  //同步方式
+						xmlHttp.send(null);																		
+						var data = xmlHttp.responseText
+						//document.write(data);					
+						tt = data.match(/"Day":\["(\S*)/)[1].split('"]')[0];	//最后交易日
+						var sc = "0";
+						if(gpdm.substr(0,1) == "6"){
+							sc = "1";
+						}
+						var url4 = "https://push2ex.eastmoney.com/getStockChanges?cb=jQuery1124007894925782716267_1638959069382&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wzchanges&code=" + gpdm + "&market=" + sc + "&date=" + tt.replace(/-/g,"");					
+						if (window.XMLHttpRequest) {
+							xmlHttp4 = new XMLHttpRequest();
+						} else {					
+							xmlHttp4 = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlHttp4.onreadystatechange = writeSource6;
+						xmlHttp4.open("GET", url4, true);
+						xmlHttp4.send(null);	
+						
+						//犀利猫
+						var iframe = document.getElementById('mapIframe');				
+						iframe.src = "https://www.xilimao.com/tdx/" + gpdm + "/";	
+					}
+				}
+			}
+			
+			var yy = "";
+			function writeSource1() { 
+				if (xmlHttp11.readyState == 4 && xmlHttp12.readyState == 4 && xmlHttp13.readyState == 4) { 					
+					var data1 = xmlHttp11.responseText	
+					var data2 = xmlHttp12.responseText						
+					var data = data1;
+					if(data2.indexOf('"List":[]') == -1){   //his不为空
+						//if(data1.indexOf('"List":[]') > -1 || data1.indexOf('"Reason":false') > -1){  //hq为空 或 "Reason":false
+						if(data1.indexOf('"List":[]') > -1){  //hq为空
+							data = data2;
+						}
+					}					
+					
+					var title = "涨停原因：";
+					if(data1.indexOf('"Type":"1"') > -1){
+						title = "大涨原因：";
+					}
+					
+					//document.write(data);
+					var transform_aa = [           
+					{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_bb));}}
+					];
+					
+					var ztyy = "";
+					yy = "";
+					var transform_bb=								
+					{"tag":"p", children:function(){
+					var jx = "<td><a style='position:absolute; right:30px;' href='javascript:void(0)' onclick='updates()'>" + "详情" + "</a></td>";					
+					yy = this.Reason;					
+					if(yy != false){
+						yy = yy.split('；')[0]
+					}else{
+						yy = "";
+					}
+					ztyy = 	this.GNSM;			
+					if(this.Date == dt){
+						return("<b style='color:#fff'>" + this.Date + "：" + yy + "&nbsp;&nbsp;&nbsp;&nbsp;" + this.SCLT + jx + "</b>");
+					}else{
+						return("<b>" + this.Date + "：" + yy + "&nbsp;&nbsp;&nbsp;&nbsp;" + this.SCLT + jx + "</b>");
+					}										
+					}};
+										
+					var html = json2html.transform(data, transform_aa);					
+					div = document.getElementById('towrite1');
+					var sx = "<a style='float:right'  href='javascript:void(0)' id='sx' onclick='updatex()'>停止刷新</a>";	
+					div.innerHTML = '<h4>个股详情：' + gpdm + "&nbsp;&nbsp;&nbsp;" + gpmc + sx + '</h4><ul><h4>' + title + '</h4></ul>' + html;
+					
+					//添加分类Div
+					var newDiv1 = document.createElement("div");
+					newDiv1.id = "xq";
+					newDiv1.style.display = "none";
+					document.getElementById("towrite1").appendChild(newDiv1);
+					div1 = document.getElementById("xq");
+					div1.innerHTML = div1.innerHTML + "<p>" + ztyy + "</p>" ;	
+					temp1 = "";	
+					
+					//同花顺速递
+					var data3 = xmlHttp13.responseText
+					data3 = data3.replace(/\s+/g,"；");
+					data3 = data3.match(/"events":(\S*)}]/)[1] + "}]";
+					
+					var result = JSON.parse(data3); //JSON字符串转换为对象
+					function up(a,b){
+					var aa = a.ctime;
+					var bb = b.ctime;					
+					if(a.catename == "涨停分析"){
+						aa = 0;
+					}
+					if(b.catename == "涨停分析"){
+						bb = 0;
+					}					
+					return aa - bb					
+					}
+					result.sort(up);
+					result = JSON.stringify( result );						
+					data3= '{\"data\":' + result + "}";
+					//document.write(data3);	
+					
+					xqs = data3.split('},{');
+					var dq = "<td><a style='position:absolute; right:30px;' href='javascript:void(0)' onclick='updatest()'>" + "详情" + "</a></td>";
+					div.innerHTML += "<ul><b>同花顺速递：（" + xqs.length + "项）" + dq + "</b></ul>";
+					//添加分类Div
+					var newDiv3 = document.createElement("div");
+					newDiv3.id = "txq";
+					newDiv3.style.display = "none";						
+					document.getElementById("towrite1").appendChild(newDiv3);
+					div3 = document.getElementById("txq");
+					
+					var transform_aa1 = [           
+					{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+					];
+					
+					var transform_bb1=												
+					{"tag":"ul style=color:#FFA500;", children:[									
+					{"tag": "li style=color:#00FFFF;", "html":"${catename}： ${date}"},
+					{"tag": "p", "html": function(){
+						if(this.catename == "涨停分析"){
+							return(this.title.replace("涨停分析:","").replace("｜","：<br>"));
+						}else{
+							return(this.content);
+						}
+					}},
+					//{"tag": "p", "html":"${title}"},
+					//{"tag": "p", "html":"${content}"},
+					{"tag": "p style=color:#FFF5EE;", "html":"${desc}"}, 						
+					]};
+					
+					var html1 = json2html.transform(data3, transform_aa1);	
+					div3.innerHTML += html1;
+					temp12 = "";
+					
+					if(ztxq == 1 && ztyy != ""){  //显示涨停原因
+						updates();
+					}
+					if(sdxq == 1){    //显示同花顺速递
+						updatest();
+					}
+
+					<!-- //大事提醒 -->
+					<!-- var data3 = xmlHttp13.responseText -->
+					<!-- data3 = data3.replace(/\s+/g,"；"); -->
+					<!-- //document.write(data3);					 -->
+					<!-- aa = data3.split('"NOTICE_DATE":"'); -->
+					<!-- bb = data3.split('}');	 -->
+					<!-- var ss = ""; -->
+					<!-- for (i = 1; i < aa.length; i++){ -->
+						<!-- var hrq = aa[i].match(/(\S*)\",\"LEVEL1_CONTENT/)[1];						 -->
+						<!-- if(DateBiJiao(dt, hrq)){							 -->
+							<!-- ss += "{" + bb[i-1].match(/{(\S*)/)[1] + "},";							 -->
+						<!-- } -->
+					<!-- } -->
+					<!-- if(ss != ""){ -->
+						<!-- ss = ss.replace('"code":0,','').replace('[[{','[{'); -->
+						<!-- ss = ss.substring(0 , ss.length - 1) + "]}";										 -->
+						<!-- //document.write(ss); -->
+						
+						<!-- xqs = ss.split('},{'); -->
+						<!-- var dq = "<td><a style='position:absolute; right:30px;' href='javascript:void(0)' onclick='updatest()'>" + "详情" + "</a></td>"; -->
+						<!-- div.innerHTML = div.innerHTML + "<ul><b>大事提醒：（" + xqs.length + "项）" + dq + "</b></ul>"; -->
+						<!-- //添加分类Div -->
+						<!-- var newDiv3 = document.createElement("div"); -->
+						<!-- newDiv3.id = "txq"; -->
+						<!-- newDiv3.style.display = "none"; -->
+						<!-- document.getElementById("towrite1").appendChild(newDiv3); -->
+						<!-- div3 = document.getElementById("txq"); -->
+						
+						<!-- var transform_aa1 = [            -->
+						<!-- {"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb1));}} -->
+						<!-- ]; -->
+						
+						<!-- var transform_bb1=												 -->
+						<!-- {"tag":"ul style=color:#FFA500;", children:[									 -->
+						<!-- {"tag": "li", "html":"${NOTICE_DATE}： ${SPECIFIC_EVENTTYPE}"},  -->
+						<!-- {"tag": "p", "html":"${LEVEL1_CONTENT}"}, 						 -->
+						<!-- ]}; -->
+						
+						<!-- var html1 = json2html.transform(ss, transform_aa1);	 -->
+						<!-- div3.innerHTML += html1; -->
+						<!-- temp12 = ""; -->
+					<!-- } -->
+				}
+			}	
+			
+			var temp1 = "";					
+			function updates() {			
+				if(document.getElementById("xq")){					
+					div1 = document.getElementById("xq");
+					if(temp1.indexOf("xq") == -1){
+						temp1 += "xq" + ";";
+						div1.style.display = "block";
+						div1.style.border="1px solid #999";
+						div1.style.color = "#FFA500";
+					}else{
+						temp1 = temp1.replace("xq" + ";" , "");
+						div1.style.display = "none";
+					}
+				}
+				if(temp1 == ""){  //查看详情时不刷新				
+					q = 0;
+				}else{
+					q = 1;
+				}				
+			}
+			
+			var temp12 = "";					
+			function updatest() {			
+				if(document.getElementById("txq")){					
+					div12 = document.getElementById("txq");
+					if(temp12.indexOf("txq") == -1){
+						temp12 += "txq" + ";";
+						div12.style.display = "block";
+						div12.style.border="1px solid #999";						
+					}else{
+						temp12 = temp12.replace("txq" + ";" , "");
+						div12.style.display = "none";
+					}
+				}
+				if(temp12 == ""){  //查看详情时不刷新				
+					q = 0;
+				}else{
+					q = 1;
+				}				
+			}
+			
+			
+			var temp2 = "";	
+			var q = 0;			
+			function updatexq(ss) {	
+				if(document.getElementById(ss)){					
+					div2 = document.getElementById(ss);
+					if(temp2.indexOf(ss) == -1){
+						temp2 += ss + ";";
+						div2.style.display = "block";
+						div2.style.whiteSpace = "normal";
+						div2.style.border="1px solid #999";
+						div2.style.color = "#FFA500";
+					}else{
+						temp2 = temp2.replace(ss + ";" , "");
+						div2.style.display = "none";
+					}
+				}
+				if(temp2 == ""){  //查看详情时不刷新				
+					q = 0;
+				}else{
+					q = 1;
+				}
+			}
+			
+			function updatex() {				
+				aObj = document.getElementById('sx');
+				if(aObj.innerText == "停止刷新"){
+					z = "0";
+					aObj.innerText = "自动刷新";
+					aObj.style.color = "#ADFF2F";
+				}
+				else if(aObj.innerText == "自动刷新"){
+					z = "1";
+					aObj.innerText = "停止刷新";
+					aObj.style.color = "#d2d2d3";					
+				}
+			}
+						
+			function updated() {
+				z = "0";			
+				aObj = document.getElementById('sx');
+				if(aObj.innerText == "停止刷新"){					
+					aObj.innerText = "自动刷新";
+					aObj.style.color = "#ADFF2F";
+				}					
+			}
+			
+			function UnUnicode(str) {
+				return unescape(str.replace(/\\/g, "%"));
+			}
+			
+			function writeSource2() { 
+				if (xmlHttp21.readyState == 4 && xmlHttp22.readyState == 4 && xmlHttp23.readyState == 4) { 
+					div1 = document.getElementById('towrite2');
+					div1.innerHTML = "<h4 style='color:#FFFF00'>精选板块</h4>";				
+					var data = xmlHttp21.responseText					
+					data = data.replace(/ /g,"");				
+					data = data.replace(/(\[\").*?(?=\])/g,function(word){ 
+					str = word.match(/\[(\S*)/)[1];
+					//str = word;
+					return '{"code":' + str.split(',')[0] + 
+					',"name":' + str.split(',')[1] +
+					',"zf":' + str.split(',')[2] ;});					
+					data = data.replace(/\[\[/g,'[{').replace(/\]\]/g,"}]").replace(/],{/g,"},{");
+					data = data.match(/(\S*)],"ttag/)[1];	
+					//document.write(data);	
+					
+					var data1 = xmlHttp22.responseText
+					data1 = data1.replace(/ /g,"");
+					data1 = UnUnicode(data1);
+					data1 = data1.replace(/\s+/g,"");
+					data1 = data1.match(/(\S*)],\"errcode/)[1];									
+					//document.write(data1);
+					var bks = "";
+					var gn = data1.split('},{');
+					//var m = 1;
+					for (i = 0; i < gn.length; i++){
+						var code = gn[i].match(/\"CCode\":\"(\S*)\",\"Analysis/)[1];
+						if(data.indexOf(code) == -1){
+							var name = gn[i].match(/\"CName\":\"(\S*)\"/)[1];
+							data += ',{"code":"' + code + '","name":"' + name + '","zf":null}';							
+						 }									
+					}
+					data = data + "]";
+					//document.write(data);
+					ss = data.split('},{');				
+					for (i = 0; i < ss.length; i++){
+						var code = ss[i].match(/\"code\":\"(\S*)\",\"name/)[1];						
+						var name = ss[i].match(/\"name\":\"(\S*)\",\"zf/)[1];
+						name = UnUnicode(name);
+						var zf = "";
+						if(i != ss.length - 1){ 						
+							zf = ss[i].match(/\"zf\":(\S*)/)[1];
+						}else{
+							zf = ss[i].match(/\"zf\":(\S*)\}\]/)[1];							
+						}						
+						var zfs = "";
+						if(zf != 'null'){
+							zfs = "&nbsp;涨幅：" + zf + "%";
+						}						
+						bks = "<a href='javascript:void(0)' id='" + name + "' onclick='changeCss(this,\"towrite2\");update(" + "\"" +
+									code + "\"+\"#\"+" + "\"" + name + "\"" + ")'>" + ( i + 1) + "、" +
+									 "&nbsp;" + name + zfs + "</a>"	;									 
+						var jx = "<td><a href='javascript:void(0)' onclick='updatexq(888" + code + ")'>" + "详情" + "</a></td>";						
+						bks = bks + jx;							
+						var xq = "";
+						if(data1.indexOf(code) > 0){	
+							//alert(code);		
+						    var s = data1.split(code)[1];
+							//alert(s);								
+							var k1 = s.indexOf("\"Analysis\":\"");
+							var k2 = s.indexOf("}");
+							xq = s.substring(k1,k2);												
+							xq = xq.match(/\"Analysis\":\"(\S*)\",\"CName/)[1];							
+							if(xq == ""){
+								xq = "暂无";
+							}							
+						}else{
+							xq = "暂无";
+						}						
+						var bkdm = code;	
+	
+						subclass(bkdm , bks , xq);						
+						if (i == 0 && y == 1){
+							temp = code + ";";
+							update(code + "#" + name);
+						}						
+					}
+					
+					//常规板块
+					div1.innerHTML += "<br><h4 style='color:#FFFF00'>常规板块</h4>";
+					var data2 = xmlHttp23.responseText
+					//alert(data2)
+					data2 = data2.replace(/ /g,"");
+					data2 = UnUnicode(data2);
+					data2 = data2.replace(/\s+/g,"");
+					data2 = data2.match(/(\S*)],\"errcode/)[1];	
+					data2 = data2 + "]}";
+					//document.write(data2);
+					ss2 = data2.split('},{');				
+					for (i = 0; i < ss2.length; i++){
+						var code = ss2[i].match(/\"CCode\":\"(\S*)\",\"CName/)[1];
+						var name = ss2[i].match(/\"CName\":\"(\S*)\",\"Analysis/)[1];
+						//name = UnUnicode(name);
+						var xq = ss2[i].match(/\"Analysis\":\"(\S*)\"/)[1];	
+						
+						var bks = "<a href='javascript:void(0)' id='" + name + "' onclick='changeCss(this,\"towrite2\");update(" + "\"" +
+									code + "\"+\"#\"+" + "\"" + name + "\"" + ")'>" + ( i + 1) + "、" +
+									 "&nbsp;" + name + "</a>"	;									 
+						var jx = "<td><a style='position:absolute; right:5px;' href='javascript:void(0)' onclick='updatexq(" + ( i + 1) + "888" + code + ")'>" + "详情" + "</a></td>";						
+						//bks = bks + jx;
+						div1.innerHTML += "<p>" + bks + jx + "</p>";
+						
+						//添加详情
+						var newDiv = document.createElement("div");
+						newDiv.id = ( i + 1) + "888" + code;
+						newDiv.style.display = "none";
+						newDiv.style.whiteSpace = "normal";
+						div1.appendChild(newDiv);
+						
+						div2 = document.getElementById(i + 1 + "888" + code);
+						div2.innerHTML = xq;																
+					}
+					
+					//变色
+					var interval = setInterval(function() {
+						if(yy != ""){	
+							ranking();							
+							clearInterval(interval);							
+						}					
+					},100);					
+				}				
+			}
+			
+			//子类
+			function subclass(bkdm , bks, xq) {
+			//alert(bkdm);
+				var url3 = "https://apphq.longhuvip.com/w1/api/index.php?a=SonPlate_Info&c=ZhiShuRanking&apiv=w26&PlateID=" + bkdm + "&"; 
+				var xhr = new XMLHttpRequest();	
+				xhr.open("GET", url3, false);//同步 
+				xhr.send(null)																		
+				div1 = document.getElementById('towrite2');
+				//div1.innerHTML = div1.innerHTML + "<ul><li>" + bks + "</li></ul>";
+				var data3 = xhr.responseText;						
+				if(data3.indexOf('\"List\":[]') == -1) {
+					var dms = bks.split('、');					
+					div1.innerHTML = div1.innerHTML + "<p>" + dms[0] + "、★" + dms[1] + "</p>";
+					//添加详情
+					var newDiv1 = document.createElement("div");
+					newDiv1.id = "888" + bkdm;
+					newDiv1.style.display = "none";					
+					document.getElementById("towrite2").appendChild(newDiv1);
+					
+					div2 = document.getElementById("888" + bkdm);
+					div2.innerHTML = div2.innerHTML + xq;
+						
+					//添加分类Div
+					var newDiv = document.createElement("div");
+					newDiv.id = bkdm;
+					newDiv.style.display = "none";
+					document.getElementById("towrite2").appendChild(newDiv);
+						
+					//data3 = data3.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+					data3 = data3.replace(/ /g,"").match(/\{\"List\":(\S*)\]\],\"/)[1] + ']]';	
+					data3 = data3.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2];});							
+					data3 = data3.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]");
+					//alert(data3);	
+					//document.write(data3);
+
+					var result = JSON.parse(data3); //JSON字符串转换为对象
+					function up(a,b){
+					return b.qd-a.qd
+					}
+					result.sort(up);
+					result = JSON.stringify( result );						
+					data3= '{\"List\":' + result + "}";
+					//document.write(data3);
+
+					var transform_ee1 = [           
+					{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_ff1));}}
+					];
+
+					var transform_ff1= 
+					{"tag":"p", children:[
+					{"tag":"p", children:[
+					{"tag": "li", "html":"<a href='javascript:void(0)' id='" + bkdm + "' onclick='changeCss(this,this.id);update(\"${code}\"+\"#\"+\"${name}\")'>${name}&nbsp;强度：${qd}</a>"}
+					]}]};
+
+					var html3 = json2html.transform(data3, transform_ee1);		
+					//div1 = document.getElementById('towrite1');
+					var div = document.getElementById(bkdm);
+					div.innerHTML += html3;					
+				}
+				else
+				{
+					div1.innerHTML = div1.innerHTML + "<p>" + bks + "</p>";
+					//添加详情
+					var newDiv1 = document.createElement("div");
+					newDiv1.id = "888" + bkdm;
+					newDiv1.style.display = "none";
+					newDiv1.style.whiteSpace = "normal";
+					document.getElementById("towrite2").appendChild(newDiv1);
+					
+					div2 = document.getElementById("888" + bkdm);
+					div2.innerHTML = div2.innerHTML + xq;
+				}				
+			}
+			
+			var temp = "";
+			var bdm = "";
+			var bkm = "";
+			var y = 1;			
+			function update(ss) {
+				//alert(ss);
+				y = 1;
+				if(ss != "0")
+				{
+					var dms = ss.split('#');					
+					bdm = dms[0];
+					bkm = dms[1];
+					//alert(temp);
+					if(document.getElementById(bdm))
+					{					
+						div1 = document.getElementById(bdm);
+						if(temp.indexOf(bdm) == -1)
+						{
+							temp += bdm + ";";
+							div1.style.display = "block";							
+						}
+						else
+						{
+							temp = temp.replace(bdm + ";" , "");
+							div1.style.display = "none";
+						}
+					}
+					//alert(temp);
+				}
+				//alert(bdm);
+				var bfyy = "<a style='padding-left:0px' href='javascript:void(0)' onclick='updateb()'>【原因】</a>";
+				var zz = "<a style='float:right;margin-right:5px;' href='javascript:void(0)' onclick='updatez()'>最正宗</a>";				
+				div2 = document.getElementById('towrite3');	
+				//div2.innerHTML = '<h4>' + bkm + zz + '</h4>';				
+				div2.innerHTML = '<h4>' + bkm + bfyy + zz + '</h4>';					
+				var url2 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&st=30&a=ZhiShuStockList_W8&c=ZhiShuRanking&PhoneOSNew=1&old=1&apiv=w21&Type=6&PlateID=" + bdm + "&"; 								
+				if (window.XMLHttpRequest) {
+					xmlHttp3 = new XMLHttpRequest();
+					} else {					
+						xmlHttp3 = new ActiveXObject("Microsoft.XMLHTTP");
+					}					
+				xmlHttp3.onreadystatechange = writeSource3;				
+				xmlHttp3.open("GET", url2, true);
+				xmlHttp3.send(null);				
+			}
+			
+			function writeSource3() { 			
+				if (xmlHttp3.readyState == 4) {                  	
+				var data2 = xmlHttp3.responseText
+				//document.write(data2);
+				//data2 = data2.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+				data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';	
+				//data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"zf":'+str.split(',')[6];});
+				data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+				str = word.match(/\[(\S*)/)[1]; 
+				return '{"code":' + str.split(',')[0] + 
+				',"name":' + str.split(',')[1] +
+				',"zf":'+str.split(',')[6] +
+				',"lz":'+str.split(',')[24] +
+				',"zl":'+str.split(',')[2] +
+				',"lb":'+str.split(',')[23] + 
+				',"zt":'+str.split(',')[39];});
+								
+				data2 = '{\"list\":' + data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+				
+				var transform_aa2 = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb2));}}
+				];
+				
+				var transform_bb2= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[											
+				//{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' onclick='updated()'>${name}&nbsp;&nbsp;[${zt}]&nbsp;&nbsp;涨幅：${zf}%&nbsp;${lz}</a>"}, 
+				{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank'  onclick='changeCss(this,\"towrite3\");updated()'>${name}&nbsp;&nbsp;[${zt}]&nbsp;涨幅：${zf}%&nbsp;${lz}&nbsp;${zl}&nbsp;<font color=#FFA500>${lb}</font></a>"}, 
+				]}]}; 
+				
+				
+				var html2 = json2html.transform(data2, transform_aa2);		
+				div2 = document.getElementById('towrite3');
+				div2.innerHTML = div2.innerHTML + html2.replace(/\[\]/g,"");
+				div2.style.whiteSpace = "nowrap"; 			
+				}
+			}
+			
+			function updatez() {
+				var dmz = bdm; 			 					
+				var url3 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&ZZ=1&a=PlateIntroduction&st=30&c=ZhiShuRanking&Index=0&apiv=w24&Type=2&PlateID=" + dmz + "&"; 								
+				if (window.XMLHttpRequest) {
+				xmlHttp4 = new XMLHttpRequest();				
+				} else {
+				xmlHttp4 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}
+				xmlHttp4.onreadystatechange = writeSource4;				
+				xmlHttp4.open("GET", url3, true);
+				xmlHttp4.send(null);				
+			}
+			
+			function writeSource4() { 			
+				if (xmlHttp4.readyState == 4) {                  	
+				var data3 = xmlHttp4.responseText
+				//document.write(data3);
+				data3 = data3.replace(/ /g,"").match(/\{\"List\":(\S*)\]\],\"/)[1] + ']]';
+				data3 = data3.replace(/(\[\").*?(?=\])/g,function(word){ 
+				str = word.match(/\[(\S*)/)[1]; 
+				return '{"code":' + str.split(',')[0] + 
+				',"name":' + str.split(',')[1] + 
+				',"zf":'+str.split(',')[3] + 
+				',"lzcs":'+str.split(',')[4]});
+				
+				data3 = '{\"list\":' + data3.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";				
+				//document.write(data3);
+				
+				var transform_aa3 = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb3));}}
+				];
+				
+				var transform_bb3= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[											
+				{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' onclick='changeCss(this,\"towrite3\");updated(this)'>${name}&nbsp;涨幅：${zf}%&nbsp;&nbsp;领涨：${lzcs}</a>"}, 
+				]}]}; 
+				
+				var html3 = json2html.transform(data3, transform_aa3);	
+				var bfyy = "<a style='padding-left:0px' href='javascript:void(0)' onclick='updateb()'>【原因】</a>";
+				var qb = "<a style='float:right;margin-right:5px;' href='javascript:void(0)' onclick='update(" + "0" + ")'>全部</a>";				
+				div2 = document.getElementById('towrite3');				
+				//div2.innerHTML = '<h4>' + bkm + qb + '</h4>';
+				div2.innerHTML = '<h4>' + bkm + bfyy + qb + '</h4>';					
+				div2.innerHTML = div2.innerHTML + html3;
+				div2.style.whiteSpace = "nowrap";
+				}					
+			}
+			
+			function updateb() {
+				y = 0;	
+				var dm = bdm; 			 
+				//div2 = document.getElementById('towrite2');				
+				//div2.innerHTML = '<h3>' + bk + '</h3>';
+				var url4 = "https://apphq.longhuvip.com/w1/api/index.php?a=GetBaseFaceListZDEvnArtNew&apiv=w26&c=ZhiShuL2Data&StockID=" + dm;				
+				var url5 = "https://apphis.longhuvip.com/w1/api/index.php?a=GetDayBaseFaceListZDEvnArt&st=10&c=ZhiShuKLine&apiv=w26&StockID=" + dm; 								
+				if (window.XMLHttpRequest) {
+				xmlHttp41 = new XMLHttpRequest();				
+				} else {
+				xmlHttp41 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}
+				xmlHttp41.onreadystatechange = writeSource5;				
+				xmlHttp41.open("GET", url4, true);
+				xmlHttp41.send(null);
+				
+				if (window.XMLHttpRequest) {
+				xmlHttp5 = new XMLHttpRequest();				
+				} else {
+				xmlHttp5 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}
+				xmlHttp5.onreadystatechange = writeSource5;				
+				xmlHttp5.open("GET", url5, true);
+				xmlHttp5.send(null);								
+			}
+			
+			function writeSource5() { 			
+				if (xmlHttp41.readyState == 4 && xmlHttp5.readyState == 4) { 
+					var data = xmlHttp41.responseText
+					data = '{"List":[' + data + ']}';
+					//document.write(data);	
+					var fh = "<a style='padding-left:10px' href='javascript:void(0)' onclick='update(" + "0" + ")'>【返回】</a>";
+					var zz = "<a style='float:right' href='javascript:void(0)' onclick='updatez()'>最正宗</a>";				
+					div2 = document.getElementById('towrite3');				
+					div2.innerHTML = '<h4>' + bkm + fh + zz + '</h4>';	
+						
+					if(data.indexOf('"Date":""') == -1)
+					{
+						var rq = data.match(/\"Date\":\"(\S*)\",\"/)[1];
+						var day = new Date();
+						gt = day.getTime();			
+						mymonth = day.getMonth()+1;
+						myday = day.getDate();
+						if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+						if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+						tt = day.getFullYear() + "-" + mymonth + "-" + myday;													
+						if(rq == tt){
+							var transform_aa = [           
+							{"tag":"p", children:function(){return(json2html.transform(this.List, transform_bb));}}
+							];
+							
+							var transform_bb= 
+							{"tag":"p", children:[
+							{"tag":"li", children:[							
+							{"tag": "b", "html":"${Date}：${BoomReason}"},
+							{"tag": "p", "html":"${Title}"}, 								
+							]}]}; 
+							
+							var html = json2html.transform(data, transform_aa);																						
+							div2.innerHTML = div2.innerHTML + html;
+						}
+					}
+					
+					var data1 = xmlHttp5.responseText
+					//document.write(data);				
+					if(data1.indexOf('\"List\":[]') == -1)
+					{
+						var transform_aa = [           
+						{"tag":"p", children:function(){return(json2html.transform(this.List, transform_bb));}}
+						];
+						
+						var transform_bb= 
+						{"tag":"p", children:[
+						{"tag":"li", children:[							
+						{"tag": "b", "html":"${Date}：${BoomReason}"},
+						{"tag": "p", "html":"${Title}"}, 								
+						]}]}; 
+						
+						var html = json2html.transform(data1, transform_aa);					
+						<!-- var fh = "<a style='padding-left:0px' href='javascript:void(0)' onclick='update(" + "0" + ")'>【返回】</a>"; -->
+						<!-- var zz = "<a style='float:right;margin-right:5px;' href='javascript:void(0)' onclick='updatez()'>最正宗</a>";				 -->
+						<!-- div2 = document.getElementById('towrite3');				 -->
+						<!-- div2.innerHTML = '<h4>' + bkm + fh + zz + '</h4>';													 -->
+						div2.innerHTML = div2.innerHTML + html;
+					}
+					else if(data1.indexOf('\"List\":[]') > -1 && data.indexOf('"Date":""') > -1)
+					{
+						<!-- var fh = "<a style='padding-left:10px' href='javascript:void(0)' onclick='update(" + "0" + ")'>【返回】</a>"; -->
+						<!-- var zz = "<a style='float:right;margin-right:5px;' href='javascript:void(0)' onclick='updatez()'>最正宗</a>";				 -->
+						<!-- div2 = document.getElementById('towrite3');				 -->
+						<!-- div2.innerHTML = '<h4>' + bkm + fh + zz + '</h4>';	 -->
+						div2.innerHTML = div2.innerHTML + "暂无数据";	
+					}	
+					div2.style.whiteSpace = "normal";  //折行
+				}					
+			}
+			
+			function NumberTransform(num) { 
+				var result = num;
+               if(Math.abs(num) > 100000000){
+			    result = num / 100000000;
+				result = result.toFixed(2) + "亿";
+			   }else if(Math.abs(num) > 10000){
+			    result = num/10000;
+				result = result.toFixed(2) + "万";
+			   }				   
+               return result;  
+			}
+			
+			function change() {
+				var div = document.getElementById('towrite4');
+				var items = div.getElementsByTagName("span"); 
+				for ( var i = 0; i < items.length; i++)
+				{
+					var obj = items[i];
+					var num = parseFloat (obj.firstChild.nodeValue);
+					//obj.style.color = num > 0 ? "Orange" : "Lime";					
+					obj.style.color = num > 0 ? "Orange" : (num < 0 ? "Lime" : "#d2d2d3");					
+				}							
+			}
+			
+			function ranking(){			
+				var alist = document.getElementById("towrite2").getElementsByTagName("a");				
+				for(var i = 0; i < alist.length; i++){
+					yy = yy.replace(/ /g,"");
+					var bk = alist[i].id;
+					var y1 = "";
+					var y2 = "";
+					if(yy.indexOf("+")>-1){
+						y1 = yy.split("+")[0];
+						y2 = yy.split("+")[1];
+					}else if(yy.indexOf("(")>-1){
+						y1 = yy.split("(")[0];
+						y2 = yy.split("(")[1].split(")")[0];
+					}else{
+						y1 = yy;
+					}
+					
+					if(bk != ""){					
+						if(y1 == bk || y2 == bk){
+							
+							alist[i].style.color = "#FFA500";
+						}
+					}					
+				}				
+			}
+			
+			function writeSource6() { 
+				if (xmlHttp31.readyState == 4 && xmlHttp32.readyState == 4) {         
+					var data = xmlHttp31.responseText	
+					//document.write(data);
+					var pm = data.match(/\"rank\":(\S*),\"rankChange/)[1];
+					var pmwz = "<a href='http://guba.eastmoney.com/rank/stock?code=" + gpdm + "' target='_blank'>网址</a>"	;	
+					var lhbwz = "<a href='http://page.tdx.com.cn:7615/site/kggx/tk_ygzl_lhb.html?info=" + gpdm + "' target='_blank' style='color:#FFFF00'>龙虎榜</a>"	;					
+					div = document.getElementById('towrite4');
+					div.innerHTML = "<font size='3'>东方财富个股人气排名：<font size='1'>&nbsp;&nbsp;&nbsp;&nbsp;" + pmwz + lhbwz + "</font></font"; 
+					div.innerHTML = div.innerHTML + "<p>A股市场排名第<strong style ='color:#FFFF00'>" + pm + "</strong>名</p>";
+				
+					var data1 = xmlHttp32.responseText	
+					//document.write(data1);
+					var zljlr = data1.match(/"f62":(\S*),"f66/)[1];
+					var zljb = data1.match(/"f184":(\S*)}]}/)[1];					
+					var cddjlr = data1.match(/"f66":(\S*),"f69/)[1];
+					var cddjb = data1.match(/"f69":(\S*),"f72/)[1];					
+					var ddjlr = data1.match(/"f72":(\S*),"f75/)[1];
+					var ddjb = data1.match(/"f75":(\S*),"f78/)[1];					
+					var zdjlr = data1.match(/"f78":(\S*),"f81/)[1];
+					var zdjb = data1.match(/"f81":(\S*),"f84/)[1];					
+					var xdjlr = data1.match(/"f84":(\S*),"f87/)[1];
+					var xdjb = data1.match(/"f87":(\S*),"f164/)[1];
+					
+					var zljlr5 = data1.match(/"f164":(\S*),"f165/)[1];
+					var zljb5 = data1.match(/"f165":(\S*),"f166/)[1];					
+					var cddjlr5 = data1.match(/"f166":(\S*),"f167/)[1];
+					var cddjb5 = data1.match(/"f167":(\S*),"f168/)[1];					
+					var ddjlr5 = data1.match(/"f168":(\S*),"f169/)[1];
+					var ddjb5 = data1.match(/"f169":(\S*),"f170/)[1];					
+					var zdjlr5 = data1.match(/"f170":(\S*),"f171/)[1];
+					var zdjb5 = data1.match(/"f171":(\S*),"f172/)[1];					
+					var xdjlr5 = data1.match(/"f172":(\S*),"f173/)[1];
+					var xdjb5 = data1.match(/"f173":(\S*),"f184/)[1];
+					
+					var html = "<p>今日主力净流入：<span>" + NumberTransform(zljlr) + "</span>&nbsp;&nbsp;主力净比：<span>" + zljb + "%</span></p>" +					
+					"<p>今日超大单净流入：<span>" + NumberTransform(cddjlr) + "</span>&nbsp;&nbsp;超大单净比：<span>" + cddjb +  "%</span></p>" + 
+					"<p>今日大单净流入：<span>" + NumberTransform(ddjlr) + "</span>&nbsp;&nbsp;大单净比：<span>" + ddjb +  "%</span></p>" + 
+					"<p>今日中单净流入：<span>" + NumberTransform(zdjlr) + "</span>&nbsp;&nbsp;中单净比：<span>" + zdjb +  "%</span></p>" + 
+					"<p>今日小单净流入：<span>" + NumberTransform(xdjlr) + "</span>&nbsp;&nbsp;小单净比：<span>" + xdjb +  "%</span></p>" + 
+					
+					"<br><p>5日主力净流入：<span>" + NumberTransform(zljlr5) + "</span>&nbsp;&nbsp;主力净比：<span>" + zljb5 + "%</span></p>" +					
+					"<p>5日超大单净流入：<span>" + NumberTransform(cddjlr5) + "</span>&nbsp;&nbsp;超大单净比：<span>" + cddjb5 +  "%</span></p>" + 
+					"<p>5日大单净流入：<span>" + NumberTransform(ddjlr5) + "</span>&nbsp;&nbsp;大单净比：<span>" + ddjb5 +  "%</span></p>" + 
+					"<p>5日中单净流入：<span>" + NumberTransform(zdjlr5) + "</span>&nbsp;&nbsp;中单净比：<span>" + zdjb5 +  "%</span></p>" + 
+					"<p>5日小单净流入：<span>" + NumberTransform(xdjlr5) + "</span>&nbsp;&nbsp;小单净比：<span>" + xdjb5 +  "%</span></p>";
+					var zjwz = "<a href='https://data.eastmoney.com/zjlx/" + gpdm + ".html' target='_blank'>网址</a>";
+					//div.innerHTML = div.innerHTML +  '<br><h4>东方财富个股资金流向：</h4>' + html;
+					div.innerHTML = div.innerHTML + "<br><font size='3'>东方财富个股资金流向：<font size='1'>" + "&nbsp;&nbsp;&nbsp;&nbsp;" + zjwz + "</font></font>" + html;
+					if (xmlHttp4.readyState == 4 && xmlHttp4.readyState == 4) {         
+						var data4 = xmlHttp4.responseText	
+						//document.write(data4);
+						
+						var buys = 0;
+						var sells = 0;
+						var wzlx = "";
+						if(data4.indexOf('"data":[]') == -1 && data4.indexOf('"data":null') == -1){							
+							var yy = data4.split('},{');							
+							var buyx = "1,4,32,64,256,8193,8195,8201,8202,8206,8207,8209,8211,8213,8215";						
+							var sellx = "2,8,16,128,512,8194,8196,8203,8204,8205,8208,8210,8212,8214,8216";
+							for (i = 0; i < yy.length; i++)
+							{
+								var ydlx = yy[i].match(/"t":(\S*),"p/)[1];
+								var cjl = yy[i].match(/"v":(\S*)/)[1].replace('}]}});','');											
+								//alert(ydlx + "|" + cjl);
+								if(buyx.indexOf(ydlx) > -1){
+									buys += Number(cjl);
+								}
+								else if(sellx.indexOf(ydlx) > -1){
+									sells += Number(cjl);
+								}
+								else{
+								 wzlx += ydlx + ",";
+								}
+							}							
+						}
+						var dkce = Number(buys) - Number(sells);
+						var gpdms = "sz" + gpdm;
+						if(gpdm.substr(0,1) == "6"){
+							gpdms = "sh" + gpdm;
+						}
+						var ydwz = "<a href='https://quote.eastmoney.com/changes/stocks/" + gpdms + ".html' target='_blank'>网址</a>";				
+						div.innerHTML = div.innerHTML + "<br><br><font size='3'>异动分布：<font size='1'>" + tt + "&nbsp;&nbsp;&nbsp;&nbsp;" + ydwz + "</font></font><p>多方异动成交量：" + buys + "</p><p>空方异动成交量：" + sells + "</p>" + "</p><p>多空差额：<span>" + dkce + "</span></p>";
+						//div.innerHTML = div.innerHTML + "<p>" + wzlx + "</p>";
+					}
+					change();
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towriter" class="fixedBox">
+			<div id="towrite1" ></div>
+			<div id="towrite" style="margin-top:-10px">				
+				<!-- <div id="towrite2" style="border: 1px solid #d2d2d3; float: left;"></div> -->
+				<div id="towrite2" class="fixedBox" style="position:relative; float:left;"></div>
+				<div id="towrite3" class="fixedBox" style="position:relative; float:left;"></div>
+				<div id="towrite4" class="fixedBox" style="position:relative; float:left;"></div>				
+			</div>
+		</div>	
+	</body>
+</html>

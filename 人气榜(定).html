@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>人气榜</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			//p {margin:5px}
+			//ul {margin:1px}			
+			//h4 {margin:1px}	
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource(1);
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource("");					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "100%";	
+				obj1.style.height= "620px";		
+				obj1.style.fontSize="12px";			
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			var p = "1";
+			function getSource(ss) {			
+				var pz = "<a href='javascript:void(0)' id='bt1' onclick='getSource(" + "\"1\"" + ")'>" + "盘中人气榜" + "</a>";
+				var ph = "<a href='javascript:void(0)' id='bt2' onclick='getSource(" + "\"2\"" + ")'>" + "复盘人气榜" + "</a>";	
+				div1 = document.getElementById('towrite');
+				div1.innerHTML = '<h4>人气榜（' + pz + "&nbsp;&nbsp;&nbsp;&nbsp;" + ph + '）</h4>';
+				if(ss != ""){
+					p = ss;
+				}
+				aObj = document.getElementById('bt' + p);				
+				aObj.style.color = "#FFA07A";
+				
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=GetHotPHB&st=50&apiv=w21&Type=1&c=StockBidYiDong"; 
+				var url2 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=GetHotPHB&st=50&apiv=w28&Type=13&c=StockBidYiDong"
+				var url = url1;
+				if(p == "2"){
+					url = url2;
+				}				
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+			
+			function writeSource() { 
+			if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText				
+				data = data.replace(/ /g,"").replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1] + ',"ranking":'+str.split(',')[4] + ',"bh":'+str.split(',')[3] + ',"zf":'+str.split(',')[2];});
+				data = data.replace(/\],\{/g,"},{").replace(/\]\],/g,"}],");				
+				//document.write(data);
+
+				var transform_aa = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_bb));}}
+				];
+				
+				var transform_bb= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[							
+				{"tag": "li", "html":"${ranking}.&nbsp;&nbsp;<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' onclick='changeCss(this,\"gg\")'>${code} ${name} &nbsp;&nbsp;排名变化：${bh} &nbsp;&nbsp;涨幅：${zf}% </a><a style='color:#FFA500'  href='ggxqa.html##${code}##${name}'>亮点</a>"}, 							
+				]}]};  
+				
+
+				var html = json2html.transform(data, transform_aa);		
+				div = document.getElementById('towrite');
+				div.innerHTML += "<span id='gg'>" + html;
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

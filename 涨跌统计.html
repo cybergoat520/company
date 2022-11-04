@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>涨跌统计</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script>
+		<script>
+			var dt = "";
+			var tt = "";
+			var gt = "";
+			var k = "0";
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();			
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;	
+			dt = tt;
+			getSource();
+			changeStyle();			
+			}		
+
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "200px";	
+				obj1.style.height= "100px";		
+				obj1.style.fontSize="12px";				
+			}
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+								
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			
+			function BookingRmk(date)
+			{         
+				tt = date;
+				gt = new Date(tt).getTime();
+				jt = Math.round(gt/1000);
+				k = 0;
+				if(dt != tt)
+				{			
+					k = 1;
+				}
+				getSource();
+			}
+						
+			function getSource() {
+				div = document.getElementById('towrite');
+				var myDate = new Date();
+				//var time = '<p>' + myDate.Format("hh:mm:ss") +'</p>';					
+				div.innerHTML = '<font size="3">' + myDate.Format("hh:mm:ss") + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 90px; height:15px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';		
+							
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?a=ZhangFuDetail&apiv=w21&c=HomeDingPan"; 
+				var url2 = "https://apphis.longhuvip.com/w1/api/index.php?a=HisZhangFuDetail&c=HisHomeDingPan&apiv=w27&Day=" + tt; 			
+				var url = url1;
+				if(k == "1")
+				{
+					url = url2;
+				}				
+				createXmlHttp();				
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+				
+			}
+						
+			function writeSource() { 						
+				if (xmlHttp.readyState == 4) {				
+				var data = xmlHttp.responseText	
+				//document.write(data);				
+				var transform_aa = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.info, transform_bb));}}
+				];
+				
+				var transform_bb= 				
+				{"tag":"p", children:[				
+				{"tag": "p","html":"实际涨停：${SJZT} &nbsp;&nbsp;实际跌停：${SJDT}"},								
+				{"tag": "p","html":"上涨家数：${SZJS} &nbsp;&nbsp;下跌家数：${XDJS}"},												
+				]};
+				
+				
+				var html = json2html.transform(data, transform_aa);
+						
+				div = document.getElementById('towrite');													
+				div.innerHTML = div.innerHTML + html;					
+				}	
+				document.getElementById("PriceDate").value = tt;				
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>		
+	</body>
+</html>

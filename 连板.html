@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>连板</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />			
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script>
+		<script>
+			var dt = "";
+			var tt = "";
+			var gt = "";
+			var k = "0";
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;	
+			dt = tt;
+			start();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					start();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				if(k == "0")
+					{
+						time_range("9:00","15:15")	
+					}									
+				},
+				60000);
+			})
+			
+			Date.prototype.Format = function (fmt) {
+			var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+			};
+			
+			if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+												
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			
+			function BookingRmk(date){         
+				tt = date;
+				var date1 = new Date(tt);
+				var date2 = new Date(dt);							
+				k = 0;
+				if(date1.getTime() < date2.getTime()){			
+					k = 1;
+					tradeday();
+				}								
+				start();						
+			}
+
+			function tradeday() {  //判断最后交易日
+				var day = new Date(tt);							
+				for (i = 1; i < 100; i++){	//节假日																										
+					if(i > 1){
+						day.setTime(day.getTime() - 24*60*60*1000);							
+					}	
+					tt = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=0&a=DailyLimitPerformance&st=1000&apiv=w26&Type=4&c=HisHomeDingPan&Index=0&PidType=1&Day=" + tt;				
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data = xhr.responseText;
+					//document.write(data);
+					if(data.indexOf('"info":[[]') == -1){						
+						break;
+					}
+				}
+			}				
+			
+			function start() {
+				div = document.getElementById('towrite');				
+				var p1 = "<a href='javascript:void(0)' id='px4' onclick='getType(" + "\"4\"" + ")'>" + "按涨停时间排序" + "</a>";
+				var p2 = "<a href='javascript:void(0)' id='px5' onclick='getType(" + "\"5\"" + ")'>" + "按涨停原因排序" + "</a>";					
+				var p3 = "<a href='javascript:void(0)' id='px8' onclick='getType(" + "\"8\"" + ")'>" + "按主力净额排序" + "</a>";					
+				div.innerHTML = '<font size="3">连板&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';		
+				div.innerHTML = div.innerHTML + "<p>" + p1 + p2 + p3 + "</p>";
+				aObj = document.getElementById('px' + px);
+				if(fx == "0")
+				{
+					aObj.innerText = aObj.innerText + "↑";				
+				}
+				else
+				{
+					aObj.innerText = aObj.innerText + "↓";
+				}				
+				for (i = 1; i < 6 ; i++)
+				{
+					getSource(i.toString());
+				}
+				document.getElementById("PriceDate").value = tt;				
+			}
+			
+			var px = "4";
+			var fx = "0";
+			function getType(ss) {	
+				if(ss != px)  //切换类别 清零
+				{
+					fx = 0;
+				}			
+				px = ss;				
+				if(fx == "0")
+				{
+					fx = "1";				
+				}
+				else
+				{
+					fx = "0";
+				}
+				
+				start();
+			}			
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+					xmlHttp = new XMLHttpRequest();					
+					} else {
+					xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");					
+				}
+			}
+			
+			function getSource(ss) {
+				//alert(ss);
+				
+				
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w21&Type=" + px + "&c=HomeDingPan&PhoneOSNew=1&PidType=5&"; 				
+				var url2 = "https://apphq.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w21&Type=" + px + "&c=HomeDingPan&PhoneOSNew=1&PidType=4&"; 				
+				var url3 = "https://apphq.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w21&Type=" + px + "&c=HomeDingPan&PhoneOSNew=1&PidType=3&"; 				
+				var url4 = "https://apphq.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w21&Type=" + px + "&c=HomeDingPan&PhoneOSNew=1&PidType=2&"; 				
+				var url5 = "https://apphq.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w21&Type=" + px + "&c=HomeDingPan&PhoneOSNew=1&PidType=1&";
+				
+				var url11 = "https://apphis.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w26&Type=" + px + "&c=HisHomeDingPan&Index=0&PidType=5&Day=" + tt + "&";
+				var url21 = "https://apphis.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w26&Type=" + px + "&c=HisHomeDingPan&Index=0&PidType=4&Day=" + tt + "&";
+				var url31 = "https://apphis.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w26&Type=" + px + "&c=HisHomeDingPan&Index=0&PidType=3&Day=" + tt + "&"; 				
+				var url41 = "https://apphis.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w26&Type=" + px + "&c=HisHomeDingPan&Index=0&PidType=2&Day=" + tt + "&";
+				var url51 = "https://apphis.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=DailyLimitPerformance&st=1000&apiv=w26&Type=" + px + "&c=HisHomeDingPan&Index=0&PidType=1&Day=" + tt + "&";
+				
+				var url = "";
+				var bt = "";
+				if(ss == "1")
+				{
+					url = url1;
+					if(k == "1" )
+					{
+					  url = url11;
+					}
+					bt = "四板以上：";
+				}
+				if(ss == "2")
+				{
+					url = url2;
+					if(k == "1" )
+					{
+					  url = url21;
+					}
+					bt = "四板：";
+				}
+				if(ss == "3")
+				{
+					url = url3;
+					if(k == "1" )
+					{
+					  url = url31;
+					}
+					bt = "三板：";
+				}
+				if(ss == "4")
+				{
+					url = url4;
+					if(k == "1" )
+					{
+					  url = url41;
+					}
+					bt = "二板：";
+				}
+				if(ss == "5")
+				{
+					url = url5;
+					if(k == "1" )
+					{
+					  url = url51;
+					}
+					bt = "一板：";
+				}				
+				createXmlHttp();
+				//xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, false);  //同步方式
+				xmlHttp.send(null);				
+			    
+				var data = xmlHttp.responseText
+				if(k == 0){
+					tt = data.match(/\],"(\S*)"\]/)[1];
+					dt = tt;
+				}
+				data = data.replace("\[\[\]","\[\]");
+				//alert(data);
+				var html = "";
+				if (data.indexOf('\"' + 'info' + '\"' + ':\[\]') == -1 ) { 
+					data = data.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';												
+					data = data.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"zttime":'+str.split(',')[4]+',"ztyy":'+str.split(',')[5]+',"je":'+str.split(',')[8];});
+					data = data.replace(/\[\[\{/g,'[{').replace(/\]\]/g,"}]}").replace(/],{/g,"},{");
+					//时间				
+					data = data.replace(/(\"zttime\":).*?(?=,)/g, function(word){ 						
+					str = word.match(/\"zttime\":(\S*)/)[1]; 					
+							return '\"zttime\":\"' + getLocalTime(str) + '\"';					
+					});  	 			
+					//净额				
+					data = data.replace(/(\"je\":).*?(?=})/g, function(word){ 						
+					str = word.match(/\"je\":(\S*)/)[1]; 					
+						if(keepTwoDecimal(Math.abs(str/100000000)) >= 1)
+						{
+							return '\"je\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+						}
+						else
+						{
+							return '\"je\":\"' + Math.round(str/10000) + '万\"';
+						}					
+					});  	 									
+					//document.write(data1);
+					var x = data.split("},{")
+					var transform_aa = [   
+					{"tag": "ul", children:function(){					
+						return(bt + '(' + x.length + ')');
+					}},							
+					{"tag":"ul", children:function(){return(json2html.transform(this.info, transform_bb));}}				
+					];
+					
+					var transform_bb= 
+					{"tag":"ul", children:[
+					{"tag":"ul", children:[                            						
+					{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' >${code} ${name} &nbsp;&nbsp;涨停时间：${zttime} &nbsp;&nbsp;涨停原因：${ztyy} &nbsp;&nbsp;主力净额：${je}</a> "}, 							
+					]}]};
+					html = json2html.transform(data, transform_aa);					
+				}				
+				div.innerHTML += html;					
+			}
+			
+		</script>
+	</head>
+	<body>
+		<div id="towrite"></div>
+	</body>
+</html>

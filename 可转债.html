@@ -1,0 +1,434 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<title>可转债</title>
+	<link href="css/text.css" rel="stylesheet" type="text/css" />
+	<meta charset="utf-8" />
+	<style>
+		.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		table{
+			width:100%; 
+			border-collapse:collapse; 
+			text-align:center;
+		}
+		td,th{border:1px solid #696969}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script>
+	</head>
+	<body>
+		<div id="data"></div>
+		<script>
+			var dt = "";
+			var tt = "";
+			var gt = "";
+			var k = "0";			
+			window.onload = function() {				
+				var day = new Date();
+				gt = day.getTime();
+				mymonth = day.getMonth()+1;
+				myday = day.getDate();
+				if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+				if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+				tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+				dt = tt;				
+				changeStyle();
+				getSource(1);
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {					
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function changeStyle() {
+				var obj = document.getElementById("towrite");								
+				obj.style.left= "0px"; 				
+				obj.style.width= "100%";	
+				//obj.style.height= "620px";		
+				obj.style.fontSize="12px";					
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+			
+			var trid = "";
+			function changeCss(obj,hid,id){						
+				var tlist = document.getElementById(id).getElementsByTagName("tr");					
+				for(var i = 0; i < tlist.length; i++){														
+					tlist[i].style.backgroundColor = "#252528"; 					
+				}
+				trid = hid;
+				var tr = document.getElementById(hid);				
+				tr.style.backgroundColor = "#483D8B";						
+			}
+			
+			function hover(){  //鼠标经过
+				var rows = document.getElementsByTagName('tr');
+				for(var i=0;i<rows.length;i++){
+					rows[i].onmouseover=function(){						
+						if(this.id != ""){  //过滤表头
+							this.style.background="#800000";
+						}
+					}
+					rows[i].onmouseout=function(){
+						if(this.id != ""){  //过滤表头
+							if(this.id != trid){  //过滤选中行
+								this.style.background="#252528";
+							}else{
+								this.style.background="#483D8B";
+							}
+						}						
+					}					
+				}
+			}			
+			
+			var ts = "";			
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			
+			function BookingRmk(date)
+			{         
+				tt = date;
+				var date1 = new Date(tt);
+				var date2 = new Date(dt);				
+				k = 0;
+				if(date1.getTime() < date2.getTime()){			
+					k = 1;
+					tradeday()
+				}								
+				getSource();						
+			}
+			
+			function tradeday() {  //判断最后交易日
+				var day = new Date(tt);							
+				for (i = 1; i < 100; i++){	//节假日																										
+					if(i > 1){
+						day.setTime(day.getTime() - 24*60*60*1000);							
+					}	
+					tt = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=ZhiShuStockList_W8&st=10&c=ZhiShuRanking&apiv=w28&Type=6&PlateID=801909&Date=" + tt;
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data = xhr.responseText;
+					//document.write(data);
+					if(data.indexOf('MYSQL数据库链接出错!') == -1){						
+						break;
+					}
+				}
+			}	
+			
+			function getSource(p) {				
+				div = document.getElementById('towrite');												
+				div.innerHTML = '<font size="3">可转债行情&nbsp;&nbsp;</font><font size="2"></font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" /><br><br>';										
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?st=5000&Order=1&a=ZhiShuStockList_W8&apiv=w28&Type=6&c=ZhiShuRanking&PlateID=801909";
+				var url2 = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=ZhiShuStockList_W8&st=5000&c=ZhiShuRanking&apiv=w28&Type=6&PlateID=801909&Date=" + tt;
+				
+				var url = url1;
+				if(k == "1" ){
+				  url = url2;
+				}
+				
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);				
+				
+			}
+						
+			function writeSource() { 
+				if (xmlHttp.readyState == 4) {					
+					var data = xmlHttp.responseText
+					//document.write(data);
+					if(k == 0){
+						tt = data.match(/"Day":\["(\S*)"],"Min"/)[1];	
+						dt = tt;						
+					}	
+					
+					//data = data.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + "]]";
+					data = data.replace(/ /g,"").match(/{"list":(\S*)]],"Time"/)[1] + "]]";
+					//document.write(data);
+					data = data.replace(/(\[\").*?(?=\])/g,function(word){ 
+						str = word.match(/\[(\S*)/)[1];
+						var dm = str.split(',')[0];						
+						var xj = str.split(',')[5];
+						return '{"代码":' + dm + 
+						',"名称":' + str.split(',')[1] + 						
+						',"现价":' + xj +
+						',"涨幅%":' + str.split(',')[6] + 					
+						',"涨速%":' + str.split(',')[9]+ 
+						',"实际换手%":' + str.split(',')[8]+						
+						',"主力净额":' + str.split(',')[13];						
+					});
+					data = data.replace(/\],\{/g,"},{").replace("]]","}]");
+					//document.write(data);
+					
+					//涨幅				
+					data = data.replace(/(\"涨幅%\":).*?(?=,)/g, function(word){ 				
+						str = word.match(/\"涨幅%\":(\S*)/)[1]; 					
+						return '\"涨幅%\":"' + keepTwoDecimal(str) + '"';
+					});  
+					
+					//涨速				
+					data = data.replace(/(\"涨速%\":).*?(?=,)/g, function(word){ 				
+						str = word.match(/\"涨速%\":(\S*)/)[1]; 					
+						return '\"涨速%\":"' + keepTwoDecimal(str) + '"';
+					});  	
+				
+					//换手				
+					data = data.replace(/(\"实际换手%\":).*?(?=,)/g, function(word){ 				
+						str = word.match(/\"实际换手%\":(\S*)/)[1]; 					
+						return '\"实际换手%\":"' + keepTwoDecimal(str) + '"';
+					});  
+					
+					//主力净额				
+					data = data.replace(/(\"主力净额\":).*?(?=})/g, function(word){ 						
+					str = word.match(/\"主力净额\":(\S*)/)[1]; 					
+					if(keepTwoDecimal(Math.abs(str/100000000)) >= 1){
+						return '\"主力净额\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+					}else{
+						return '\"主力净额\":\"' + Math.round(str/10000) + '万\"';
+					}								
+					}); 					
+					//document.write(data);
+					var json = JSON.parse(data);
+					
+					//document.write(json);
+					
+					//创建table					
+					var table=document.createElement("table");										
+					var thead=document.createElement("thead");
+					table.appendChild(thead);					
+					var tr=document.createElement("tr");
+					thead.appendChild(tr);					
+					
+					var m = 0;
+					var n = 0;					
+					var gl = "涨幅";  //高亮
+					for(var key in json[0]){  //表头											
+						var th=document.createElement("th");						
+						th.innerHTML=key;						
+						tr.appendChild(th);
+						if(gl == key.replace("%","")){
+							n = m;
+							th.style.color = "#FF6633";	
+						}						
+						m++;
+					}
+										
+					var tbody=document.createElement("tbody");					
+					table.appendChild(tbody);
+					
+					//遍历json
+					for(var i = 0; i < json.length; i++){					
+						var tr=document.createElement("tr");						
+						var p = 1;
+						var dm = "";
+						var sc = "SH";
+						
+						var mc = "";
+						for(var key in json[i]){ //行元素遍历						
+							var td=document.createElement("td");							
+							
+							var rc = json[i][key];
+							if(p == 1){  //代码列
+								dm = rc;
+								if(dm.substr(0,2)!="11"){
+									sc = "SZ";
+								}
+								tr.id = dm;
+								
+								td.innerHTML = "<a href=https://www.xilimao.com/tdx/" + dm + "/ id='" + p + "' onclick='changeCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";
+							}else if(p == 2){
+								td.innerHTML = "<a href=基本面(定).html##" + dm + " id='" + p + "' onclick='changeCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";
+							}else {
+								
+								td.innerHTML = "<a href=https://xueqiu.com/S/" + sc + dm + " id='" + p + "' onclick='changeCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";
+							}					
+							
+							
+							if(p == n + 1){							
+								td.getElementsByTagName("a")[0].style.color = "#FF6633";
+							}																				
+							tr.appendChild(td);							
+							p++;
+						}														
+						tbody.appendChild(tr);																
+					}					
+					var div = document.getElementById("towrite");									
+					div.appendChild(table);
+					table.id = "gg";	
+								
+				}	
+				document.getElementById("PriceDate").value = tt;
+				
+				var table=document.getElementsByTagName("table")[0];
+				makeSortable(table);
+				hover();
+			}
+			
+			function makeSortable(table) {
+				var headers=table.getElementsByTagName("th");
+				for(var i=0;i<headers.length;i++){				
+					(function(n){
+						var flag=false;
+							
+						headers[n].onclick=function(){												
+							showCol(n);		//高亮
+							var tbody=table.tBodies[0];
+							var rows=tbody.getElementsByTagName("tr");
+							rows=Array.prototype.slice.call(rows,0);
+
+							//基于第n个<td>元素的值对行排序
+							rows.sort(function(row1,row2){
+								headtxt = headers[n].textContent;								
+								var cell1=row1.getElementsByTagName("td")[n];//获得第n个单元格
+								var cell2=row2.getElementsByTagName("td")[n];																
+								var val1=cell1.textContent||cell1.innerText;//获得文本内容
+								var val2=cell2.textContent||cell2.innerText;
+								if(headtxt.indexOf("名称") != -1 || headtxt.indexOf("板块") != -1){
+									val1 = val1;
+									val2 = val2;
+								}else{
+									if(val1 == "-"){
+										val1 = " ";
+									}
+									if(val2 == "-"){
+										val2 = " ";
+									}
+									val1 = val1.replace(" ","0").replace("无","1000").replace("NaN","0");
+									val2 = val2.replace(" ","0").replace("无","1000").replace("NaN","0");
+									if(val1.indexOf("万") != -1){
+										val1 = parseFloat(val1)*10000;
+									}else if(val1.indexOf("亿") != -1){
+										val1 = parseFloat(val1)*100000000;
+									}else{
+										val1 = parseFloat(val1);
+									}
+									
+									if(val2.indexOf("万") != -1){
+										val2 = parseFloat(val2)*10000;
+									}else if(val2.indexOf("亿") != -1){
+										val2 = parseFloat(val2)*100000000;
+									}else{
+										val2 = parseFloat(val2);
+									}
+								}
+								if(val1<val2){
+									return -1;
+								}else if(val1>val2){
+									return 1;
+								}else{
+									return 0;
+								}
+							});
+							if(flag){
+								rows.reverse();
+							}
+							
+							for(var i=0;i<rows.length;i++){
+								tbody.appendChild(rows[i]);
+							}
+
+							flag=!flag;
+						}
+					}(i));
+				}
+			}
+			
+			function showCol(iCol){			
+				var oTable = document.getElementsByTagName('table')[0];
+				for (i=0;i < oTable.rows.length; i++){										
+					for (j=0;j < oTable.rows[0].cells.length; j++){
+						oTable.rows[i].cells[j].style.color = "#d2d2d3";									
+					}
+					oTable.rows[i].cells[iCol].style.color = "#FF6633";					
+				}
+
+				otagsA = oTable.getElementsByTagName("a");  //a变色
+				for (i = 0; i < otagsA.length; i++) {
+					otagsA[i].style.color = "#d2d2d3";					
+					if(otagsA[i].id == iCol + 1){
+						otagsA[i].style.color = "#FF6633";
+					}
+				}								
+			}
+		</script>
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

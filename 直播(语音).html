@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>直播</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			//p {margin:5px}
+			//ul {margin:1px}			
+			//h4 {margin:1px}	
+			.fixedBox{
+				border: 1px solid #555555;				
+				//white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+				getSource();
+				changeStyle();				
+			}			
+
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　
+			　　
+   　　　	var k = 1;	
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")
+				k++;
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "480px";	
+				obj1.style.height= "620px";		
+				obj1.style.fontSize="14px";				
+			}
+			
+			function closeStyle() {				
+				var obja = document.getElementById("fb");
+				if(obja.innerText=="▲")
+				{
+					obja.innerText="▼";	
+					var obj = document.getElementById("towrite2");					
+					obj.style.left= "550px";
+					obj.style.width= "250px";			  
+					obj.style.height= "30px";
+				}
+				else if(obja.innerText=="▼")	
+				{
+					obja.innerText="▲";	
+					changeStyle();
+				}			
+			}
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}
+			
+			function speckText(str){
+				//var url = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + encodeURI(str);        // baidu
+				var url = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&cuid=baike&ctp=1&pdt=311&vol=9&rate=32&per=0&text=" + encodeURI(str);				
+				var n = new Audio(url);
+				n.src = url;
+				n.play();				
+			}
+			
+			function UnUnicode(str) {
+				return unescape(str.replace(/\\/g, "%"));
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();			
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");				
+				}
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			function getSource() {	
+						
+				var url = "https://apphq.longhuvip.com/w1/api/index.php?a=ZhiBoContent&apiv=w21&c=ConceptionPoint&PhoneOSNew=1"; 				
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);				
+			}
+			
+			var tts = "";	
+			var ts = "";			
+			function writeSource() { 			
+			if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText			
+				//data = data.replace(/ /g,"").replace(/\"Time\":(\d{10})/g, function(word){ str = word.match(/\"Time\":(\S*)/)[1]; return '\"Time\":\"' + getLocalTime(str)+'\"';});  //时间							
+				data = data.replace(/ /g,"").replace(/(\"Time\":).*?(?=,)/g, function(word){ str = word.match(/\"Time\":(\S*)/)[1]; return '\"Time\":\"' + getLocalTime(str)+'\"';});  //时间							
+				data = data.replace(/(,\"DisStock\":\[\[).*?(\]\])/g,"").replace(/,\"DisStock\":\[\]/g,"");//del DisStock							
+				data = data.replace(/(\"Stock\":\[\[).*?(?=\])/g,function(word){ str = word.match(/\"Stock\":\[\[(\S*)/)[1]; return '"Stock":[{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1] + ',"zf":' + str.split(',')[2];});
+				data = data.replace(/(\],\[).*?(?=\])/g,function(word){ str = word.match(/\],\[(\S*)/)[1]; return '},{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1] + ',"zf":' + str.split(',')[2];});
+				data = data.replace(/]]}/g,"}]}");
+				//////data = data.replace(/\"Stock\":\[\[/g,'\"Stock\":{\"Stocks\":[').replace(/\],\[/g,'],\"Stocks\":[').replace(/\]\],/g,']}');
+				//alert(data);	
+				//document.write(data);
+				
+				ss = data.split('}]},{');
+				var	x = 0;
+				var xxx=""				
+				for (i = 0; i < ss.length; i++)				
+				{
+					var tt = ss[i].match(/\"Comment\":\"(\S*)\",\"Type/)[1];
+					tt = UnUnicode(tt);
+					
+					if(tts.indexOf(tt) == -1)
+					{
+						if(k == 1) //（刷新网页）
+						{
+							if(x <= 2)  //只播放前三条
+							{
+								ts += tt + ";";
+							}
+							tts += tt + ";";
+						}
+						else
+						{
+							ts += tt + ";";
+							tts = tt + ";" + tts;
+						}
+						//tts += tt + ";";	
+						x++;						
+					}					
+				}
+				//alert(x);
+				xxx = ts;
+				if(ts != "")
+				{
+					speckText(ts);
+					ts = "";					
+				}
+				var transform_aa = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.List, transform_bb));}}
+				];
+				
+				var transform_bb= 				
+				{"tag":"p", children:[				
+				{"tag": "b","html":"【${Time}】 ${Comment}"},	
+				<!-- {"tag": "b", "html": function(){ -->
+				
+					<!-- if(k == 1)  //首次不播报 -->
+					<!-- { -->
+						<!-- tts += this.Comment + ";"; -->
+					<!-- } -->
+					<!-- if(tts.indexOf(this.Comment) == -1 && k > 1) -->
+					<!-- { -->
+						<!-- //speckText(this.Comment); -->
+						<!-- tts += this.Comment + ";"; -->
+						<!-- //sleep(1000); -->
+					<!-- }											 -->
+					<!-- return("【" + this.Time + "】" + this.Comment); -->
+				<!-- }},				 -->
+				{"tag":"p", children:function(){return(json2html.transform(this.Stock, transform_cc));}},    							
+				]};
+				
+				var transform_cc= 
+				{"tag":"p", children:[
+				//{"tag": "li", "html":"${code} ${name}"},
+				{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' onclick='changeCss(this,\"towrite\")'>${code} ${name} &nbsp;&nbsp;涨幅：${zf}% </a>"}, 							
+				]};  
+				
+				var html = json2html.transform(data, transform_aa);		
+				div = document.getElementById('towrite');
+				div.innerHTML = '<h4>直播</h4>' + html;
+				}											
+			}
+		</script>
+	</head>
+	<body>		
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

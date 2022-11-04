@@ -1,0 +1,72 @@
+            /* 修改了下拉菜单20220821 */
+.nav{
+            /* 整体框架大小位置 */
+            width: 100%;
+            height: 100%;
+            position: relative;
+            top: 0px;
+        }
+        .nav li{
+            /* 导航栏大小 */
+            width: 18%;
+            height: 30px;
+            /* 去浮动，使li横向布局 */
+            float: left;
+            /* 每个li之间间隙 */
+            margin-right: 2px;
+            /* 去点 */
+            list-style: none;
+            /* 背景颜色 */
+            background-color: gray;
+            /* 行高，使文本居中 */
+            line-height: 30px;
+            text-align: center;
+            /* 阴影，使导航栏有层次感 */
+           
+        }
+		.nav li ul{margin-top: 2px;}
+        .nav li ul li {
+            /* 去点 */
+            list-style: none;
+            /* 下拉菜单大小 */
+            width: 60px;
+            height: 30px;
+            /* 去浮动，使li横向布局 */
+            float: left;
+            /* 背景颜色 */
+			font-size: 12px;
+            background-color: chocolate;
+            /* 阴影，使导航栏有层次感 */
+            border: 1px rgba(0, 0, 0, 0.1) solid;
+           /* margin-top: 5px; 此代码可使下拉菜单有间隔，更美观，但无法实现hover效果 */
+        }
+        .nav li:hover{
+            /* 鼠标 */
+            cursor: pointer;
+            /* 背景颜色 */
+            background-color: #50536e;
+            /* 阴影，使导航栏有层次感 */
+            
+            /* 执行时间 */
+            transition: 0.3s;
+        }
+            /* 隐藏 */
+        .nav li ul li {
+            display: none;
+			margin: 0px 0px 0px -14px;
+        }
+		 .nav a {
+            margin: 0px 0px 0px 0px;
+        }
+            /* 显示 */
+        .nav li:hover ul li{
+            display: block;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .nav li ul li:hover{
+            cursor: pointer;
+            background-color: sandybrown;
+        }
+
+	/* 下拉菜单   */

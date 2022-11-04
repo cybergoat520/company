@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>同花顺热点板块</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />		
+		<style type="text/css">						
+			#towriter{
+				border: 1px solid #555555;
+				white-space: normal;											
+			}
+			.fixedBox{					
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 8px;     
+				height: 8px;				
+			}					  			
+			table{
+			width:380px; 
+			border-collapse:collapse; 
+			text-align:center;
+			}
+			td,th{border:1px solid #696969}	
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource();
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj = document.getElementById("towriter");				
+				obj.style.left= "0px"; 				
+				obj.style.width= "710px";	
+				//obj.style.height= "630px";		
+				
+				var obj1 = document.getElementById("towrite1");				
+				obj1.style.width= "280px";	//左侧宽度
+				obj1.style.fontSize="12px";	//左侧字体
+				
+				var obj2 = document.getElementById("towrite2");
+				obj2.style.left= "250px";   //右侧左边位置
+				obj2.style.width= "400px";  //右侧宽度
+				obj2.style.fontSize="12px";	//右侧字体		  		  			  
+			}
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			}
+			
+			function NumberTransform(num) { 
+				var result = num;
+               if(Math.abs(num) > 100000000){
+			    result = num / 100000000;
+				result = result.toFixed(2) + "亿";
+			   }else if(Math.abs(num) > 10000){
+			    result = num/10000;
+				result = result.toFixed(0) + "万";
+			   }				   
+               return result;  
+			};	
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp1 = new XMLHttpRequest();
+				xmlHttp2 = new XMLHttpRequest();
+				} else {
+				xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");				
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				//ranking();
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			var trid = "";
+			function changeTCss(obj,hid,id){						
+				var tlist = document.getElementById(id).getElementsByTagName("tr");					
+				for(var i = 0; i < tlist.length; i++){														
+					tlist[i].style.backgroundColor = "#252528"; 					
+				}
+				trid = hid;
+				var tr = document.getElementById(hid);				
+				tr.style.backgroundColor = "#483D8B";						
+			}
+			
+			function hover(){  //鼠标经过
+				var rows = document.getElementsByTagName('tr');
+				for(var i=0;i<rows.length;i++){
+					rows[i].onmouseover=function(){						
+						if(this.id != ""){  //过滤表头
+							this.style.background="#800000";
+						}
+					}
+					rows[i].onmouseout=function(){
+						if(this.id != ""){  //过滤表头
+							if(this.id != trid){  //过滤选中行
+								this.style.background="#252528";
+							}else{
+								this.style.background="#483D8B";
+							}
+						}						
+					}					
+				}
+			}			
+			
+			function getSource() {	    							
+				var url1 = "http://zx.10jqka.com.cn/hotblock/proxy/block/platerankinfo?callback=jQuery183035776317082556974_1624191358973&platetype=all"; //概念：concept  行业：industry  地域：zone								
+				createXmlHttp();				
+				xmlHttp1.onreadystatechange = writeSource;
+				xmlHttp1.open("GET", url1, true);
+				xmlHttp1.send(null);				
+			}
+			
+			
+			function writeSource() { 
+				if (xmlHttp1.readyState == 4) {				
+					var data = xmlHttp1.responseText					
+					//document.write(data);
+					
+					data = data.replace(/ /g,"")					
+					data = "{" + data.match(/\(\{(\S*)\}\]\}\)/)[1] + "}]}";
+					//document.write(data);
+					var transform_aa = [           
+					{"tag":"p", children:function(){return(json2html.transform(this.result, transform_bb));}}
+					];
+					
+					var n = 0;
+					var transform_bb= 
+					{"tag":"p", children:[																			
+					{"tag": "p", "html": function(){
+						n++;
+						return("<a href='javascript:void(0);' onclick='changeCss(this,\"towrite1\");update(\"" + this.platecode + "\"+\"#\"+\"" + this.platename + "\");'>" + 
+					    n + "、" + this.platecode + "&nbsp;&nbsp;" + 
+						this.platename + "&nbsp;&nbsp;" + 
+						"涨幅：" + keepTwoDecimal(this.increase) + "%</a>"
+					);}},					
+					]};
+								
+					var html = json2html.transform(data, transform_aa); 				
+					div = document.getElementById('towrite1');							
+					div.innerHTML = '<h4>同花顺热点概念：</h4>' + html;
+					$("div a:first").click();						
+				}			
+			}
+			
+			function update(ss) {				
+				var dms=ss.split('#');
+				dm = dms[0];
+				bk = dms[1];				
+				div2 = document.getElementById('towrite2');				
+				div2.innerHTML = '<h4>' + bk + '</h4>';				
+				var url2 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&st=30&a=ZhiShuStockList_W8&c=ZhiShuRanking&old=1&apiv=w21&Type=6&PlateID=" + dm; 
+				//var url2 = "https://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/1/ajax/1/code/" + dm;				
+				createXmlHttp();
+				xmlHttp2.onreadystatechange = writeSource2;				
+				xmlHttp2.open("GET", url2, true);
+				xmlHttp2.send(null);				
+			}
+						
+			function writeSource2() { 			
+				if (xmlHttp2.readyState == 4) {                  	
+					var data2 = xmlHttp2.responseText					
+					//document.write(data2);
+					var div = document.getElementById("towrite2");
+					if(data2.indexOf('"list":[]') == -1){
+						data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';	
+						data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+						str = word.match(/\[(\S*)/)[1]; 
+						return '{"code":' + str.split(',')[0] + 
+						',"name":' + str.split(',')[1] +
+						',"xj":'+str.split(',')[5] +
+						',"zf":'+str.split(',')[6] +
+						',"zs":'+str.split(',')[9] +
+						',"ltsz":'+str.split(',')[38];});
+										
+						data2 = data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]");					
+						//document.write(data2);
+						
+						var json = JSON.parse(data2);
+							
+						//创建table					
+						var table=document.createElement("table");										
+						var thead=document.createElement("thead");
+						table.appendChild(thead);					
+						var tr=document.createElement("tr");
+						thead.appendChild(tr);					
+						
+						var m = 0;
+						var v = 0;
+						var b = 0;
+						var gl = "涨幅";  //高亮
+						for(var key in json[0]){  //表头													
+							key = key.replace('code','代码').replace('name','名称').replace('zf','涨幅%').replace('xj','现价').replace('ltsz','流通市值').replace('zs','涨速%');
+							var th=document.createElement("th");						
+							th.innerHTML=key;						
+							tr.appendChild(th);										
+							if(gl == key.replace("%","")){
+								v = m;
+								th.style.color = "#FF6633";	
+							}
+							m++;
+						}
+											
+						var tbody=document.createElement("tbody");					
+						table.appendChild(tbody);
+						
+						//遍历json
+						for(var i = 0; i < json.length; i++){					
+							var tr=document.createElement("tr");						
+							var p = 1;	
+							var dm = "";
+							var mc = "";					
+							for(var key in json[i]){ //行元素遍历					
+								var td=document.createElement("td");							
+								
+								var rc = json[i][key];
+								if(p == 1){  //代码列
+									dm = rc;
+									tr.id = dm;
+								}else if(p == 5){
+									rc = keepTwoDecimal(rc);
+								}else if(p == 6){
+									rc = NumberTransform(rc);
+								}						
+								td.innerHTML = "<a href=https://m.10jqka.com.cn/stockpage/hs_" + dm + "/ target=_blank id='" + p + "' onclick='changeTCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";
+									
+								if(p == v + 1){							
+									td.getElementsByTagName("a")[0].style.color = "#FF6633";
+								}						
+								tr.appendChild(td);
+								p++;
+							}						
+							tbody.appendChild(tr);
+						}		
+						
+						div.style.whiteSpace = "nowrap";				
+						div.appendChild(table);
+						table.id = "gg";					
+						
+						var table=document.getElementsByTagName("table")[0];
+						makeSortable(table);			
+						hover();
+					}else{
+						div.innerHTML += "暂无";
+					}
+				}
+			}
+			
+			var f = 1;
+			function makeSortable(table) {
+				var headers=table.getElementsByTagName("th");
+				for(var i=0;i<headers.length;i++){				
+					(function(n){
+						var flag=false;
+							
+						headers[n].onclick=function(){							
+							showCol(n);		//高亮
+							var tbody=table.tBodies[0];
+							var rows=tbody.getElementsByTagName("tr");
+							rows=Array.prototype.slice.call(rows,0);
+
+							//基于第n个<td>元素的值对行排序
+							rows.sort(function(row1,row2){
+								headtxt = headers[n].textContent;								
+								var cell1=row1.getElementsByTagName("td")[n];//获得第n个单元格
+								var cell2=row2.getElementsByTagName("td")[n];																
+								var val1=cell1.textContent||cell1.innerText;//获得文本内容
+								var val2=cell2.textContent||cell2.innerText;
+								if(headtxt.indexOf("名称") != -1){
+									val1 = val1;
+									val2 = val2;												
+								}else{
+									if(val1 == "-"){
+										val1 = " ";
+									}
+									if(val2 == "-"){
+										val2 = " ";
+									}									
+									if(val1.indexOf("万") != -1){
+										val1 = parseFloat(val1)*10000;
+									}else if(val1.indexOf("亿") != -1){
+										val1 = parseFloat(val1)*100000000;
+									}else{
+										val1 = parseFloat(val1);
+									}
+									
+									if(val2.indexOf("万") != -1){
+										val2 = parseFloat(val2)*10000;
+									}else if(val2.indexOf("亿") != -1){
+										val2 = parseFloat(val2)*100000000;
+									}else{
+										val2 = parseFloat(val2);
+									}
+								}
+								if(val1<val2){
+									return -1;
+								}else if(val1>val2){
+									return 1;
+								}else{
+									return 0;
+								}
+								
+							});
+							if(flag){
+								rows.reverse();								
+							}
+							
+							for(var i=0;i<rows.length;i++){
+								tbody.appendChild(rows[i]);
+							}
+
+							flag=!flag;
+							f = f * (-1);
+						}
+					}(i));
+				}
+			}
+			
+			function showCol(iCol){			
+				var oTable = document.getElementsByTagName('table')[0];
+				for (i=0;i < oTable.rows.length; i++){										
+					for (j=0;j < oTable.rows[0].cells.length; j++){
+						oTable.rows[i].cells[j].style.color = "#d2d2d3";						
+					}
+					oTable.rows[i].cells[iCol].style.color = "#FF6633";					
+				}
+
+				otagsA = oTable.getElementsByTagName("a");  //a变色
+				for (i = 0; i < otagsA.length; i++) {
+					otagsA[i].style.color = "#d2d2d3";					
+					if(otagsA[i].id == iCol + 1){
+						otagsA[i].style.color = "#FF6633";
+					}
+				}								
+			}
+						
+		</script>
+	</head>
+	<body>
+		<div id="towriter" class="fixedBox">			
+			<div id="towrite1" ></div>		
+			<div id="towrite2" class="fixedBox" ></div>
+		</div>
+	</body>
+</html>

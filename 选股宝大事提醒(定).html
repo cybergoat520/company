@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>选股宝大事提醒</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">	
+			p {margin:1px;}					
+			ul {margin:1px;}			
+			b {margin:0px}	
+			.fixedBox{	
+				border: 5px solid #555555;
+				white-space: nowrap;	
+			}			
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}
+			
+			#f10{
+				color: #FFD700;		<!-- 公司概况、大事提醒 标题颜色-->
+			}
+			
+			#f11{
+				color: #FFFFE0;		<!-- 公司概况、大事提醒 详情颜色-->
+			}
+			
+			#title{
+				color: #FFFF00;		<!-- 标题颜色 -->
+			}  
+			
+		</style>		
+		
+		
+	</head>
+	<body>
+		
+		<div id="towrite" class="fixedBox"></div>
+		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		
+		<script>
+			window.onload = function() {						
+				getSource();				
+				changeStyle();					
+			}
+			
+			$(function() {
+				setInterval(function() {					
+					getSource();																	
+				},
+				500);
+			})					
+			
+			function changeStyle() {				
+				var obj = document.getElementById("towrite");
+				//obj.style.border = "none"; 
+				obj.style.left= "0px"; 				
+				obj.style.width= "90%";						
+				//obj.style.height= "630px";		
+				obj.style.fontSize="12px";									
+			}			
+			
+			var gpdm = "";
+			var gpmc = "";
+			var dm = "";
+			var ds = 0;
+			var dms = "";
+			function getSource() {
+				var u = decodeURI(window.location.href);					
+				if(u.indexOf("##") > -1){
+					var gp = u.split('##');				
+					dm = gp[1];
+					gpmc = gp[2];					
+					//alert(dm);
+					dm == gpdm ? ds = 0: ds = 1;					
+				}else{
+					dm = "600000";
+					gpmc = "浦发银行";
+				}
+				
+				if(dm != gpdm){					
+					gpdm = dm;
+									
+					if(dm.substr(0,1)=="6"){
+						dms = dm + ".SS";					
+					}else{
+						dms = dm + ".SZ";					
+					}
+										
+					
+					//大事提醒
+					var url31 = "https://flash-api.xuangubao.cn/api/f10/great_events?symbol=" + dms; 																														
+					xmlHttp31 = new XMLHttpRequest();							
+					xmlHttp31.onreadystatechange = writeSource5;
+					xmlHttp31.open("GET", url31, true);
+					xmlHttp31.send(null);
+					
+					//个股标签
+					var url30 = "https://flash-api.xuangubao.cn/api/stock_label/labels?symbols=" + dms;				 																													
+					xmlHttp30 = new XMLHttpRequest();							
+					xmlHttp30.onreadystatechange = writeSource5;
+					xmlHttp30.open("GET", url30, true);
+					xmlHttp30.send(null);
+					
+				}
+			}
+			
+			function writeSource5() { 
+				if (xmlHttp31.readyState == 4 && xmlHttp30.readyState == 4) { 
+					var div = document.getElementById('towrite'); 					
+					//div.innerHTML = "<b id=title>大事提醒：</b>";
+					//div.innerHTML = "<a href='javascript:void(0)' id='title' >大事提醒" + gpdm + gpmc + "</a>";
+					div.innerHTML = "<font size='3' style=color:#FFFF00;>大事提醒：<font size='2' color=#fff>&nbsp;&nbsp;&nbsp;&nbsp;" + gpdm + "&nbsp;&nbsp;" + gpmc + "</font></font>";
+
+					var data = xmlHttp31.responseText;
+					data = data.replace(/ /g,"")					
+					//document.write(data);
+										
+					var data1 = xmlHttp30.responseText.replace(new RegExp(dms,'g'),"items")  //对变量进行全文替换														
+					//document.write(data1);					
+					if (data1.indexOf('"data":{}') == -1){ 	
+						var transform_aa1 = [           
+						{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+						];  
+						
+						var transform_bb1 = [
+						{"tag":"p", children:[ 		
+						{"tag": "p style=color:#00FFFF;", "html":"个股标签"},		
+						{"tag":"ul", children:function(){return(json2html.transform(this.items, transform_cc1));}}]}
+						];  
+						
+						var transform_cc1= 
+						{"tag":"li style=color:#ADFF2F;", children:[   	
+						{"tag":"p", "html":"${label_name}"}, 
+						{"tag":"p style=color:#FF6347;white-space:normal;", "html":"${description}"},                   
+						]};						
+					}
+				
+					var transform_aa = [           
+						{"tag":"ul style=color:#FFD700;", children:function(){return(json2html.transform(this.data, transform_bb));}}
+					];
+					
+					var transform_bb= 
+						{"tag":"li", children:[ 																	
+						{"tag": "p id=f10", "html": function(){
+							var rq = this.Date.split("T")[0];							
+							return(rq + '&nbsp;&nbsp;' + this.Title);					
+						}},
+						{"tag":"p id=f11 style=white-space:normal;margin-bottom:10px;", "html":"${Description}"}, 										
+					]};
+					
+					var html = json2html.transform(data, transform_aa);
+					var html1 = json2html.transform(data1, transform_aa1);
+					div.innerHTML += html1 + html;	
+					div.scrollTop = 0; //回到顶部
+				}
+			}			
+		</script>
+		
+	</body>
+</html>

@@ -1,0 +1,3 @@
+浏览器地址最后要加上：“##xxxxxx”，例如：
+
+file:///C:/TDXdate/company/%E8%BF%91%E6%9C%9F%E9%87%8D%E8%A6%81%E4%BA%8B%E4%BB%B6.html##xxxxxx

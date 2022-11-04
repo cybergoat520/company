@@ -1,0 +1,598 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta charset="utf-8">
+		<title>
+			题材龙头明细
+		</title>
+		
+		<style>
+			@charset "UTF-8";body,html{-moz-user-select:none;-khtml-user-select:none;user-select:none;width:100%;height:100%}*{margin:0;padding:0}body{list-style:none;font:15px
+			'Microsoft YaHei',微软雅黑,tahoma,arial,Helvetica,sans-serif;font-weight:400;line-height:1.5;overflow:hidden}.center,.top{left:0;position:absolute}.top{width:100%;height:240px;top:0}.center{height:24px;top:240px;padding:0
+			28px 0 20px}.center table th{text-align:right}.bottom,.bottom .left{position:absolute;bottom:0}.bottom{width:100%;top:264px;left:0}.bottom
+			.left{left:10px;right:18px;top:0;z-index:2;overflow:hidden;padding:0 10px}.bottom
+			.left tr.stockinfo td{height:24px;text-align:right;line-height:24px}.bottom
+			.left tr.stockinfo td:nth-child(2){padding-left:20px}.bottom .left table
+			thead th{padding:0;border-width:0;height:0}.bottom .left .first tr:nth-child(1)
+			td:nth-child(1){border-width:0}.bottom .left .line{position:absolute;z-index:-1;width:1px;left:0;top:9px;height:24px}.bottom
+			.left tr td:nth-child(1){border-width:0 0 0 1px;border-left-style:solid}.bottom
+			.right{position:absolute;right:0;width:18px;top:0;bottom:0}.loading{position:absolute;z-index:999;top:60px;height:60px;line-height:60px;left:0;text-align:center;width:100%}.rq{position:relative;height:32px;line-height:32px}.rq
+			.cicle{position:absolute;left:-6px;top:9px;width:10px;height:10px;border-radius:5px}.loadingimage{background-image:none!important}.txblack
+			body{background-color:#000;color:#a1a1a1}.txblack .iScrollIndicator{background-color:#000;border:1px
+			solid #414141}.txblack .loading{background:url(data:image/gif;base64,R0lGODlhIAAgALMPAClScBgoNR41SDp7qUeb1kuk4z2DtESSyi9ggzNrkiNDWxMcJTdynUGKvxAUGQAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkQ1RUQ2QkQ2RTY1NzExRThBNzZDREVFNjdBODgzMzhDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkQ1RUQ2QkQ3RTY1NzExRThBNzZDREVFNjdBODgzMzhDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RDVFRDZCRDRFNjU3MTFFOEE3NkNERUU2N0E4ODMzOEMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6RDVFRDZCRDVFNjU3MTFFOEE3NkNERUU2N0E4ODMzOEMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4B//79/Pv6+fj39vX08/Lx8O/u7ezr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)
+			no-repeat center center}.txblack .color-up{color:#f33}.txblack .color-down{color:#0bab5b}.txblack
+			.rq .cicle,.txwhite .rq .cicle{background-color:#fba710}.txblack .select{background-color:#202020}.txblack
+			.bottom .left tr td:nth-child(1),.txwhite .bottom .left tr td:nth-child(1){border-left-color:#bcbcbc}.txblack
+			.bottom .left td{color:#fff}.txblack .bottom .left td.title{color:#8f8f8f}.txblack
+			.bottom .left td.hqcode{color:#ffe98f}.txblack .bottom .left .line,.txwhite
+			.bottom .left .line{background:#bcbcbc}.txwhite body{background-color:#fff;color:#333}.txwhite
+			.iScrollIndicator{background-color:#fff;border:1px solid #efefef}.txwhite
+			.loading{background:url(data:image/gif;base64,R0lGODlhIAAgAPfRAP7+//n8/vX6/v3+//D4/fz+//f7/u73/fv9/+Lx/ODw+/r9/vT6/vz9//L5/eTy/Oz2/cvm+Wy47qjV9V6x7Nbr+ubz/FOs69Tq+qbU9PL5/vb7/vj8/t3v+9vt+7La9lWt6+/3/en0/NLp+r3f99Pq+ur1/ef0/Oj0/GCy7Lbc9ufz/Mzm+Xq/71eu6/P5/tnt++Py/Lzf93G77srl+ev2/YHC8JrO89Xr+orH8cLh+PH4/dDo+dns+uXz/JbM83zA8HW878Pi+I3I8s3n+cfk+MTj+NHp+uv1/Vyw7Ljd96/Y9o/J8qTT9Gi27Wq37Viu65TL8oDC8KnW9dfs+nu/78nl+azX9d3u+06q6rTb9oXE8Xa97+n1/Hm+7+Hw+5HK8pDJ8rre95jN82+57u32/a7Y9VCq6mGz7IPD8IfF8VKr61qv7ILD8N7v+5fN82e17aDR9JPL8lGr6s/o+cbj+HO876PS9Nrt+9vu+3O77tfr+p3P83i+78Ti+G+67r7g95zP82a17b/g97DZ9ojG8X3A8Lve97/g+GS07WW07WGy7LXb9l2x7LPa9q3X9cXj+IjF8ZLK8p7Q9Lnd99js+qbU9d/v+3/B8KrW9cjk+J3Q82Kz7JnO82O07Xe976HR9MDh+KLS9HC67mu47rfc96/Z9lqv61+y7FCr6o3I8avX9Vat62m27W657mOz7aXT9LHZ9p/R9HG67k+q6obF8YbE8cbk+FSs66vW9Z/Q9E6p6qHS9HK77s7n+Y7I8ovH8ZvP88Hh+Nzu+4TE8ZXM8mW17YnG8afV9XS878Li+IzH8Vmv61uw7H7B8HW9763Y9f///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKFdpbmRvd3MpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjdBNjI4QUJBQUQ2QjExRTY5MkE3RjNGODY0ODM1NUE3IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjdBNjI4QUJCQUQ2QjExRTY5MkE3RjNGODY0ODM1NUE3Ij4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6N0E2MjhBQjhBRDZCMTFFNjkyQTdGM0Y4NjQ4MzU1QTciIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6N0E2MjhBQjlBRDZCMTFFNjkyQTdGM0Y4NjQ4MzU1QTciLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4B//79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3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)
+			no-repeat center center}.txwhite .color-up{color:#f33}.txwhite .color-down{color:#0bab5b}.txwhite
+			.bottom .left td.hqcode{color:#c09b00}
+		</style>
+		<script>
+			var JsUrl = {};
+			! function() {
+				document.documentElement.focus();
+				var t = window.location.search.substring(1);				
+				if (void 0 !== t)
+					for (var l = t.split("&"), e = 0; e < l.length; e++) JsUrl[l[e].split("=")[0]] = l[e].split("=")[1];
+				"0" == JsUrl.color ? JsUrl.style = "black" : JsUrl.style = "white", "white" == JsUrl.style ? document.getElementsByTagName("html")[0].setAttribute("class", "txwhite") : document.getElementsByTagName("html")[0].setAttribute("class", "txblack"), JsUrl.dirhtml = "http://page.tdx.com.cn:7615/site/pcwebcall/html/"
+			}()			
+		</script>
+		
+	</head>
+	<body onselectstart="return!1">
+		<script>
+			void 0 !== JsUrl.bkcolor && "-1" == JsUrl.bkcolor.indexOf("tdxbkcolor") && "0" == JsUrl.color && (document.getElementsByTagName("body")[0].style.background = "#" + JsUrl.bkcolor)
+		</script>		
+		<div class="top" id="top" >			
+		</div>
+		<div class="center" id="center" >			
+			<table style="width:100%;border-collapse:collapse;table-layout:fixed"
+			border="0" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr>
+						<th width="20">&nbsp </th>
+						<th width="100">涨停时间</th>
+						<th width="80">代码</th>
+						<th width="80">名称</th>
+						<th width="80">现价</th>
+						<th width="80">涨幅</th>
+						<th width="36%">封单额</th>
+						<th width="28%">封成比</th>
+						<th width="36%">几天几板</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+		<div class="bottom" id="bottom">
+			<div class="left" id="left">
+				<div class="scrollBox" id="scrollBox">
+				</div>
+			</div>
+			<div class="right" id="right">
+			</div>
+		</div>
+		<div class="loading" id="loading">
+		</div>
+		<script src="http://page.tdx.com.cn:7615/site/lib/jquery.min.js">
+		</script>
+		<script src="http://page.tdx.com.cn:7615/site/lib/echarts.min.js">
+		</script>
+		<script src="http://page.tdx.com.cn:7615/site/pcwebcall/mylib/echartcolor.js">
+		</script>
+		<script src="http://page.tdx.com.cn:7615/site/pcwebcall/mylib/tscroll.js">
+		</script>
+		<script src="http://page.tdx.com.cn:7615/site/pcwebcall/mylib/dataFormat.js">
+		</script>
+		<!-- <script src="http://page.tdx.com.cn:7615/site/lib/connect/req.js"> -->
+		<!-- <script src="req.js"> -->
+		<!-- </script> -->
+		<script>
+			"use strict";
+			var glob = {
+				loadstate: 0,
+				lastrq: "",
+				page: 1,
+				recid: {},
+				waitstate: 1,
+				hqstock: {},
+				hqinfo: {},
+				rowindex: 0,
+				currowindex: -1,
+				prerowindex: -1,
+				columns: [{
+					field: "T006",
+					title: "涨停时间"
+				}, {
+					field: "code",
+					title: "代码"
+				}, {
+					field: "name",
+					title: "名称"
+				}, {
+					field: "xj",
+					title: "现价"
+				}, {
+					field: "zf",
+					title: "涨幅"
+				}, {
+					field: "T005",
+					dataType: 10,
+					title: "封单额"
+				}, {
+					field: "T018",
+					dataType: 2,
+					title: "封成比"
+				}, {
+					field: "lbxx",
+					dataType: 0,
+					title: "几天几板"
+				}],
+				tdObj: {}
+			};
+
+			function updategrid(t) {
+				if (-1 != (t = fnRst(t)) && -2 != t && 0 != t.length && 0 != t[0].rows.length) {
+					var e = 0;
+					if (2 == t.length && (e = t[1].rows[0].cnt), 1 == glob.page && 1 == e)
+						for (var o = 0; o < t[0].rows.length; o++) t[0].rows[o].cnt = 1;
+					transR(t[0].rows), glob.page += 1, glob.page % 2 == 0 ? queryLoad() : glob.loadstate = 1
+				}
+			}
+
+			function queryLoad() {
+				JsUrl.ztbkcode ? CallTQL(updategrid, "pcwebcall_tclt_ztmx", ["8", JsUrl.ztbkcode, glob.page + ""], {
+					reqtype: "cwserv"
+				}) : CallTQL(updategrid, "pcwebcall_tclt_ztmx", ["2", JsUrl.ztid, glob.page + ""], {
+					reqtype: "cwserv"
+				})
+			}
+
+			function transR(t) {
+				for (var e = [], o = {}, l = 0; l < t.length; l++) {
+					var r = t[l].rq + t[l].code;
+					glob.recid[r] || (-1 == $.inArray(t[l].rq, e) && (e.push(t[l].rq), o[t[l].rq] = []), o[t[l].rq].push(t[l])), glob.hqstock[t[l].code] = {
+						code: t[l].code,
+						sc: t[l].sc
+					}
+				}
+				if (e.length)
+					if ("1" != glob.page) {
+						if (e[0] == glob.lastrq) return glob.lastrq = e[e.length - 1], void createD(e, o, 1);
+						glob.lastrq = e[e.length - 1], createD(e, o, 0)
+					} else glob.lastrq = e[e.length - 1], createD(e, o, 0)
+			}
+
+			function createD(t, e, o) {
+				var l = "",
+					r = "",
+					a = glob.columns.length;
+				"1" == glob.page && (r = "first");
+				for (var i = ['<table class="' + r + '" style="width:100%;border-collapse: collapse;table-layout: fixed;"  border="0" cellspacing="0" cellpadding="0">'], n = ['<thead> <tr><th  width="20"></th>'], s = 0; s < a; s++) 0 == s ? n.push('<th  width="100"></th>') : 1 == s || 2 == s || 3 == s || 4 == s ? n.push('<th  width="80"></th>') : 5 == s || 7 == s ? n.push('<th  width="36%"></th>') : n.push('<th  width="28%"></th>');
+				i.push(n.join("")), i.push("</thead><tbody>");
+				for (var d = [], c = 0; c < t.length; c++) {
+					l = "1" == glob.page && 0 == c ? '<div class="line"></div>' : "", 0 == c && 0 != o || (i.push("<tr>"), i.push('<td class="rq" width="20" >' + l + '<div class="cicle"></div></td><td  class="title" colspan="' + a + '">' + t[c] + "</td>"), i.push("</tr>"));
+					for (var h = e[t[c]], g = 0; g < h.length; g++) {
+						i.push('<tr rowindex="' + glob.rowindex + '" id="row-index-' + glob.rowindex + '"  class=" stockinfo" sc="' + h[g].sc + '" code="' + h[g].code + '">'), glob.rowindex += 1, i.push('<td width="20">&nbsp</td>');
+						var f = glob.hqinfo[h[g].code];
+						f || d.push({
+							code: h[g].code,
+							sc: h[g].sc
+						});
+						for (var u = 0; u < a; u++) {
+							var b = glob.columns[u].field;
+							"xj" == b || "zf" == b ? f ? "xj" == b ? i.push('<td style="text-align: right" field="' + b + '">' + fmtZdf(f.now, f.zdf) + "</td>") : i.push('<td style="text-align: right" field="' + b + '">' + dataFormat.baseZdf(f.zdf, "%") + "</td>") : i.push('<td style="text-align: right" field="' + b + '">--</td>') : "T006" == b ? i.push('<td style="text-align: right"  field="' + b + '">' + glob.columns[u].formatterSelf(h[g][b]) + "</td>") : "code" == b || "name" == b ? i.push('<td class="hqcode" style="text-align: right"  field="' + b + '">' + glob.columns[u].formatterSelf(h[g][b]) + "</td>") : "ltsz" == b && "1" == h[g].cnt ? i.push('<td id="ltsz' + h[g].code + '" style="text-align: right"  field="' + b + '">' + glob.columns[u].formatterSelf(h[g][b]) + "</td>") : i.push('<td style="text-align: right"  field="' + b + '">' + glob.columns[u].formatterSelf(h[g][b]) + "</td>")
+						}
+						i.push("</tr>")
+					}
+				}
+				i.push("</tbody></table>");
+				var p = $(i.join("")).appendTo($("#scrollBox"));
+				glob.TScroll && glob.TScroll.refresh(), setTimeout(function() {
+					var t = p.children("tbody").children("tr");
+					if (t.click(function() {
+						if ($(this).hasClass("stockinfo")) {
+							if ($(this).hasClass("select")) return;
+							var t = $(this).attr("rowindex");
+							$(this).addClass("select");
+							var e = glob.prerowindex,
+								o = $(this).attr("code"),
+								l = $(this).attr("sc");
+							"-1" != e && $("#row-index-" + glob.prerowindex).removeClass("select"), glob.prerowindex = t, glob.currowindex = t, jumpHQ(l, o)
+						}
+					}), t.each(function() {
+						var t = $(this),
+							e = t.attr("code");
+						if (e) {
+							glob.tdObj[e] || (glob.tdObj[e] = []);
+							var o = {};
+							t.children("td").each(function() {
+								var t = $(this).attr("field");
+								"xj" != t && "zf" != t || (o[t] = $(this))
+							}), glob.tdObj[e].push(o)
+						}
+					}), d.length) var e = setInterval(function() {
+						1 == glob.waitstate && (glob.waitstate = 0, serverhq(d, function(t) {
+							for (var e in t) glob.hqinfo[e] = t[e], updateHq(e)
+						}), clearInterval(e), e = null)
+					}, 100)
+				}, 40)
+			}
+
+			function fnRst(t) {			
+				try {
+					t = FormatResult(t, 1)
+				} catch (t) {
+					return -1
+				}
+				return 0 != t.ErrorCode ? "timeout" == t.ErrorInfo ? -2 : -1 : (null == t.tables && (t.tables = []), t.tables)
+			}
+
+			function serverhq(t, e) {
+				for (var o = [], l = 0; l < t.length; l++) o.push(t[l]);
+				var r = {},
+					a = glob.reqid;
+				! function t() {
+					var l = 90;
+					window.TDXQuery || (l = 60);
+					var i = o.splice(0, l),
+						n = [];
+					if ($.each(i, function(t, e) {
+						n.push(e.sc + e.code)
+					}), window.TDXQuery) window.TDXQuery({
+						request: JSON.stringify({
+							Method: "ASK_HQSimData",
+							FuncName: "",
+							Param: "12|" + n.join("|")
+						}),
+						onSuccess: function(l) {
+							var i = null;
+							try {
+								i = $.parseJSON(l), $.each(i, function(t, e) {
+									var o, l = dataFormat.fmtFlt(e.NOW),
+										a = dataFormat.fmtFlt(e.CLOSE);
+									o = 0 == l || 0 == a ? 0 : 100 * (l - a) / a, r[e.CODE] = {
+										sc: e.MARKET,
+										now: l,
+										zdf: o
+									}
+								})
+							} catch (l) {}
+							a == glob.reqid ? o.length ? t() : (glob.waitstate = 1, e(r)) : glob.waitstate = 1
+						},
+						onFailure: function(l, i) {
+							a == glob.reqid ? o.length ? t() : (glob.waitstate = 1, e(r)) : glob.waitstate = 1
+						}
+					});
+					else {
+						for (var s = "", d = 0; d < i.length; d++) 0 != s.length && (s += ","), s += '{"Code":' + i[d].code + ',"Setcode":' + i[d].sc + "}";
+						CallTQL(function(l) {
+							var i = null;
+							try {
+								i = $.parseJSON(l)
+							} catch (l) {}
+							if (i && i.List)
+								for (var n = i.ListHead, s = i.List, d = 0; d < s.length; d++) {
+									for (var c = {}, h = 0; h < n.length; h++) c[n[h]] = s[d][h];
+									var g, f = dataFormat.fmtFlt(c.NOW),
+										u = dataFormat.fmtFlt(c.CLOSE);
+									g = 0 == f || 0 == u ? 0 : 100 * (f - u) / u, r[c.Code] = {
+										sc: c.Setcode,
+										now: f,
+										zdf: g
+									}
+								}
+							a == glob.reqid ? o.length ? t() : (glob.waitstate = 1, e(r)) : glob.waitstate = 1
+						}, "HQServ.CombHQ", '{"WantCol":["ACTIVECAPITAL","CLOSE","NOW"],"Secu":[' + s + "]}")
+					}
+				}()
+			}
+
+			function fmtZdf(t, e) {
+				return e = dataFormat.fmtFlt(e), t = dataFormat.fmtFlt(t), isNaN(t) ? "--" : 0 < e ? '<span class="color-up">' + t.toFixed(2) + "</span>" : e < 0 ? '<span class="color-down">' + t.toFixed(2) + "</span>" : t.toFixed(2)
+			}
+
+			function jumpHQ(t, e) {			
+				window.open("http://www.treeid/breed_" + t + e, "_parent")
+			}
+
+			function updateHq(t) {
+				var e = glob.hqinfo[t],
+					o = glob.tdObj[t];
+				if (o.length)
+					for (var l = 0; l < o.length; l++) o[l].xj.html(fmtZdf(e.now, e.zdf)), o[l].zf.html(dataFormat.baseZdf(e.zdf, "%"))
+			}
+			
+			$(function() {
+				for (var t = 0; t < glob.columns.length; t++) glob.columns[t].formatter || (glob.columns[t].formatterSelf = dataFormat.getDefaultFunc(glob.columns[t].dataType || "0", glob.columns[t].fmtParam));
+				glob.TScroll = new Tscroll($("#left")[0], {
+					useTransform: !0,
+					scrollX: !1,
+					scrollY: $("#left")[0],
+					width: 10,
+					right: 2,
+					scrollBoxY: $("#right")[0]
+				});
+				var e = echarts.init($("#top")[0]);
+				glob.TScroll.on("scroll", function() {
+					1 == glob.loadstate && (glob.loadstate = 0, queryLoad())
+				}), $(window).resize(function() {
+					e.resize()
+				});
+				var o = "4",
+					l = JsUrl.ztid;
+				JsUrl.ztbkcode && (o = "7", l = JsUrl.ztbkcode), CallTQL(function(t) {				
+					if (-1 != (t = fnRst(t)) && -2 != t && 0 != t.length && 0 != t[0].rows.length) {
+						$("#loading").hide();
+						for (var o = [], l = [], r = 0; r < t[0].rows.length; r++) o.push(t[0].rows[r].rq), l.push(dataFormat.fmtFlt(t[0].rows[r].cnt));
+						var a = getChartColor({
+							title: {
+								show: !0,
+								text: "历史涨停轨迹",
+								left: "center",
+								top: 10
+							},
+							tooltip: {
+								show: !0,
+								trigger: "axis",
+								showContent: !0,
+								confine: !0,
+								borderWidth: 1,
+								textStyle: {
+									lineHeight: 18,
+									fontSize: 12
+								},
+								axisPointer: {
+									label: {},
+									lineStyle: {
+										width: 0
+									}
+								}
+							},
+							grid: {
+								top: 40,
+								left: 40,
+								right: 40,
+								bottom: 40
+							},
+							legend: {
+								right: 20,
+								show: !0,
+								top: 10,
+								data: [{
+									name: "涨停家数",
+									icon: "none"
+								}],
+								selectedMode: !1
+							},
+							xAxis: {
+								data: o,
+								inverse: !0,
+								show: !0,
+								gridIndex: 0,
+								position: "bottom",
+								type: "category",
+								nameLocation: "center"
+							},
+							yAxis: {
+								show: !0,
+								gridIndex: 0,
+								type: "value",
+								name: "",
+								axisLabel: {
+									show: !0
+								},
+								nameLocation: "end"
+							},
+							color: ["#C48026"],
+							animation: !0,
+							series: [{
+								name: "涨停家数",
+								data: l,
+								lineStyle: {
+									normal: {
+										width: 2,
+										color: "#FBA710"
+									}
+								},
+								showSymbol: !1,
+								type: "line"
+							}]
+						}, JsUrl.style);
+						e.setOption(a)
+					} else $("#loading").addClass("loadingimage").show().text("无涨停数据")
+				}, "pcwebcall_tclt_ztmx", [o, l, ""], {
+					reqtype: "cwserv"
+				}), setInterval(function() {
+					var t = [];
+					for (var e in glob.hqstock) t.push(glob.hqstock[e]);
+					1 == glob.waitstate && serverhq(t, function(t) {
+						for (var e in t) glob.hqinfo[e] = t[e], updateHq(e)
+					})
+				}, 8e3), queryLoad()
+				hide();				
+			});
+			var fmtTen = dataFormat.getDefaultFunc(10);
+			
+			//reg.js
+			var CALLTQL_CONFIG = {
+				url: 'http://page.tdx.com.cn:7615/',
+				dataType: 'text',
+				type: 'POST',
+				callType: 'external',
+				timeout: 20000,
+				CilentSpecifiedKey: ''
+			};	
+
+			function CallTQL(m, j, d, c) {
+				c = c == undefined ? {} : c;
+				var g = $.extend(true, {}, CALLTQL_CONFIG);
+				if (c != undefined && c != '' && c != null) {
+					$.each(c, function(e, n) {
+						g[e] = n;
+					});
+				}
+				var a = Fun_Name(m);
+				var f = 'CWServ.SecuInfo';
+				if (typeof d == 'string') {
+					f = j;
+				} else {
+					if (j) {
+						if (
+							j.substring(0, 10).toUpperCase() == 'SKEF10_HK_' ||
+							j.substring(0, 10).toUpperCase() == 'SKEF10_MG_' ||
+							j.substring(0, 6).toUpperCase() == 'TDXSJ_' ||
+							j.substring(0, 7).toUpperCase() == 'TDXF10_' ||
+							j.substring(0, 8).toUpperCase() == 'TDXBF10_' ||
+							j.substring(0, 10).toUpperCase() == 'PCWEBCALL_'
+						) {
+							g.reqtype = 'cwserv';
+						}
+					}
+					if (g.hasOwnProperty('reqtype') && g.reqtype == 'cwserv') {
+						f = 'CWServ.' + j;
+						d = FormatParams(d);
+						d = '{' + d;
+						if (g.CilentSpecifiedKey) {
+							d += ',"CilentSpecifiedKey":"' + g.CilentSpecifiedKey + '"';
+						}
+						if (g.secuparse == 'true') {
+							d += ',"secuparse":"true"';
+						}
+						d += '}';
+					} else {
+						d = FormatParams(d);
+						d = '{"CallName":"' + j + '",' + d;
+						if (g.CilentSpecifiedKey) {
+							d += ',"CilentSpecifiedKey":"' + g.CilentSpecifiedKey + '"';
+						}
+						if (g.secuparse == 'true') {
+							d += ',"secuparse":"true"';
+						}
+						d += '}';
+					}
+				}				
+													
+				var b = (c || {})['callFunc'];
+				if (b) {
+					f = b;
+				}				
+				$.ajax({
+					url: g.url + 'TQLEX?Entry=' + f,
+					type: g.type,
+					dataType: g.dataType,
+					data: d,
+					jsonp: 'callback',
+					timeout: g.timeout,
+					success: function(e) {
+						m(e);
+					},
+					error: function(o, e, n) {
+						if (e == 'timeout') {
+							m('{"ErrorCode":1, "ErrorInfo":"timeout"}');
+						} else {
+							m('{"ErrorCode":1, "ErrorInfo":"error"}');
+						}
+					}
+				});					
+			}
+
+			function Fun_Name(a) {
+				var b = a.toString();
+				var c = /function\s*(\w*)/i;
+				var d = c.exec(b);
+				return d[1];
+			}
+
+			function FormatParams(d) {
+				var c = '';
+				c += '"Params":[';
+				var b = '';
+				for (var a = 0; a < d.length; a++) {
+					if (typeof d[a] == 'string') {
+						b += ',"' + d[a] + '"';
+					} else {
+						if (typeof d[a] == 'number') {
+							b += ',' + d[a];
+						} else {
+							alert('非法的参数！');
+							break;
+						}
+					}
+				}
+				if (b != '') {
+					b = b.substr(1);
+				}
+				c += b;
+				c += ']';
+				return c;
+			}
+
+			function FormatResult(f) {
+				try {					
+					var l = $.parseJSON(f);
+				} catch (h) {}
+				var m = {};
+				m.ErrorCode = l.ErrorCode;
+				if (m.ErrorCode != 0) {
+					m.ErrorInfo = l.ErrorInfo;
+					return m;
+				}
+				m.CilentSpecifiedKey = l.CilentSpecifiedKey;
+				m.tables = [];
+				for (var g = 0; g < l.ResultSets.length; g++) {
+					var a = [];
+					if (typeof l.ResultSets[g].ColName !== 'undefined') {
+						for (var c = 0; c < l.ResultSets[g].ColName.length; c++) {
+							a.push({
+								Name: l.ResultSets[g].ColName[c]
+							});
+						}
+					} else {
+						a = l.ResultSets[g].ColDes;
+					}
+					if (a[0].Name == 'total') {
+						if (g - 1 >= 0) {
+							m.tables[g - 1].total = l.ResultSets[g].Content[0][0];
+						}
+					}
+					m.tables[g] = {};
+					m.tables[g].total = '';
+					m.tables[g].rows = [];
+					var n = l.ResultSets[g].Content;
+					for (var c = 0; c < n.length; c++) {
+						m.tables[g].rows[c] = {};
+						for (var b = 0; b < a.length; b++) {
+							m.tables[g].rows[c][a[b].Name] = n[c][b];
+						}
+					}
+				}
+				return m;
+			}
+					
+			function hide() {				
+				var p = window.parent.t;//调取父窗口变量				
+				<!-- $("#top").attr("style","display:none;"); -->
+				<!-- $("#center").attr("style","top:30px;"); -->
+				<!-- $("#bottom").attr("style","top:55px;"); -->
+				var obj1 = document.getElementById("top");													
+				var obj2 = document.getElementById("center");				
+				var obj3 = document.getElementById("bottom");				
+				if(p == 0){						
+					obj1.style.display = "none";					
+					obj2.style.top= "30px";
+					obj3.style.top= "55px"; 										
+				}else{						
+					obj1.style.display = "block";					
+					obj2.style.top= "270px";
+					obj3.style.top= "295px"; 							
+				}				
+			}
+			
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>可比公司</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			p {margin:3px}
+			ul {margin:1px}			
+			h4 {margin:0px}				
+			.fixedBox{
+				border: 1px solid #555555;			
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			var count = 15; //股票数量，多于此数折叠	
+			window.onload = function() {			
+				getSource();
+				changeStyle();
+			}
+			
+			var z = "1";
+			$(function() {
+				setInterval(function() {
+					if(z == "1"){					
+						getSource();										
+					}					
+				},
+				500);
+			})
+			
+			
+			function changeStyle() {
+				var obj = document.getElementById("towrite");								
+				obj.style.left= "0px"; 
+				obj.style.width= "95%";								
+				obj.style.fontSize="12px";				
+			}			
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){									
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+				
+			
+			var gpdm = "";
+			var gpmc = "";				
+			function getSource() {					
+				var u = decodeURI(window.location.href);								
+				if(u.indexOf("##") > -1){
+					var gp = u.split('##');				
+					dm = gp[1];
+					gpmc = gp[2];										
+				}else{
+					dm = "600000";
+					gpmc = "浦发银行";
+									
+				}
+				
+				if(dm != gpdm){	
+					gpdm = dm;
+					temp = "";					
+					div = document.getElementById('towrite');
+					var sx = "<a style='float:right; padding-right:30px;color:#E1FFFF;font-size:14px;'  href='javascript:void(0)' id='sx' onclick='updatex()'>停止刷新</a>";														
+					
+					div.innerHTML = "<h4>可比公司" + sx + "</h4>";	
+					div.innerHTML += '<p style="font-size:14px;">' + gpdm + "&nbsp;&nbsp;" + gpmc + '</p>';							
+					//div.innerHTML += '<p style="font-size:14px;">' + gpdm + "&nbsp;&nbsp;" + gpmc + sx + '</p>';	
+					var url = "http://basic.10jqka.com.cn/mapp/" + gpdm + "/a_companies_list.json" ;					
+										
+					if (window.XMLHttpRequest) {
+					xmlHttp = new XMLHttpRequest();
+					} else {					
+						xmlHttp21 = new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					xmlHttp.onreadystatechange = writeSource;
+					xmlHttp.open("GET", url, true);
+					xmlHttp.send(null);										
+				}
+			}
+			
+			function updatex() {				
+				aObj = document.getElementById('sx');
+				if(aObj.innerText == "停止刷新"){
+					z = "0";
+					aObj.innerText = "自动刷新";
+					aObj.style.color = "#ADFF2F";
+				}else if(aObj.innerText == "自动刷新"){
+					z = "1";
+					aObj.innerText = "停止刷新";
+					aObj.style.color = "#d2d2d3";					
+				}
+			}
+						
+			function updated() {
+				z = "0";			
+				aObj = document.getElementById('sx');
+				if(aObj.innerText == "停止刷新"){					
+					aObj.innerText = "自动刷新";
+					aObj.style.color = "#ADFF2F";
+				}					
+			}
+			
+			function UnUnicode(str) {
+				return unescape(str.replace(/\\/g, "%"));
+			}
+			
+			function writeSource() { 
+				if (xmlHttp.readyState == 4) { 
+					var div = document.getElementById('towrite');																		
+					var data = xmlHttp.responseText					
+					//document.write(data);
+					
+					data = data.replace(/ /g,"");				
+					var transform_aa1 = [           
+					{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+					];
+					
+					var num1 = 0;
+					var transform_bb1= 
+					{"tag":"p", children:[										
+					{"tag":"p", children:function(){
+						num1 = this.domestic.all_num;					
+						div.innerHTML += '<p style="color:#FFFF00;font-size:14px">行业：' + this.field + '</p><ul style="color:#FFFFE0;font-size:14px">国内：</ul>';
+					}},
+					{"tag":"p", children:function(){return(json2html.transform(this.domestic, transform_cc1));}}					
+					]}; 
+					
+					var transform_cc1= 
+					{"tag":"p", children:[
+					{"tag":"p", children:function(){return(json2html.transform(this.company_data, transform_dd1));}}	
+					]}; 
+					
+					var qid = "";
+					var transform_dd1= 
+					{"tag":"ul", children:[					
+					{"tag":"p", children:function(){
+						var tip = this.tip;						
+						qid = tip;						
+						var aa = "";
+						if(this.list != ""){
+							aa = "<a style='color:#FFA500;font-size:14px' href='javascript:void(0)' onclick='update(\"" + tip + "\")'>" + tip + "</a>";						
+						}
+						div.innerHTML += '<ul>' + aa + '</ul>';
+						
+						var newDiv = document.createElement("div");
+						newDiv.id = qid;
+						//alert(num)
+						if(num1 > count){
+							newDiv.style.display = "none";							
+						}else{
+							newDiv.style.display = "block";
+							temp += qid + ";";
+						}
+						div.appendChild(newDiv);
+						//return("<a href='javascript:void(0)'  onclick='update(\"" + tip + "\")'>" + tip + "</a>");
+					}},
+					{"tag":"p", children:function(){return(json2html.transform(this.list, transform_ee1));}}	
+					]}; 
+					
+					var transform_ee1 = [
+					{"tag":"ul", children:[								
+					{"tag":"p", children:function(){
+						var dm = this.code;
+						var mc = this.name;										
+						var jx = "<a href='https://m.10jqka.com.cn/stockpage/hs_" + dm + "/ target=_blank' onclick='changeCss(this,\"" + qid + "\");updated()'>" + dm + "&nbsp;&nbsp;" + mc + "</a>";															
+						div1 = document.getElementById(qid);	
+						div1.innerHTML += '<p>' + jx + '</p>';					
+					}},								
+					]}];
+					json2html.transform(data, transform_aa1);
+
+					var transform_aa2 = [           
+					{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb2));}}
+					];
+					
+					var num2 = 0;
+					var transform_bb2 = 
+					{"tag":"p", children:[										
+					{"tag":"p", children:function(){
+                        num2 = this.abroad.all_num;				
+						if(this.abroad.all_num != 0){				
+							div.innerHTML += '<ul style="color:#FFFFE0;font-size:14px">国外：</ul>';
+						}
+					}},
+					{"tag":"p", children:function(){return(json2html.transform(this.abroad, transform_cc2));}}					
+					]}; 
+					
+					var transform_cc2= 
+					{"tag":"p", children:[
+					{"tag":"p", children:function(){return(json2html.transform(this.company_data, transform_dd2));}}	
+					]}; 
+					
+					var transform_dd2= 
+					{"tag":"ul", children:[					
+					{"tag":"p", children:function(){
+						var tip = this.tip;
+						qid = tip;						
+						var aa = "";
+						if(this.list != ""){
+							aa = "<a style='color:#FFA500;font-size:14px' href='javascript:void(0)' onclick='update(\"" + tip + "\")'>" + tip + "</a>";						
+						}
+						div.innerHTML += '<ul>' + aa + '</ul>';
+						var newDiv = document.createElement("div");
+						newDiv.id = qid;						
+						if(num1 + num2 > count){
+							newDiv.style.display = "none";							
+						}else{
+							newDiv.style.display = "block";
+							temp += qid + ";";
+						}
+						div.appendChild(newDiv);
+						//return("<a href='javascript:void(0)'  onclick='update(\"" + tip + "\")'>" + tip + "</a>");
+					}},
+					{"tag":"p", children:function(){return(json2html.transform(this.list, transform_ee2));}}	
+					]}; 
+					
+					var transform_ee2 = [
+					{"tag":"ul", children:[								
+					{"tag":"p", children:function(){
+						var dm = this.code;
+						var mc = this.name;										
+						var jx = "<a href='https://m.10jqka.com.cn/stockpage/hs_" + dm + "/ target=_blank' onclick='changeCss(this,\"" + qid + "\");updated()'>" + dm + "&nbsp;&nbsp;" + mc + "</a>";															
+						div1 = document.getElementById(qid);	
+						div1.innerHTML += '<p>' + jx + '</p>';					
+					}},								
+					]}];
+					
+					json2html.transform(data, transform_aa2);
+					if(num1 > count){
+						temp = "";						
+						$("a")[1].click();	
+					}					
+				}				
+			}
+			
+			
+			var temp = "";								
+			function update(ss) {			
+				if(document.getElementById(ss)){		
+					div1 = document.getElementById(ss);
+					if(temp.indexOf(ss) == -1){
+						temp += ss + ";";
+						div1.style.display = "block";							
+					}else{
+						temp = temp.replace(ss + ";" , "");
+						div1.style.display = "none";
+					}
+				}
+				//alert(temp)
+			}			
+		</script>
+	</head>
+	<body>					
+		<div id="towrite" class="fixedBox"></div>										
+	</body>
+</html>

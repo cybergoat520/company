@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>东财强势股池</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">			
+			nav a{	
+			padding: 1em 1em;
+			letter-spacing: -100px;			
+			}			  
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}					  
+			#towrite {margin-top:-10px}		  
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script> 
+		<script>			
+			var tt = "";
+			var gt = "";
+			var jt = "";
+			var dt = "";
+			var k = "0";			
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();			
+			jt = Math.round(gt/1000);
+			dt = jt;
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+					
+			getSource(1);
+			changeStyle();
+			}
+								
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource(0);					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj	 = document.getElementById("towrite");	
+				obj.style.left= "0px"; 				
+				obj.style.width= "100%";
+				obj.style.height= "100%";						
+				obj.style.fontSize="12px";
+			}
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function UnUnicode(str) {
+					return unescape(str.replace(/\\/g, "%"));
+				}
+				
+			<!-- function getDate(t) {			 -->
+				<!-- var day = new Date();			 -->
+				<!-- day.setTime(gt + t*24*60*60*1000); -->
+				<!-- gt = day.getTime(); -->
+				<!-- jt = Math.round(gt/1000);			 -->
+				<!-- mymonth = day.getMonth()+1; -->
+				<!-- myday = day.getDate(); -->
+				<!-- if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;} -->
+				<!-- if(myday >= 10){myday = myday;}else{myday = "0" + myday;} -->
+				<!-- tt = day.getFullYear() + "-" + mymonth + "-" + myday;	 -->
+				<!-- k = 0; -->
+				<!-- if(dt != jt) -->
+					<!-- {			 -->
+						<!-- k = 1; -->
+					<!-- }						 -->
+				<!-- getSource(0);			 -->
+			<!-- } -->
+			
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			function BookingRmk(date)
+			{         
+				//var PriceDate = date;    
+				//alert(PriceDate);
+				tt = date;							
+				getSource(0);
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			
+			function keepTwoDecimal(num) {  
+				   var result = parseFloat(num);  
+				   if (isNaN(result)) {  
+					   //alert('传递参数错误，请检查！');  
+					   return false;  
+				   }  
+				   result = Math.round(num * 100) / 100;  
+				   return result;  
+			};
+		
+			function NumberTransform(num) { 
+				var result = num;
+               if(Math.abs(num) > 100000000)
+			   {
+			    result = num / 100000000;
+				result = result.toFixed(2) + "亿";
+			   }
+				else if(Math.abs(num) > 10000)
+			   {
+			    result = num/10000;
+				result = result.toFixed(2) + "万";
+			   }				   
+               return result;  
+			};	
+			
+			function updated() {  //判断最后交易日
+				var day = new Date(tt);							
+				for (i = 0; i < 10; i++)
+				{	
+					gt = day.getDate();							
+					if(i > 0){
+						day.setDate(gt - 1);
+					}		
+					tt = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "http://push2ex.eastmoney.com/getTopicQSPool?cb=callbackdata3686089&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=100&sort=zdp%3Adesc&date=" + tt.replace(/-/g,""); 
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data1 = xhr.responseText;					
+					if(data1.indexOf('"data":null') == -1)
+					{
+						break;
+					}
+				}
+			}	
+			
+			var fx = "";
+			var fs = "";
+			var x = "";
+			var gl = "";  //高亮
+			function getSource(s) {
+				updated();			
+				div = document.getElementById('towrite');
+				div.innerHTML = '<font size="2">东财强势股池&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';		
+				var p1 = "<a href='javascript:void(0)' id='px1' onclick='getSource(" + "\"1\"" + ")'>" + " 涨幅" + "</a>";
+				var p2 = "<a href='javascript:void(0)' id='px2' onclick='getSource(" + "\"2\"" + ")'>" + "涨停统计" + "</a>";
+				var p3 = "<a href='javascript:void(0)' id='px3' onclick='getSource(" + "\"3\"" + ")'>" + "涨停统计2" + "</a>";
+				div.innerHTML = div.innerHTML + "<p>排序（" + p1 + p2 + p3 + "）</p>";					
+				//document.getElementById("PriceDate").value = tt;				
+				if(s != 0)
+				{
+					if(fs != s)  //切换类别 清零
+					{
+						fx = 0;
+					}				
+					fs = s;	
+					x = s;
+				}
+				
+				aObj = document.getElementById('px' + x);
+				gl = aObj.innerText;
+				gl = gl.replace(" ","").replace("2","");
+				if(s != 0)
+				{				
+					if(fx == "1")
+					{
+						aObj.innerText = aObj.innerText + "↑";						
+						fx = 0;				
+					}
+					else
+					{
+						aObj.innerText = aObj.innerText + "↓";						
+						fx = 1;
+					}	
+				}
+				else
+				{
+					if(fx == "1")
+					{
+						aObj.innerText = aObj.innerText + "↓";						
+									
+					}
+					else
+					{
+						aObj.innerText = aObj.innerText +  "↑";						
+						
+					}	
+				}				
+				aObj.style.color = "#FFA07A";
+				
+				var px = "";
+				if(x == 1)
+				{
+					if(fx == 1)
+					{
+						px = "zdp%3Adesc";
+					}
+					else
+					{
+						px = "zdp%3Aasc";
+					}				
+				}				
+				if(x == 2 || x == 3)
+				{
+					if(fx == 1)
+					{
+						px = "zttj%3Adesc";
+					}
+					else
+					{
+						px = "zttj%3Aasc";
+					}								
+				}
+							
+				var url = "http://push2ex.eastmoney.com/getTopicQSPool?cb=callbackdata3686089&ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=100&sort=" + px + "&date=" + tt.replace(/-/g,""); 
+				
+				if (window.XMLHttpRequest) {
+						xmlHttp = new XMLHttpRequest();				
+					} else {
+						xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");				
+					}				
+					xmlHttp.onreadystatechange = writeSource;
+					xmlHttp.open("GET", url, true);
+					xmlHttp.send(null);			
+			}
+			
+			
+			function writeSource() { 
+				if (xmlHttp.readyState == 4 ) {         					
+					var data = xmlHttp.responseText					
+					//document.write(data);					
+					if(data.indexOf('"data":null') == -1){
+						data = data.replace(/ /g,"").match(/\"pool\"(\S*)\}\);/)[1];
+						data = '{"data"' + data.replace(/"zttj":{"days"/g,'"days"').replace(/},"hybk"/g,',"hybk"');
+						//document.write(data);
+						
+						<!-- var transform_aa = [            -->
+						<!-- {"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb));}} -->
+						<!-- ]; -->
+						
+						<!-- var transform_bb= 					 -->
+						<!-- {"tag":"p", children:[							 -->
+						<!-- {"tag": "p", "html": function(){ -->
+							<!-- var dm = this.c; -->
+							<!-- var mc = this.n; -->
+							<!-- var ztcs = this.ct; -->
+							<!-- if(ztcs >= 2){ -->
+								<!-- return("<a href=https://m.10jqka.com.cn/stockpage/hs_" + dm + "/ target=_blank id='gg' onclick='changeCss(this,this.id)'>" +  -->
+								<!-- dm + " &nbsp;" + -->
+								<!-- mc + " &nbsp;涨幅：" + keepTwoDecimal(this.zdp) + "% " + -->
+								<!-- " &nbsp;流通市值：" + NumberTransform(this.ltsz) + " &nbsp;涨停统计：" + this.ct + "/" + this.days + -->
+								<!-- " <br>&nbsp;所属行业：" + this.hybk +  -->
+								<!-- "</a>"); -->
+							<!-- }}},				 -->
+						<!-- ]};   -->
+						
+
+						<!-- var html = json2html.transform(data, transform_aa);		 -->
+						<!-- div = document.getElementById('towrite');				 -->
+						<!-- div.innerHTML = div.innerHTML + "<span id='gg'>" + html + "</span>"; -->
+				
+						ss = data.split('},{');	
+						var html = "";
+						var html2 = "";
+						for (i = 0; i < ss.length; i++)							
+						{											
+							var code = ss[i].match(/"c":"(\S*)","m/)[1];
+							var name = ss[i].match(/"n":"(\S*)","p/)[1];
+							var zf = ss[i].match(/"zdp":(\S*),"amount/)[1];
+							var ltsz = ss[i].match(/"ltsz":(\S*),"tshare/)[1];
+							var ct = ss[i].match(/"ct":(\S*),"hybk/)[1];
+							var days = ss[i].match(/"days":(\S*),"ct/)[1];
+							var hy = ss[i].match(/"hybk":"(\S*)"/)[1];													
+							if(ct >= 2){
+								if(x != 3){		
+									html += "<ul><li><a href='https://m.10jqka.com.cn/stockpage/hs_" + code  + "/' target='_blank' id='gg' onclick='changeCss(this,this.id)'>" + 
+											code + "&nbsp;&nbsp;" + name + "&nbsp;&nbsp;涨幅："+ keepTwoDecimal(zf) + "%&nbsp;&nbsp;" + 
+											" &nbsp;流通市值：" + NumberTransform(ltsz) + " &nbsp;<br>涨停统计：" + ct + "/" + days +
+											"&nbsp;所属行业：" + hy + "</a><a style='color:#FFA500' href='ggxqa.html##" +
+							code + "##" + 
+							name + "'>亮点</a></li></ul>";
+								}
+								else{
+									if(ct == days){
+										html += "<ul><li><a href='https://m.10jqka.com.cn/stockpage/hs_" + code  + "/' target='_blank' id='gg' onclick='changeCss(this,this.id)'>" + 
+											code + "&nbsp;&nbsp;" + name + "&nbsp;&nbsp;涨幅："+ keepTwoDecimal(zf) + "%&nbsp;&nbsp;" + 
+											" &nbsp;流通市值：" + NumberTransform(ltsz) + " &nbsp;<br>涨停统计：" + ct + "/" + days + 
+											" &nbsp;所属行业：" + hy + "</a><a style='color:#FFA500' href='ggxqa.html##" +
+							code + "##" + 
+							name + "'>亮点</a></li></ul>";
+										}
+									else{
+										html2 += "<ul><li><a href='https://m.10jqka.com.cn/stockpage/hs_" + code  + "/' target='_blank' id='gg' onclick='changeCss(this,this.id)'>" + 
+											code + "&nbsp;&nbsp;" + name + "&nbsp;&nbsp;涨幅："+ keepTwoDecimal(zf) + "%&nbsp;&nbsp;" + 
+											" &nbsp;流通市值：" + NumberTransform(ltsz) + " &nbsp;涨停统计：" + ct + "/" + days +
+											" <br>&nbsp;所属行业：" + hy + "</a><a style='color:#FFA500' href='ggxqa.html##" +
+							code + "##" + 
+							name + "'>亮点</a></li></ul>";
+									}
+								}								
+							}
+						}
+						div.innerHTML = div.innerHTML + "<span id='gg'>" + html + html2 + "</span>";	
+
+						//高亮
+						var content = document.getElementById("gg").innerHTML;
+						var reg = new RegExp("(" + gl + ")", "g");  
+						var str = content;  
+						var newstr = str.replace(reg, "<font color=#FF6633>$1</font>");
+						document.getElementById("gg").innerHTML = newstr;						
+					}					
+					document.getElementById("PriceDate").value = tt;
+				}
+			}	
+						
+		</script>
+	</head>
+
+	<body>
+		<div id="towrite" class="fixedBox">
+			<!-- <font size="3">东财强势股池  </font><input style="width: 120px;" type="text" class="Wdate" id="nn" onclick="getDate();" readonly="readonly"> -->
+			<!-- <font size="3">东财强势股池  </font><input type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" /> -->
+		</div>	
+	</body>
+</html>

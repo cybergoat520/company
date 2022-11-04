@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>路演</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">				
+			p {margin:5px}
+			//ul {margin:1px}			
+			h4 {margin:1px}	
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>		   
+			window.onload = function() {				
+			getSource("0","0");
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource("0");					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","10:00")									
+				},
+				60000);
+			})
+			
+			
+			function changeStyle() {
+				var obj1 = document.getElementById("towrite");				
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "480px";	
+				obj1.style.height= "620px";		
+				obj1.style.fontSize="12px";			  		
+			}
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS)).Format("yyyy-MM-dd hh:mm:ss")}						
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+			
+			function getDate(t) {			
+				var day = new Date();
+				var gt = day.getTime();	
+				day.setTime(gt + t*24*60*60*1000);
+				gt = day.getTime();
+				mymonth = day.getMonth()+1;
+				myday = day.getDate();
+				if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+				if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+				tt = day.getFullYear() + "-" + mymonth + "-" + myday;	
+				//var tt = day.getFullYear() + "-" + (day.getMonth()+1) + "-" + day.getDate();							
+				return tt;				
+			}
+			
+			function getDates(t) {	
+				var day = new Date();
+				var gt = day.getTime();	
+				day.setTime(gt + t*24*60*60*1000);
+				gt = day.getTime();
+				mymonth = day.getMonth()+1;
+				myday = day.getDate();
+				if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+				if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+				tt = mymonth + "-" + myday;					
+				return tt;				
+			}
+			
+			function unixstart(tt) {
+				var str = tt + ' 00:00:00';
+				var new_str = str.replace(/:/g,'-');
+				new_str = new_str.replace(/ /g,'-');
+				var arr = new_str.split("-");				
+				var datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));
+				return datum.getTime();			
+			}
+			
+			function unixend(tt) {
+				var str = tt + ' 23:59:59';
+				var new_str = str.replace(/:/g,'-');
+				new_str = new_str.replace(/ /g,'-');
+				var arr = new_str.split("-");				
+				var datum = new Date(Date.UTC(arr[0],arr[1]-1,arr[2],arr[3]-8,arr[4],arr[5]));				
+				return datum.getTime();
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}				
+			}
+						
+			function getSource(a,b) {
+				//alert(a+","+b);				
+				var yg = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"0\"" + ")'>" + "路演预告" + "</a>";
+				var hg = "<a href='javascript:void(0)' onclick='getSource(" + "\"1\"" + "," + "\"0\"" + ")'>" + "近期回顾" + "</a>";	
+				div1 = document.getElementById('towrite');					 
+				div1.innerHTML = "<h4>" + yg + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + hg + "</h4>" ;																
+					
+				var url = "https://server.comein.cn/comein/index.php"; 	                			
+				createXmlHttp();
+				var array1 = new FormData();
+				var act = "";
+				//预告							
+				if(a == "0")
+				{
+					var jr = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"0\"" + ")'>" + "今日" + "</a>";
+					var mr = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"1\"" + ")'>" + "明日" + "</a>";
+					var d1 = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"2\"" + ")'>" + getDates(2) + "</a>";
+					var d2 = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"3\"" + ")'>" + getDates(3) + "</a>";
+					var d3 = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"4\"" + ")'>" + getDates(4) + "</a>";
+					var d4 = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"5\"" + ")'>" + getDates(5) + "</a>";
+					var d5 = "<a href='javascript:void(0)' onclick='getSource(" + "\"0\"" + "," + "\"6\"" + ")'>" + getDates(6) + "</a>";
+					div1.innerHTML = div1.innerHTML + "<h4>" + jr + "&nbsp;&nbsp;" + mr + "&nbsp;&nbsp;" + d1 + "&nbsp;&nbsp;" + d2 + "&nbsp;&nbsp;" + d3 + "&nbsp;&nbsp;" + d4 + "&nbsp;&nbsp;" + d5 + "</h4>";								
+					act = "advance";
+					if(b == "0")
+					{
+						array1 = {'pagestart':0,'pagenum':1000,'startTime':unixstart(getDate(0)),'endTime':unixend(getDate(0))};					
+					}
+					if(b == "1")
+					{
+						array1 = {'pagestart':0,'pagenum':1000,'startTime':unixstart(getDate(1)),'endTime':unixend(getDate(1))};					
+					}
+					if(b == "2")
+					{
+						array1 = {'pagestart':0,'pagenum':1000,'startTime':unixstart(getDate(2)),'endTime':unixend(getDate(2))};					
+					}
+					if(b == "3")
+					{
+						array1 = {'pagestart':0,'pagenum':1000,'startTime':unixstart(getDate(3)),'endTime':unixend(getDate(3))};					
+					}
+					if(b == "4")
+					{
+						array1 = {'pagestart':0,'pagenum':1000,'startTime':unixstart(getDate(4)),'endTime':unixend(getDate(4))};					
+					}
+					if(b == "5")
+					{
+						array1 = {'pagestart':0,'pagenum':1000,'startTime':unixstart(getDate(5)),'endTime':unixend(getDate(5))};					
+					}
+					if(b == "6")
+					{
+						array1 = {'pagestart':0,'pagenum':1000,'startTime':unixstart(getDate(6)),'endTime':unixend(getDate(6))};					
+					}
+				}
+				
+				//回顾	
+				if(a == "1")
+				{
+					var tj = "<a href='javascript:void(0)' onclick='getSource(" + "\"1\"" + "," + "\"0\"" + ")'>" + "推荐" + "</a>";
+					var zx = "<a href='javascript:void(0)' onclick='getSource(" + "\"1\"" + "," + "\"1\"" + ")'>" + "最新" + "</a>";
+					var rm = "<a href='javascript:void(0)' onclick='getSource(" + "\"1\"" + "," + "\"2\"" + ")'>" + "热门" + "</a>";
+					div1.innerHTML = div1.innerHTML + "<h4>" + tj + "&nbsp;&nbsp;" + zx + "&nbsp;&nbsp;" + rm + "</h4>";					
+					if(b == "0")
+					{
+						act = "recent-search";
+					}
+					if(b == "1")
+					{
+						act = "recent-new";					
+					}
+					if(b == "2")
+					{
+						act = "recent-hot";					
+					}
+					array1 = {"pagestart":0,"pagenum":100,"bannerid":6}					
+				}
+						
+							
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("POST", url, true);				
+				xmlHttp.setRequestHeader("mod","roadshow");
+				xmlHttp.setRequestHeader("app","json");
+				xmlHttp.setRequestHeader("act",act);				
+				xmlHttp.send(JSON.stringify(array1)) ;						
+				
+			}
+								
+			var dms = "";
+			function writeSource() { 			
+				if (xmlHttp.readyState == 4) { 	
+					var data = xmlHttp.responseText						
+					//document.write(data);																			
+					
+					var transform_aa = [           
+					{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb));}}
+					];
+										
+					var transform_bb = 
+					{"tag": "p", children: [
+					{"tag": "p", "html": function(){					
+						var time = this.stime;
+						var commonTime = getLocalTime(time);
+						var wz = "<a href='" + this.presenturl + "' target='_blank' >" + this.title + "（" + commonTime + "）"+"</a>";													
+						return("<li>" + wz);}},	
+						//return("<li>" + this.title + "（" + this.creator.uname + " " + commonTime + "）");	}},					
+					]};
+					
+					
+					var html = json2html.transform(data, transform_aa);																		
+
+					div1 = document.getElementById('towrite');	
+					div1.innerHTML = div1.innerHTML + html;									
+					
+				}				
+			}
+			
+			
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

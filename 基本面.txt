@@ -1,0 +1,2 @@
+用于弹窗方式（非自定义版面），格式如下：
+http://www.treeid/dlglocalurl##homepath##company/基本面.html##xxxxxx####STOCKNAME##

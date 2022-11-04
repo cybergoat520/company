@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+					<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+	</head>
+	<body>
+		<div id="autore" onclick="gotopage();">
+
+			<a href="精选板块轮动(反序折线图).html" target="mapIframe">精选板块轮动</a>
+			<a href="连板3(定).html" target="mapIframe">连板</a>	
+			<a href="百日新高.html" target="mapIframe">百日新高</a>
+			<a href="阶段强势股(缓存).html" target="mapIframe">阶段强势</a>							
+			<a href="区间涨幅.html" target="mapIframe">区间涨幅</a>
+      <a href="东财机构买卖(表).html" target="mapIframe">机构龙虎榜</a>	
+      <a href="板块核心.html" target="mapIframe">板块核心</a>
+      <a href="综合人气榜(创业板).html" target="mapIframe">创业板人气榜</a>
+      <a href="创牛.html" target="mapIframe">创牛</a>
+      <a href="次新股(表).html" target="mapIframe">次新</a>
+      <a href="可转债.html" target="mapIframe">可转债</a>
+
+			<a href="http://www.treeid/dlglocalurl##homepath##company/Page.html">个股详情</a>            
+            <a href="盘前.html" style="float:right">盘前</a>
+            <a href="盘中.html" style="float:right">盘中</a>		
+			<!-- <a href="javascript:replaceDoc();" style="color:#fff">刷新</a> -->
+			<!-- <a href="javascript:window.top.frames['mapIframe'].history.back();" style="float:right">返回上一级</a> -->
+		</div>
+		<button type="button" id="btn" onclick="javascript:changeFrameHeight()">刷新</button>
+		<link href="css/text.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<iframe width="100%" height="200" id="mapIframe" name="mapIframe" src="精选板块轮动(反序折线图).html"></iframe>
+		<script>
+			var dm = "";
+			var sc = "";
+			var mc = "";
+			window.onload = function() {			                				
+				var u = decodeURI(window.location.href);				
+				gp = u.split('##');	
+				dm = gp[1];
+				sc = gp[2];
+				mc = gp[3];
+				var ss = storage.b;
+				//alert(ss);
+				var iframe = document.getElementById('mapIframe');
+				if(ss == undefined){
+					iframe.src = '直播.html';
+				}				
+				document.body.innerHTML = document.body.innerHTML.replace(/xxxxxx/g, gp[1]).replace(/SC##/g, sc).replace(/sc##/g, sc.toLowerCase()).replace(/STOCKNAME/g, mc);							
+				
+				var alist = document.getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){					
+					if(alist[i].innerText == ss){
+						alist[i].click();											
+						break;
+					}										
+				}				
+			}
+						
+			//切换股票可自动刷新
+			$(function() {
+				setInterval(function() {
+					if(t == 1 && isMinStatus()==false) {
+						var zdsx = document.getElementById('mapIframe').contentWindow.z;  //获取子页面变量值						
+						if(zdsx == 0){
+							replaceDoc();
+						}						
+					}					
+				},
+				500);
+			})
+			
+			function replaceDoc() {
+					window.location.replace("")
+			}
+			
+			var storage = window.localStorage;  //localStorage			
+			var t = 1;
+			$(document).on("click", "a", function () {
+				var href = $(this).attr("href");		
+				var datas = $(this).text();							
+				if(datas != "亮点"){
+					storage.b = datas;
+				}				
+				if(datas == "个股详情"){
+					t = 1;
+				} else {
+				    t = 0;										
+				}				
+			});
+			
+			//最小化
+			function isMinStatus() {
+			  var isMin = false;
+			  if (window.outerWidth != undefined) {
+				 isMin = window.outerWidth <= 160 && window.outerHeight <= 27;
+			  } else {
+				 isMin = window.screenTop < -30000 && window.screenLeft < -30000;
+			  }
+			 
+				 return isMin;
+			}
+			
+			function changeFrameHeight() {
+					var ifm = document.getElementById("mapIframe");
+					ifm.height = document.documentElement.clientHeight - ifm.offsetTop - 20;
+			}
+			
+			document.getElementById('btn').style.display = 'none';
+	
+			function setRem() {
+					var width = document.getElementById('autore').offsetWidth;
+					var htmlFont = document.getElementById('autore');
+					if (width > 700) {
+							htmlFont.style.fontSize = "16px";
+					}
+					if (width > 500 && width < 700) {
+							htmlFont.style.fontSize = "14px";
+					}
+					if (width < 500) {
+							htmlFont.style.fontSize = "12px";
+					}
+			}
+			setRem();
+	
+			window.onresize = function() {
+					changeFrameHeight();
+					setRem();
+			}
+			$(function() {
+					changeFrameHeight();
+			});
+		</script>
+	</body>
+</html>

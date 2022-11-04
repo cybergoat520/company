@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>公司亮点</title>
+	</head>
+	<body>
+		<div  >
+		<ul class="nav">
+		           	 <li style="border-radius: 10px 0px 0px 0px;">亮点
+		                <ul>
+							<a href="https://www.xilimao.com/tdx/xxxxxx/" target="mapIframe"><li>犀利猫</li></a>
+					<a href="https://www.xilimao.com/jj/xxxxxx/" target="mapIframe"><li>犀利竞价</li></a>
+		                    
+		                    <a href="选股宝.html##xxxxxx##SC##" target="mapIframe"><li>选股宝</li></a>			
+					<a href="开盘啦.html##xxxxxx" target="mapIframe"><li>开盘啦</li></a>
+					<a href="http://vip.tdx.com.cn/site/app/publish/ggtz/ggtz.html?setcode=0&code=xxxxxx" target="mapIframe"><li>K线图</li></a>
+					
+		                </ul>
+		            </li>
+		           
+		            <li>F10
+		                <ul>
+					<a href="https://emweb.eastmoney.com/PC_HSF10/OperationsRequired/Index?code=SC##xxxxxx" target="mapIframe"><li>东财F10</li></a>	
+					<a href="http://basic.10jqka.com.cn/xxxxxx/" target="mapIframe"><li>同花顺F10</li></a>			 
+					<a href="http://webf10.gw.com.cn/SC##/B1/SC##xxxxxx_B1.html" target="mapIframe"><li>大智慧F10</li></a>		
+					<a href="http://vis.10jqka.com.cn/free/jgpj/index/stockCode/xxxxxx" target="mapIframe"><li>机构评级</li></a>
+					<a href="http://page1.tdx.com.cn:7615/site/pcwebcall_static/bxb/bxb.html?code=xxxxxx&amp;color=0" target="mapIframe"><li>扫雷</li></a>
+					<a href="http://page.tdx.com.cn:7615/site/kggx/tk_ygzl_lhb.html?info=xxxxxx&amp;pageId=dpyd&amp;color=0&amp;bkcolor=000000" target="mapIframe"><li>龙虎榜</li></a>
+					<a href="http://hot.icfqs.com:7615/site/tjcj/html/tjcb.html?isdebug=1&stockCode=xxxxxx&amp;pageId=dpyd&amp;color=0&amp;bkcolor=000000" target="mapIframe"><li>图解财报</li></a>
+					
+					<a href="http://hot.icfqs.com:7615/site/tdx-pc-find/page_yzfp.html" target="mapIframe"><li>游资复盘</li></a>
+
+
+		                </ul>
+		            </li>
+					<a href="基本面(定).html##xxxxxx##SC##STOCKNAME##" target="mapIframe"><li>基本面</a>
+					                <ul>
+					
+					                </ul>
+					            </li>
+		            <a href="ggxqa.html##xxxxxx##SC##STOCKNAME" target="mapIframe"><li>详情</a>
+		                <ul>
+						
+		                </ul>
+		            </li>
+		            <li style="border-radius: 0px 10px 0px 0px;">返回
+		                <ul>
+		            <a href="index.html" target="_blank"><li>首页</li></a>
+					<a href="javascript:document.getElementById('mapIframe').contentWindow.location.reload();"><li>刷新</li></a>
+					   <li> <input id="input"  type="text" style="width:45px" onkeydown="if(event.keyCode==13){getcodec.click()}" placeholder="代码">
+					    <button style="display: none;" id="getcodec" onclick="javascript:getcode();window.location.reload()"></button> </li>
+<!-- 		                    <li><input type="text" id="input" style="width:20px" >
+<a id="getcode" onclick="javascript:getcode();window.location.reload()" style="color:#fff" target="mapIframe"> Go</a>
+		</li> -->
+		                </ul>
+		            </li>
+		        </ul>
+				</div>
+		<div id="autore" >		
+			
+		</div>
+		<button type="button" id="btn" onclick="javascript:changeFrameHeight()">刷新</button>
+		<link href="css/text.css" rel="stylesheet" type="text/css">		   <link href="css/menu.css" rel="stylesheet" type="text/css">		  <script type="text/javascript" src="js/jquery.min.js"></script>
+		<iframe width="100%" height="200" id="mapIframe" name="mapIframe" src=""></iframe>		
+		<script>		
+			var dm = "";
+			var sc = "";
+			var mc = "";
+			window.onload = function() {				
+				var u = decodeURI(window.location.href);
+				//alert(u)
+				gp = u.split('##');					
+				dm = gp[1];
+				sc = gp[2];
+				mc = gp[3];				
+				var ss = storage.datas;
+				//alert(ss);
+				var iframe = document.getElementById('mapIframe');
+				if(ss == undefined){
+					iframe.src = 'ggxqa.html##' + gp[1];
+					//alert(iframe.src);
+				}				
+				document.body.innerHTML = document.body.innerHTML.replace(/xxxxxx/g, dm).replace(/SC##/g, sc).replace(/sc##/g, sc.toLowerCase()).replace(/STOCKNAME/g, mc);											
+				var alist = document.getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){
+					//alert(alist[i].href)				
+					if(alist[i].innerText == ss){
+						alist[i].click();	
+						//$("a")[i].click();						
+						break;
+					}	else
+					{
+						mapIframe.location.replace("ggxqa.html##" + gp[1])	
+						
+						}							
+				}				
+			}
+			
+			
+			function clearstorage(){
+				storage.removeItem('datas'); //清除缓存localStorage
+			}
+			
+			//切换股票可自动刷新
+/* 		$(function() {
+				setInterval(function() {
+					if(t == 0 && isMinStatus()==false) {
+						var zdsx = document.getElementById('mapIframe').contentWindow.z;  //获取子页面变量值						
+						if(zdsx != 0){
+							replaceDoc();
+						}						
+					}					
+				},
+				500);
+			}) */
+			
+			function getcode() {
+				var dm = document.getElementById("input").value;				
+				//alert(dm);
+				var sc = "SH";
+				if(dm.substr(0,1)!="6"){
+					sc = "SZ";
+				}
+				//alert(sc);
+				var mc = "";
+				top.location.replace("page1.html##" + dm + "##" + sc + "##" + mc)
+                
+			}
+
+
+			//最小化
+			function isMinStatus() {
+			  var isMin = false;
+			  if (window.outerWidth != undefined) {
+				 isMin = window.outerWidth <= 160 && window.outerHeight <= 27;
+			  } else {
+				 isMin = window.screenTop < -30000 && window.screenLeft < -30000;
+			  }
+			 
+				 return isMin;
+			}
+
+
+			var storage = window.localStorage;  //localStorage			
+			var t = 0;
+			$(document).on("click", "a", function () {
+				var href = $(this).attr("href");				
+				var datas = $(this).text();				
+				if(datas != "刷新" && datas != "直播" && datas != "返回上一级" && datas != " Go"){
+					storage.datas = datas;
+				}				
+				if(href.indexOf("龙头股") > -1 || href.indexOf("同花顺概念") > -1 || datas == "游资复盘"){
+					t = 1;
+				} else {
+				    t = 0;										
+				}				
+			}); 
+			
+			function replaceDoc() {
+				window.location.replace("#")				
+			}
+			
+			function changeFrameHeight() {
+				var ifm = document.getElementById("mapIframe");
+				ifm.height = document.documentElement.clientHeight - ifm.offsetTop - 20;
+			}
+			
+			document.getElementById('btn').style.display = 'none';
+	
+			function setRem() {
+				var width = document.getElementById('autore').offsetWidth;
+				var htmlFont = document.getElementById('autore');
+				if (width > 700) {
+						htmlFont.style.fontSize = "16px";
+				}
+				if (width > 500 && width < 700) {
+						htmlFont.style.fontSize = "14px";
+				}
+				if (width < 500) {
+						htmlFont.style.fontSize = "12px";
+				}
+			}
+			setRem();
+	
+			window.onresize = function() {
+					changeFrameHeight();
+					setRem();
+			}
+			$(function() {
+					changeFrameHeight();
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>个股行情</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">						
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		  
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script>
+		<script>
+			var dt = "";
+			var tt = "";
+			var gt = "";
+			var k = "0";
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+			dt = tt;
+			getSource(6);
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					tk = 1;
+					getSource(fs);					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function changeStyle() {
+				var obj = document.getElementById("towrite");								
+				obj.style.left= "0px"; 				
+				obj.style.width= "100%";	
+				//obj.style.height= "620px";		
+				obj.style.fontSize="12px";	 
+			}
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			function changeCss(obj,id){				
+				var alist = document.getElementById(id).getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+			
+			var ts = "";
+			var tk = 0;			
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			
+			function BookingRmk(date){         
+				tt = date;
+				var date1 = new Date(tt);
+				var date2 = new Date(dt);						
+				k = 0;
+				if(date1.getTime() < date2.getTime()){			
+					k = 1;
+					tradeday();
+				}
+				
+				if(ts != tt){			
+					tk = 1;
+				}				
+				getSource(fs);
+				ts = tt;
+				tk = 0;						
+			}
+
+			function tradeday() {  //判断最后交易日
+				var day = new Date(tt);							
+				for (i = 1; i < 100; i++){	//节假日																										
+					if(i > 1){
+						day.setTime(day.getTime() - 24*60*60*1000);							
+					}	
+					tt = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=HisRankingInfo_W8&st=10&c=HisStockRanking&Isst=0&apiv=w28&Type=6&Date=" + tt;
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data = xhr.responseText;
+					//document.write(data);
+					if(data.indexOf('"list":[]') == -1){						
+						break;
+					}
+				}
+			}	
+			
+			var fx = "";
+			var fs = "";
+			var gl = "";  //高亮
+			function getSource(p) {
+				if(fs != p)  //切换类别 清零
+				{
+					fx = 0;
+				}				
+				fs = p;
+				
+				div = document.getElementById('towrite');
+				div.innerHTML = '<font size="4">个股行情&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';						
+				
+				var p1 = "<a href='javascript:void(0)' id='px6' onclick='getSource(" + "6" + ")'>" + "涨幅" + "</a>";	
+				var p2 = "<a href='javascript:void(0)' id='px7' onclick='getSource(" + "7" + ")'>" + "涨速" + "</a>";
+				var p3 = "<a href='javascript:void(0)' id='px1' onclick='getSource(" + "1" + ")'>" + "主力净额" + "</a>";							
+				div.innerHTML = div.innerHTML + "<p>排序（ " + p1 + p2 + p3 +"）</p>";	
+				
+				aObj = document.getElementById('px' + p);
+				gl = aObj.innerText;
+			
+				if(tk == 1)
+				{
+					aObj.innerText = aObj.innerText + "↓";
+					fx = 1;
+				}
+				else
+				{
+					if(fx == "1")
+					{
+						aObj.innerText = aObj.innerText + "↑";
+						fx = 0;					
+					}
+					else
+					{
+						aObj.innerText = aObj.innerText + "↓";
+						fx = 1;	
+					}
+				}
+				aObj.style.color = "#FFA07A"; 									
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=RealRankingInfo_W8&st=100&c=NewStockRanking&Isst=0&index=0&apiv=w28&Type=" + fs;								
+				var url2 = "https://apphis.longhuvip.com/w1/api/index.php?Order=" + fx + "&a=HisRankingInfo_W8&st=100&c=HisStockRanking&Isst=0&apiv=w28&Type=" + fs + "&Date=" + tt;
+				url = url1;
+				if(k == "1" )
+				{
+				  url = url2;
+				}
+				
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+			
+			function writeSource() { 
+				if (xmlHttp.readyState == 4) {         
+					var data = xmlHttp.responseText	
+					if(k == 0){
+						tt = data.match(/"Day":\["(\S*)"\],"/)[1].split('","')[0];						
+						dt = tt;
+					}
+					data = data.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + "]]";	
+					//document.write(data);
+					data = data.replace(/(\[\").*?(?=\])/g,function(word){ 
+						str = word.match(/\[(\S*)/)[1]; 
+						return '{"code":' + str.split(',')[0] + 
+						',"name":' + str.split(',')[1] + 
+						',"bk":'+ str.split(',')[4] + 
+						',"xj":'+ str.split(',')[5] +
+						',"zf":'+str.split(',')[6] + 					
+						',"zs":'+str.split(',')[9]+ 					
+						',"zlje":'+str.split(',')[13];
+					});
+					data = data.replace(/\],\{/g,"},{").replace("]]","}]}");
+					//document.write(data);
+					
+					//涨速				
+					data = data.replace(/(\"zs\":).*?(?=,)/g, function(word){ 				
+						str = word.match(/\"zs\":(\S*)/)[1]; 					
+						return '\"zs\":"' + keepTwoDecimal(str) + '"';
+					});  	
+				
+					//主力净额				
+					data = data.replace(/(\"zlje\":).*?(?=})/g, function(word){ 						
+					str = word.match(/\"zlje\":(\S*)/)[1]; 					
+					if(keepTwoDecimal(Math.abs(str/100000000)) >= 1)
+					{
+						return '\"zlje\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+					}
+					else
+					{
+						return '\"zlje\":\"' + Math.round(str/10000) + '万\"';
+					}								
+					}); 
+					//document.write(data);
+
+					var transform_aa = [           
+					{"tag":"ul", children:function(){return(json2html.transform(this.list, transform_bb));}}
+					];
+					
+					var transform_bb= 
+					{"tag":"p", children:[				
+					{"tag":"p", children:function(){				
+						if(this.name.indexOf("ST") == -1){
+							return("<li><a href=https://m.10jqka.com.cn/stockpage/hs_" + 
+							this.code + "/ target=_blank onclick='changeCss(this,\"gg\")'>" + 						
+							this.code + "&nbsp;" + 
+							this.name + "&nbsp;" + 
+							"现价：" + this.xj + "&nbsp;" +
+							"涨幅：" + this.zf + "%&nbsp;" +
+							"涨速：" + this.zs + "%&nbsp;" +
+							"<br>主力净额：" + this.zlje + "&nbsp;" +
+							"<font color=#FFF>板块：" + '</font><font color=#FFA500>' + this.bk + '</font>' + "&nbsp;" +
+							"</a><a href='ggxqa.html##" + this.code + "##" + this.name + "'>亮点</a></li>");							
+							}
+					}}]};	
+					
+					var html = json2html.transform(data, transform_aa);		
+					div = document.getElementById('towrite');				
+					div.innerHTML += "<span id='gg'>" + html;
+				}
+				document.getElementById("PriceDate").value = tt;
+						
+				//高亮
+				var content = document.getElementById("gg").innerHTML;					
+				var reg = new RegExp("(" + gl + ")", "g");  
+				var str = content;  
+				var newstr = str.replace(reg, "<font color=#FF6633>$1</font>");
+				document.getElementById("gg").innerHTML = newstr;
+			}			
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

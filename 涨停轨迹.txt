@@ -1,0 +1,6 @@
+定制板块用：
+尾部需加上##xxxxxx####STOCKNAME##,例如：
+file:///C:/TDXdate/company/%E6%B6%A8%E5%81%9C%E8%BD%A8%E8%BF%B9.html##xxxxxx####STOCKNAME##
+
+需配合“ZTGJ.html”使用
+

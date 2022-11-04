@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>同花顺</title>
+<link href="css/text.css" rel="stylesheet" type="text/css">
+<style type="text/css">							
+			#towriter{
+				margin-top:-15px;
+				border: 1px solid #555555;
+				white-space: normal;											
+			}
+			.fixedBox{					
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 12px;     
+				height: 12px;				
+			}			
+		</style>		
+<script type="text/javascript" src="js/jquery.min.js"></script> 
+</head>
+<body>
+	<div>						
+		<a href="javascript:window.top.frames['mapIframe'].history.back();" style="float:left;font-size:12px;">返回上一级</a>
+	</div>
+	<div id="towriter" class="fixedBox">	
+		<iframe width="100%" height="800px" id="mapIframe" name="mapIframe" src=""></iframe>
+	</div>
+	<script>		
+		window.onload = function() {		
+			getSource();	
+			changeStyle();			
+		}
+		
+		$(function() {
+			setInterval(function() {
+				getSource();										
+			},
+			500);
+		})
+		
+		function changeStyle() {
+				var obj = document.getElementById("towriter");				
+				obj.style.left= "0px"; 				
+				obj.style.width= "900px";	
+				obj.style.height= "280px";	
+				obj.style.marginTop= "25px";				
+			}
+			
+		var gpdm = "";
+		function getSource() {	    
+			gp = window.location.href.split('##');				
+			var dm = gp[1];
+			//alert(dm);
+			if(dm != gpdm)
+			{
+				var iframe = document.getElementById('mapIframe');
+				iframe.src = 'http://basic.10jqka.com.cn/new/' + dm + '/#pointnew';
+				
+				if (iframe.attachEvent){ 
+					iframe.attachEvent("onload", function(){ 
+					$(".fixedBox").scrollTop(120);
+					}); 
+				} else { 
+					iframe.onload = function(){ 
+					$(".fixedBox").scrollTop(120);					
+					}; 
+				}				
+			}
+			gpdm = dm;			
+		}
+					
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>选股宝</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {	
+			getSource();
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp1 = new XMLHttpRequest();
+				xmlHttp2 = new XMLHttpRequest();
+				xmlHttp3 = new XMLHttpRequest();
+				xmlHttp4 = new XMLHttpRequest();
+				} else {
+				xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp3 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp4 = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			gp = window.location.href.split('##');
+			dm = gp[1] + "." + gp[2].replace(/SH/g, 'SS');
+			function getSource() {		    
+				var url1 = "https://flash-api.xuangubao.cn/api/stock_spotlight?symbol=" + dm; 
+				var url2 = "https://flash-api.xuangubao.cn/api/stock_label/labels?symbols=" + dm;
+				var url3 = "https://flash-api.xuangubao.cn/api/stage2/plates_by_any_stock?symbol=" + dm + "&fields=plate_name%2Creason";
+				var url4 = "https://api-ddc-wscn.xuangubao.cn/extract/stock_risk/full_desc?stock_code=" + dm; 
+				//alert(url2);
+				createXmlHttp();
+				xmlHttp1.onreadystatechange = writeSource;
+				xmlHttp1.open("GET", url1, true);
+				xmlHttp1.send(null);
+				
+				xmlHttp2.onreadystatechange = writeSource;
+				xmlHttp2.open("GET", url2, true);
+				xmlHttp2.send(null);
+				
+				xmlHttp3.onreadystatechange = writeSource;
+				xmlHttp3.open("GET", url3, true);
+				xmlHttp3.send(null);
+				
+				xmlHttp4.onreadystatechange = writeSource;
+				xmlHttp4.open("GET", url4, true);
+				xmlHttp4.send(null);
+			}
+			
+			function writeSource() { 
+				if (xmlHttp4.readyState == 4) {         
+				var data1 = xmlHttp1.responseText
+				var data2 = xmlHttp2.responseText.replace(new RegExp(dm,'g'),"items")  //对变量进行全文替换
+				var data3 = xmlHttp3.responseText
+				data3 = data3.replace(/\"+(\d{4,10})+\":/g,"").replace(/:{{/g,":[{").replace(/}}}/g,"}]}");
+				var data4 = xmlHttp4.responseText							
+				//alert(data2);	
+				var transform_aa1 = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+				];
+				
+				var transform_bb1= 
+				{"tag":"ul", children:[
+				{"tag":"h3", "html":"${text}"}				                            
+				]};
+				
+				if (!data2.match('\"' + 'data' + '\"' + ':{}')) { 	
+				var transform_aa2 = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb2));}}
+				];  
+				
+				var transform_bb2 = [
+				{"tag":"ul", children:[ 		
+				{"tag": "h3", "html":"个股标签"},		
+				{"tag":"ul", children:function(){return(json2html.transform(this.items, transform_cc2));}}]}
+				];  
+				
+				var transform_cc2= 
+				{"tag":"li", children:[   	
+				{"tag":"b", "html":"${label_name}"}, 
+				{"tag":"p", "html":"${description}"},                   
+				]};
+				}	
+				
+				if (!data3.match('\"' + 'data' + '\"' + ':{}')) { 	
+				var transform_aa3 = [ 
+				{"tag":"ul", children:[ 
+				{"tag":"ul", children:[ 			
+				{"tag": "h3", "html":"相关板块"},			
+				{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb3));}}
+				]}]}];  	
+				
+				var transform_bb3 =		                     	
+				{"tag":"li", children:[                 			
+				{"tag":"b", "html":"${plate_name}"},
+				{"tag": "p", "html":"${reason}"}, 				
+				]};			
+				}
+				
+				var transform_aa4 = [                         		
+				{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb4));}}			
+				]; 
+				
+				var transform_bb4 = [ 
+				{"tag": "ul",children:[ 		
+				{"tag": "h3", "html":"扫雷"},
+				{"tag": "b", "html":"安全项：" + "${safe_count}" + "&nbsp;&nbsp;&nbsp;危险项：" + "${risk_count}"},			
+				{"tag":"ul", children:function(){return(json2html.transform(this.items, transform_cc4));}}]}
+				];  
+				
+				var transform_cc4 =             
+				{"tag":"li", children:[                  	
+				{"tag":"b", "html":"${risk_name}"},
+				{"tag":"p", "html":"${title}"},  				
+				]};	
+				
+				var transform_mc = [            
+				{"tag":"p", children:function(){return(json2html.transform(this.data, transform_mcs));}}                	                             
+				];	
+				
+				var transform_mcs =  
+				{"tag":"ul", children:[   		 
+				{"tag":"h2", "html":"${stock_name}"},
+				
+				]};	               
+				var html1 = json2html.transform(data1, transform_aa1);
+				var html2 = json2html.transform(data2, transform_aa2);				  
+				var html3 = json2html.transform(data3, transform_aa3);				  
+				var html4 = json2html.transform(data4, transform_aa4); 
+				var mc = json2html.transform(data4, transform_mc);				  
+				div=document.getElementById('towrite');
+				div.innerHTML = '<h1>个股亮点</h1>' + mc + html1 + html2 + html3 + html4;				 
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite"></div>
+	</body>
+</html>

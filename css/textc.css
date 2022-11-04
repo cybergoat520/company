@@ -1,0 +1,142 @@
+﻿body {
+	background-color: #141212;
+	color: #FFFF80;
+	font-family: "Microsoft YaHei";
+}
+
+div {
+	/* border: 1px solid #FFFFFF;  */
+	
+	background-color: #141212;
+	padding-left: 10px;
+	margin-bottom: 10px;
+}
+.fixedBox{	
+	width:60%;
+	height:95%;
+	position:fixed;
+	left:300px;
+	top:10px;						
+	background:#141212;
+	overflow:auto;	
+	border: 1px solid #DE2929;	
+}
+
+.fixedBox::-webkit-scrollbar {
+	width: 4px;     
+	height: 4px;
+	scrollbar-arrow-color:white;
+	background-color: #141212;		
+}
+.fixedBox::-webkit-scrollbar-thumb {
+	border-radius: 5px;
+	-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+	background: rgba(0,0,0,0.2);
+	scrollbar-arrow-color:#555;
+}
+.fixedBox::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+	border-radius: 0;
+	background: rgba(0,0,0,0.1);
+}				
+
+
+button {
+	float: right;
+	margin-right: 20px;
+}
+
+h {
+	/* border: 1px solid #FFFFFF; */
+	color: #FFFFFF;
+	margin-right: 10px;
+	/* font-size: 20px; */
+}
+
+h1 {
+	color: #FFFFFF;
+}
+
+h2 {
+	/* border: 1px solid #FFFF00; */
+	color: #FFFF00;
+	margin: 1px;
+}
+
+h3 {
+	/* border: 1px solid #21ECFB; */
+	color: #21ECFB;
+	margin-top: 5px;
+	font-size: 18px;
+}
+
+h4 {
+	/* border: 1px solid #505050; */
+	margin: 10px 1px 1px 1px;	
+	padding:1px;
+	font-size: 15px;
+}
+
+
+ul {
+	/* border: 1px solid #FFFFFF; */
+	color: #FFFFFF;
+	margin-top: 10px;
+	margin-left: 10px;
+	/* margin-top:10px; */
+	padding: 0px 3px 3px 5px;
+}
+
+/* li {color:#ff80ff;} */
+b {
+	/* border: 1px solid #FFFFFF;	 */
+	/* float: left; */
+	display:block;
+}
+t {
+	/* border: 1px solid #FFFFFF; */
+	/* float: right; */
+	/* text-align:right; */
+	/* position:absolute; */
+	/* right:10px; */
+	margin-left: 15px;	
+	font-size: 12px;
+}
+
+p {
+	/* border: 1px solid #FFFFFF; */
+	margin-top: 10px;	
+	/* display:inline; */
+}
+
+a {
+	/* border: 1px solid #D9D9D9; */
+	margin: 1px 15px 1px 0px;
+
+}
+
+a:link {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+a:visited {	
+	color:#FFFFFF; 
+	text-decoration:none; 
+}
+
+a:hover {
+	color: aqua;
+	text-decoration: underline;
+}
+
+a:active {
+	font-style: italic;
+}
+
+iframe {
+	background-color: #fff;
+	/* border-left: 1px solid #D9D9D9; */
+	/* margin-top: 10px; */
+	padding: 1px;
+}

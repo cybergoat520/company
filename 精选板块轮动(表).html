@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>精选板块轮动</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">						
+			#towriter{
+				margin-top:-15px;
+				border: 1px solid #555555;						
+			}			
+			.fixedBox{					
+				white-space: nowrap;	
+				background:#000;       <!-- 板块背景色 -->
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+			p {margin-top:0px;margin-bottom:5px}				
+			
+			table{
+				width:80px; 
+				border-collapse:collapse; 
+				text-align:center;
+			}
+			td,th{border:1px solid #696969}
+			th { 
+				color:#d2d2d3;  <!-- 表头文字颜色 -->
+			}
+			td a:link{
+				color:#d2d2d3;  <!-- 列表文字颜色 -->
+			}		
+			
+			#box {
+				position: absolute;
+				top: 100px;
+				left: 200px;
+				width: 500px;
+				height: 200px;
+				display: none;
+			}
+			
+			#bar {
+				padding-top: 1px;
+				height: 25px;								
+				background-color: #666;
+				cursor: move;
+			}
+			#content {				
+				height: 200px;
+				background: #000;  <!-- 弹出框背景色 -->
+				white-space: nowrap;
+				overflow:auto;				
+			}
+			#content::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;
+				scrollbar-arrow-color:white;
+				background-color: #F5F5F5;		
+			}
+			#content::-webkit-scrollbar-thumb {
+				border-radius: 5px;
+				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+				background: rgba(0,0,0,0.2);
+				scrollbar-arrow-color:#555;
+			}
+			#content::-webkit-scrollbar-track {
+				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+				border-radius: 0;
+				background: rgba(0,0,0,0.1);
+			}				
+		</style>
+	</head>
+	<body>		
+		<div id="towriter" class="fixedBox">
+			<div id="title" style="margin-bottom:-10px"></div>
+			<div id="towrite1" class="fixedBox" style="position:relative; float:left;"></div>		
+			<div id="towrite2" class="fixedBox" style="position:relative; float:left;"></div>
+			<div id="towrite3" class="fixedBox" style="position:relative; float:left;"></div>
+			<div id="towrite4" class="fixedBox" style="position:relative; float:left;"></div>
+			<div id="towrite5" class="fixedBox" style="position:relative; float:left;"></div>	
+			<div id="box">
+				<div id="bar"></div>
+				<div id="content" ></div>
+			</div>	
+		</div>
+		
+			
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			var bkcolor = $(".fixedBox").css("backgroundColor");
+			var thcolor = "";
+			var tdcolor = "";
+			var cbkcolor = $("#content").css("backgroundColor");
+			var day = new Date();
+			var dt = "";  //当日
+			var tt = "";
+			var tt1 = "";			
+			window.onload = function() {
+			dt = day.Format("yyyy-MM-dd");			
+			getSource();
+			changeStyle();	
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					day = new Date();
+					getSource();
+					if(sx == 1){
+						showInform(ztgp);					
+					}	
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {					
+				time_range("9:00","15:15")																
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj = document.getElementById("towriter");				
+				obj.style.left= "0px"; 				
+				obj.style.width= "980px";	
+				
+				var obj1 = document.getElementById("towrite1");
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "180px";	
+				obj1.style.fontSize="12px";					
+				
+				var obj2 = document.getElementById("towrite2");
+				obj2.style.left= "0px";   
+				obj2.style.width= "180px";  
+				obj2.style.fontSize="12px";	
+				
+				var obj3 = document.getElementById("towrite3");
+				obj3.style.left= "0px";  
+				obj3.style.width= "180px";  
+				obj3.style.fontSize="12px";	
+				
+				var obj4 = document.getElementById("towrite4");
+				obj4.style.left= "0px";  
+				obj4.style.width= "180px";  
+				obj4.style.fontSize="12px";
+				
+				var obj5 = document.getElementById("towrite5");
+				obj5.style.left= "0px";  
+				obj5.style.width= "180px";  
+				obj5.style.fontSize="12px";	
+			}					
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};			
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getSource() {
+				var div = document.getElementById("title");
+				var qh = "<a style='position:absolute; right:30px;' href='javascript:void(0)' onclick='clearstorage()'>" + "清除缓存" + "</a>";
+				div.innerHTML = '<font color=#FF8C00; size="3">精选板块轮动<font size="1">&nbsp;&nbsp;&nbsp;&nbsp;' + qh + '</font></font>';	
+				
+				var url = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w21&Type=1&c=ZhiShuRanking&PhoneOSNew=1&ZSType=7&"; 				
+				if (window.XMLHttpRequest) {
+					xmlHttp1 = new XMLHttpRequest();								
+				} else {
+					xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");								
+				}				
+				xmlHttp1.onreadystatechange = writeSource1;
+				xmlHttp1.open("GET", url, true);
+				xmlHttp1.send(null);				
+			}
+			
+			var rqs = ""; //判断交易日用(缓存)
+			var a = 0; 
+			var b = 0;
+			function writeSource1() { 
+				if (xmlHttp1.readyState == 4) { 
+					var div = document.getElementById('towrite1');																
+					var data = xmlHttp1.responseText
+					//document.write(data);
+					if(dt != tt1){	//非当日						
+						tt1 = data.match(/"Day":\["(\S*)/)[1].split('"]')[0];
+						t = tt1.split("-");
+						day = new Date(t[0], t[1]-1, t[2]);
+						rqs = tt1 + ";";  //判断交易日用						
+					}
+					
+					//alert(tt1);	
+					div.innerHTML = "<span style='color:#FFFF00'>" + tt1 + "</span>";					
+					if(data.indexOf("MYSQL数据库链接出错!") == -1)	{
+						data = data.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data = data.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+keepTwoDecimal(str.split(',')[3]);});						
+						data = data.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]");
+						data = data.match(/list\":(\S*)/)[1] ;
+						//document.write(data);
+						Ctable(tt1,data,"towrite1");						
+					}
+										
+					thcolor = $("th").css("color");				
+					tdcolor = $("td a:first").css("color");		
+				
+					if(dt == tt1 && b == 0){ //竞价后切换
+						a = 0;
+						b++;
+					}
+					a++;
+					
+					//alert(a);
+					if(a == 1){  //刷新或竞价后执行一次	
+						gethis(); //交易日推算
+					}else{					
+						rdbj();
+					}
+				}				
+			}
+			
+			var datahis = "";
+			function gethis() {			
+				if(localStorage.getItem('bkldrq') != null) {  //判断有无缓存日期
+					var t = localStorage.getItem('bkldrq'); //取缓存日期
+					if(t.split(";")[0] != tt1){  //如果缓存首日不等于最后交易日，重新计算
+						for (j = 1; j < 5; j++){															
+							gethisdata();
+							var div = document.getElementById("towrite" + (j + 1));	
+							div.innerHTML = "<span style='color:#FFFF00'>" + tt + "</span>";	
+							Ctable(tt,datahis,"towrite" + (j + 1));							
+						}
+						localStorage.setItem('bkldrq', rqs);  //交易日期写入缓存
+					}else{  //否则取缓存数据
+						for (i = 1; i < 5; i++){
+							var div = document.getElementById("towrite" + (i + 1));
+							tt = t.split(";")[i];
+							div.innerHTML = "<span style='color:#FFFF00'>" + tt + "</span>";
+							datahis = localStorage.getItem('bkld' + tt);
+							Ctable(tt,datahis,"towrite" + (i + 1));								
+						}				
+					}				
+				}else{   //首次
+					for (j = 1; j < 5; j++){										
+						gethisdata();
+						var div = document.getElementById("towrite" + (j + 1));	
+						div.innerHTML = "<span style='color:#FFFF00'>" + tt + "</span>";	
+						Ctable(tt,datahis,"towrite" + (j + 1));						
+					}					
+					localStorage.setItem('bkldrq', rqs);  //交易日期写入缓存
+				}				
+				rdbj();	
+			}
+									
+			function gethisdata() {				
+				day.setTime(day.getTime());				
+				for (i = 1; i < 100; i++){	//节假日																										
+					day.setTime(day.getTime() - 24*60*60*1000);
+					tt = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w26&Type=1&c=ZhiShuRanking&ZSType=7&Date=" + tt; 					
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data = xhr.responseText;					
+					if(data.indexOf("MYSQL数据库链接出错!") == -1 && data.indexOf("\"list\":\[\]") == -1){
+						//alert(tt);
+						rqs += tt + ";"
+						if(localStorage.getItem('bkld' + tt) != null) {   //判断有无缓存数据														
+							datahis = localStorage.getItem('bkld' + tt);    //取缓存数据							
+						}else{
+							//var div = document.getElementById("towrite" + (p + 1));	
+							//div.innerHTML = "<span style='color:#FFFF00'>" + tt + "</span>";																
+							//document.write(data);						
+							data = data.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+							data = data.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+keepTwoDecimal(str.split(',')[3]);});						
+							data = data.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]");
+							data = data.match(/list\":(\S*)/)[1] ;
+							//document.write(data);
+							datahis = data;
+							localStorage.setItem('bkld' + tt, datahis);  //历史单日数据写入缓存
+						}
+						//Ctable(tt,data,"towrite" + (p + 1));															
+						break;											
+					}
+				}				
+			}
+			
+			function rdbj() {				
+				var dm = "";
+				var div1 = document.getElementById('towrite1');
+				var rows1 = div1.getElementsByTagName('tr');
+				var dm1 = "";
+				for(var i = 1; i < rows1.length; i++){
+					rows1[i].style.border = "1px solid #696969";
+					dm1 += rows1[i].id.split('towrite1')[0] + ",";					
+				}
+				
+				var div2 = document.getElementById('towrite2');
+				var rows2 = div2.getElementsByTagName('tr');
+				var dm2 = "";
+				for(var i = 1; i < rows2.length; i++){
+					rows2[i].style.border = "1px solid #696969";
+					dm2 += rows2[i].id.split('towrite2')[0] + ",";					
+				}
+				
+				var div3 = document.getElementById('towrite3');
+				var rows3 = div3.getElementsByTagName('tr');
+				var dm3 = "";
+				for(var i = 1; i < rows3.length; i++){
+					rows3[i].style.border = "1px solid #696969";
+					dm3 += rows3[i].id.split('towrite3')[0] + ",";					
+				}
+				
+				var div4 = document.getElementById('towrite4');
+				var rows4 = div4.getElementsByTagName('tr');
+				var dm4 = "";
+				for(var i = 1; i < rows4.length; i++){
+					rows4[i].style.border = "1px solid #696969";
+					dm4 += rows4[i].id.split('towrite4')[0] + ",";					
+				}
+				
+				var div5 = document.getElementById('towrite5');
+				var rows5 = div5.getElementsByTagName('tr');
+				var dm5 = "";
+				for(var i = 1; i < rows5.length; i++){
+					rows5[i].style.border = "1px solid #696969";
+					dm5 += rows5[i].id.split('towrite5')[0] + ",";					
+				}
+				
+				dm = dm1 + dm2 + dm3 + dm4 + dm5; 
+				
+				for(var i = 1; i < rows1.length; i++){
+					var dms = rows1[i].id.split('towrite1')[0];					
+					var ss = dm.split(dms);					
+					if(ss.length - 1 > 1){
+						var rows = document.getElementsByTagName('tr');
+						for(var j = 0; j < rows.length; j++){
+							var dmh = rows[j].id.split('towrite')[0];
+							if(dmh == dms){
+								//rows[j].style.background="#FF0000";
+								//rows[j].style.color="#FF0000";
+								if(ss.length - 1 == 5){
+									//rows[j].style.background="#FF0000";
+									//rows[j].getElementsByTagName("a")[1].style.color = "#000000";																		
+									rows[j].style.border = "2px solid #FF0000";
+								}else if(ss.length - 1 == 4){
+									//rows[j].style.background="#FF00FF";
+									rows[j].style.border = "2px solid #FF00FF";
+								}else if(ss.length - 1 == 3){
+									//rows[j].style.background="#FF00FF";
+									rows[j].style.border = "2px solid #FF8040";
+								}else if(ss.length - 1 == 2){
+									//rows[j].style.background="#FFC4FF";
+									rows[j].style.border = "2px solid #FFC4FF";
+								}
+							}
+						}
+					}					
+				}				
+			}			
+			
+			function Ctable(tt,ss,id){
+			//alert(ss)
+				var json = JSON.parse(ss);				
+				//创建table					
+				var table=document.createElement("table");										
+				var thead=document.createElement("thead");
+				table.appendChild(thead);					
+				var tr=document.createElement("tr");
+				thead.appendChild(tr);					
+				
+				var m = 0;
+				var n = 0;
+				var b = 0;
+				var h = 1;
+				var gl = "强度";  //高亮				
+				for(var key in json[0]){  //表头
+					key = key.replace('code','代码').replace('name','名称').replace('zf','涨幅%').replace('qd','强度');
+					//key = key.replace('ZJJE','主力净额').replace('gang','主力').replace('plate','板块').replace('index','异动次数');					
+					var th=document.createElement("th");						
+					th.innerHTML=key;						
+					tr.appendChild(th);
+					if(gl == key.replace("%","")){
+							n = m;
+							th.style.color = "#FF6633";	
+						}					
+					m++;
+				}
+									
+				var tbody=document.createElement("tbody");					
+				table.appendChild(tbody);
+				
+				//遍历json
+				for(var i = 0; i < json.length; i++){					
+					var tr=document.createElement("tr");						
+					var p = 1;
+					var dm = "";
+					var mc = "";
+					for(var key in json[i]){ //行元素遍历						
+						var td=document.createElement("td");							
+						
+						var rc = json[i][key];
+						if(p == 1){  //代码列
+							dm = rc;
+							tr.id = dm + id;
+						}else if(p == 2){  //名称列
+							mc = rc;								
+						}	
+						td.innerHTML = "<a href='javascript:void(0)' style='float:left;'  onclick='showInform(\"" + tt + "#" + dm + "#" + mc + "\");changeCss(this,\"" + dm + id + "\",\"" + id + "\")'>" + rc + "</a>";
+						
+						if(p == n + 1){							
+							td.getElementsByTagName("a")[0].style.color = "#FF6633";
+						}																				
+						tr.appendChild(td);							
+						p++;
+					}														
+					if(mc.indexOf("ST") == -1 && h < 11){		//过滤ST	限制10行															
+						tbody.appendChild(tr);
+						h++;
+					}	
+				}
+				var div = document.getElementById(id);					
+				div.appendChild(table);
+				table.id = id;
+				changeTable(table);		//隐藏某列	
+				hover();				
+			}
+			
+			//隐藏某列				
+            function changeTable(table) {
+                var trs = table.rows;
+                for (var i = 0, len = trs.length; i < len; i++) {
+                    var cell = trs[i].cells[0]; //隐藏第1列					
+                    cell.style.display = 'none';
+                }
+            }
+			
+			//方式1		
+			var pid = "";
+			function changeCss1(obj,hid,id){						
+				var tlist = document.getElementById(id).getElementsByTagName("tr");					
+				for(var i = 0; i < tlist.length; i++){														
+					tlist[i].style.backgroundColor = bkcolor; 					
+				}	
+				
+				//5组选中行id集合
+				if(pid.indexOf(id) > -1){				
+					var aa = "";				
+					var ss = pid.split(";");
+					for(i = 0; i < ss.length-1; i++){
+						if(ss[i].indexOf(id) > -1){						
+							aa += hid + ";";
+						}else{
+							aa += ss[i] + ";";
+						}				
+					}
+					pid = aa;
+				}else{
+					pid += hid + ";";
+				}
+				
+				var tr = document.getElementById(hid);				
+				tr.style.backgroundColor = "#483D8B";						
+			}
+			
+			//方式2：相同行高亮
+			function changeCss(obj,hid,id){						
+				var tlist = document.getElementById("towriter").getElementsByTagName("tr");					
+				for(var i = 0; i < tlist.length; i++){														
+					tlist[i].style.backgroundColor = bkcolor; 					
+				}	
+								
+				pid = "";				
+				var dm = hid.split("towrite")[0];				
+				for(var i = 0; i < tlist.length; i++){
+					var a = tlist[i].id;					
+					if(tlist[i].id.split("towrite")[0] == dm){
+						tlist[i].style.backgroundColor = "#483D8B";
+						pid += tlist[i].id + ";";
+					}					
+				}					
+			}
+			
+			
+			function hover(){  //鼠标经过			
+				var rows = document.getElementsByTagName('tr');
+				for(var i=0;i<rows.length;i++){
+					rows[i].onmouseover=function(){						
+						if(this.id != ""){  //过滤表头
+							this.style.background="#800000";
+						}
+					}
+					rows[i].onmouseout=function(){
+						if(this.id != ""){  //过滤表头							
+							if(pid.indexOf(this.id) == -1){  //过滤选中行
+								this.style.background = bkcolor;
+							}else{
+								this.style.background = "#483D8B";
+							}
+						}						
+					}					
+				}
+			}
+			
+			var ztgp = "";
+			var sx = 0;
+			function showInform(ss){		
+				ztgp = ss;
+				//var x = event.clientX;				
+				var dms = ss.split('#');
+				var rq = dms[0];				
+				if(rq == ""){
+					rq = tt1;
+				}
+				var dm = dms[1];
+				var bk = dms[2];
+				
+				var div = document.getElementById('box');
+				div.style.display = 'block';
+				div.style.fontSize = "12px";
+				
+				<!-- var obj = document.getElementById("towrite1"); -->
+				<!-- var w = obj.clientWidth; -->
+				<!-- if(x + 180 + 450 < w * 5){ -->
+					<!-- div.style.left = x + 180 + "px";					 -->
+				<!-- }else{ -->
+					<!-- div.style.left = "0px";					 -->
+				<!-- } -->
+				
+				var div1 = document.getElementById('bar');							
+				var gb = '<a href="javascript:close();"  style="float:right; color:#fff">关闭</a>';			
+				div1.innerHTML = "<b style='color:#FFFF00;margin:5px;'>" + rq + "&nbsp;&nbsp;" + bk + gb +"</b>";
+				
+				update(rq,dm);
+				
+				if(rq == dt){
+					sx = 1;
+				}else{
+					sx = 0;
+				}					
+			}
+			
+			
+			function close() { 
+				var div = document.getElementById("box");						
+				div.style.display = "none";
+				sx = 0;
+			}
+			
+			var Order = 1;
+			var old = 1; 
+			function update(tt,dm) {			
+				var url = "";
+				if(tt == tt1){
+					url = "https://apphq.longhuvip.com/w1/api/index.php?Order=" + Order + "&st=20&a=ZhiShuStockList_W8&c=ZhiShuRanking&old=" + old + "&apiv=w21&Type=6&PlateID=" + dm; 												
+				}else{
+					url = "https://apphis.longhuvip.com/w1/api/index.php?st=20&Index=0&old=" + old + "&Order=" + Order + "&a=ZhiShuStockList_W8&apiv=w26&Type=6&c=ZhiShuRanking&PlateID=" + dm + "&Date=" + tt;												
+				}
+								
+				if (window.XMLHttpRequest) {
+					xmlHttp = new XMLHttpRequest();
+				} else {
+					xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+			
+			function writeSource() { 			
+				if (xmlHttp.readyState == 4) { 				
+					var data = xmlHttp.responseText	
+					//document.write(data);
+					//data = data.replace(/ /g,"").match(/\{\"list\":(\S*)\]\],\"/)[1] + ']]';
+					data = data.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';
+					//document.write(data);					
+					data = data.replace(/(\[\").*?(?=\])/g,function(word){ 
+					str = word.match(/\[(\S*)/)[1]; 
+					return '{"code":' + str.split(',')[0] + 
+					',"name":' + str.split(',')[1] +
+					',"zf":'+str.split(',')[6] +
+					',"lz":'+str.split(',')[24] +
+					',"zl":'+str.split(',')[2] +
+					',"lb":'+str.split(',')[23] + 
+					',"zt":'+str.split(',')[39];});
+					
+					data = data.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]");	
+					//document.write(data);
+					
+					var json = JSON.parse(data);
+						
+					//创建table					
+					var table=document.createElement("table");										
+					var thead=document.createElement("thead");
+					table.appendChild(thead);					
+					var tr=document.createElement("tr");
+					thead.appendChild(tr);					
+					
+					var m = 0;
+					var v = 0;
+					var b = 0;
+					var gl = "领涨";  //高亮
+					if(rs == 2){
+						gl = "涨幅";
+					}
+					for(var key in json[0]){  //表头													
+						key = key.replace('code','代码').replace('name','名称').replace('zf','涨幅%').replace('zl','主力').replace('lz','领涨');
+						key = key.replace('lb','连板').replace('zt','主题').replace('zs','涨速%');
+						var th=document.createElement("th");						
+						th.innerHTML=key;						
+						tr.appendChild(th);					
+						if(key == "领涨"){
+							b = m;							
+							th.style.color = "#FFA500";
+							
+						}else if(key == "主力" || key == "连板" || key == "主题"){
+							th.style.color = "#FFA500";	
+						}
+						if(gl == key.replace("%","")){
+							v = m;
+							th.style.color = "#FF6633";	
+						}
+						m++;
+					}
+										
+					var tbody=document.createElement("tbody");					
+					table.appendChild(tbody);
+					
+					//遍历json
+					for(var i = 0; i < json.length; i++){					
+						var tr=document.createElement("tr");						
+						var p = 1;	
+						var dm = "";
+						var mc = "";					
+						for(var key in json[i]){ //行元素遍历					
+							var td=document.createElement("td");							
+							
+							var rc = json[i][key];
+							if(p == 1){  //代码列
+								dm = rc;
+								tr.id = dm;
+							}					
+							td.innerHTML = "<a href=https://m.10jqka.com.cn/stockpage/hs_" + dm + "/ target=_blank id='" + p + "' onclick='changeTCss(this,\"" + dm + "\",\"gg\")'>" + rc + "</a>";
+								
+							if(p >= b + 1){							
+								td.getElementsByTagName("a")[0].style.color = "#FFA500";															
+							}
+							if(p == v + 1){							
+								td.getElementsByTagName("a")[0].style.color = "#FF6633";
+							}						
+							tr.appendChild(td);
+							p++;
+						}						
+						tbody.appendChild(tr);
+					}	
+					//var div = document.getElementById("inform");
+					var div = document.getElementById("content");								
+					div.scrollTop = 0; //回到顶部	
+					div.innerHTML = "";					
+					div.appendChild(table);
+					table.id = "gg";					
+					
+					var table=div.getElementsByTagName("table")[0];
+					makeSortable(table);			
+					ihover();
+					
+				}
+			}
+			
+			var trid = "";
+			function changeTCss(obj,hid,id){						
+				var tlist = document.getElementById(id).getElementsByTagName("tr");					
+				for(var i = 0; i < tlist.length; i++){														
+					tlist[i].style.backgroundColor = cbkcolor; 					
+				}
+				trid = hid;
+				var tr = document.getElementById(hid);				
+				tr.style.backgroundColor = "#483D8B";						
+			}
+			
+			function ihover(){  //鼠标经过
+				var rows = document.getElementById("gg").getElementsByTagName('tr');
+				for(var i=0;i<rows.length;i++){
+					rows[i].onmouseover=function(){						
+						if(this.id != ""){  //过滤表头
+							this.style.background="#800000";
+						}
+					}
+					rows[i].onmouseout=function(){
+						if(this.id != ""){  //过滤表头
+							if(this.id != trid){  //过滤选中行
+								this.style.background = cbkcolor;
+							}else{
+								this.style.background ="#483D8B";
+							}
+						}						
+					}					
+				}
+			}	
+			
+			var pt = 0;
+			var rs = 0
+			function makeSortable(table) {
+				var headers=table.getElementsByTagName("th");
+				for(var i=0;i<headers.length;i++){				
+					(function(n){
+						var flag=false;
+							
+						headers[n].onclick=function(){
+							//alert(n);	
+							
+							if(n == 2){
+								rs = n;
+								Order = (pt%2 == 0) ? "1" : "0";								
+								old = 0; 
+								update(rq,dm);	
+								pt++;
+							}
+							
+							if(old == 0 && n != 2){
+								rs = 0;
+								Order = 1;
+								old = 1; 								
+								update(rq,dm);							
+							}
+							
+							showCol(n);		//高亮
+							var tbody=table.tBodies[0];
+							var rows=tbody.getElementsByTagName("tr");
+							rows=Array.prototype.slice.call(rows,0);
+
+							//基于第n个<td>元素的值对行排序
+							rows.sort(function(row1,row2){
+								headtxt = headers[n].textContent;								
+								var cell1=row1.getElementsByTagName("td")[n];//获得第n个单元格
+								var cell2=row2.getElementsByTagName("td")[n];																
+								var val1=cell1.textContent||cell1.innerText;//获得文本内容
+								var val2=cell2.textContent||cell2.innerText;
+								if(headtxt.indexOf("名称") != -1 || headtxt.indexOf("主力") != -1|| headtxt.indexOf("主题") != -1){
+									val1 = val1;
+									val2 = val2;
+								}else if(headtxt.indexOf("连板") != -1){								
+									val1 = val1.replace("昨日首板","-1").replace("首板","1").replace("连板","");
+									if(val1.indexOf("天")>-1){
+										val1 = val1.split("天")[0];
+									}else if(val1.indexOf("昨")>-1){
+										val1 = 0;
+									}else if(val1 == ""){
+										val1 = -2;
+									}										
+									val1 = parseFloat(val1);
+								
+									val2 = val2.replace("昨日首板","-1").replace("首板","1").replace("连板","");
+									if(val2.indexOf("天")>-1){
+										val2 = val2.split("天")[0];
+									}else if(val2.indexOf("昨")>-1){
+										val2 = 0;
+									}else if(val2 == ""){
+										val2 = -2;
+									}									
+									val2 = parseFloat(val2);
+								}else if(headtxt.indexOf("领涨") != -1){
+									val1 = val1.replace("龙十","龙一十").replace("破板","1000");
+									val2 = val2.replace("龙十","龙一十").replace("破板","1000");
+									if(val1 == ''){
+										val1 = '1001';
+									}
+									if(val2 == ''){
+										val2 = '1001';
+									}
+									if(val1.indexOf("龙") != -1){
+										val1 = ChineseToNumber(val1.replace("龙",""));										
+									}										
+									if(val2.indexOf("龙") != -1){
+										val2 = ChineseToNumber(val2.replace("龙",""));
+										
+									}
+									//val2 = parseFloat(val2);									
+								}else{
+									if(val1 == "-"){
+										val1 = " ";
+									}
+									if(val2 == "-"){
+										val2 = " ";
+									}
+									val1 = val1.replace(" ","0").replace("无","1000").replace("NaN","0");
+									val2 = val2.replace(" ","0").replace("无","1000").replace("NaN","0");
+									if(val1.indexOf("万") != -1){
+										val1 = parseFloat(val1)*10000;
+									}else if(val1.indexOf("亿") != -1){
+										val1 = parseFloat(val1)*100000000;
+									}else{
+										val1 = parseFloat(val1);
+									}
+									
+									if(val2.indexOf("万") != -1){
+										val2 = parseFloat(val2)*10000;
+									}else if(val2.indexOf("亿") != -1){
+										val2 = parseFloat(val2)*100000000;
+									}else{
+										val2 = parseFloat(val2);
+									}
+								}
+								if(val1<val2){
+									return -1;
+								}else if(val1>val2){
+									return 1;
+								}else{
+									return 0;
+								}
+								
+							});
+							if(flag){
+								rows.reverse();								
+							}
+							
+							for(var i=0;i<rows.length;i++){
+								tbody.appendChild(rows[i]);
+							}
+
+							flag=!flag;							
+						}
+					}(i));
+				}
+			}
+			
+			function showCol(iCol){			
+				var div = document.getElementById("content");
+				var oTable = div.getElementsByTagName('table')[0];
+				for (i=0;i < oTable.rows.length; i++){										
+					for (j=0;j < oTable.rows[0].cells.length; j++){
+						oTable.rows[i].cells[j].style.color = thcolor;
+						
+						oTable.rows[i].cells[3].style.color = "#FFA500";						
+						oTable.rows[i].cells[4].style.color = "#FFA500";
+						oTable.rows[i].cells[5].style.color = "#FFA500";
+						oTable.rows[i].cells[6].style.color = "#FFA500";						
+					}
+					oTable.rows[i].cells[iCol].style.color = "#FF6633";					
+				}
+
+				otagsA = oTable.getElementsByTagName("a");  //a变色
+				for (i = 0; i < otagsA.length; i++) {
+					otagsA[i].style.color = tdcolor;
+					if(otagsA[i].id >= 4){
+						otagsA[i].style.color = "#FFA500";								
+					}
+					if(otagsA[i].id == iCol + 1){
+						otagsA[i].style.color = "#FF6633";
+					}
+				}								
+			}
+			
+			var chnNumChar = {零:0,一:1,二:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9};
+
+			var chnNameValue = {
+			  十:{value:10, secUnit:false},
+			  百:{value:100, secUnit:false},
+			  千:{value:1000, secUnit:false},
+			  万:{value:10000, secUnit:true},
+			  亿:{value:100000000, secUnit:true}
+			}
+
+			function ChineseToNumber(chnStr){
+			  var rtn = 0;
+			  var section = 0;
+			  var number = 0;
+			  var secUnit = false;
+			  var str = chnStr.split('');
+
+			  for(var i = 0; i < str.length; i++){
+				var num = chnNumChar[str[i]];
+				if(typeof num !== 'undefined'){
+				  number = num;
+				  if(i === str.length - 1){
+					section += number;
+				  }
+				}else{
+				  var unit = chnNameValue[str[i]].value;
+				  secUnit = chnNameValue[str[i]].secUnit;
+				  if(secUnit){
+					section = (section + number) * unit;
+					rtn += section;
+					section = 0;
+				  }else{
+					section += (number * unit);
+				  }
+				  number = 0;
+				}
+			  }
+			  return rtn + section;
+			}
+			
+			function clearstorage(){				
+				if(localStorage.getItem('bkldrq') != null){						
+					localStorage.removeItem('bkldrq'); //清除缓存localStorage
+				}
+				
+				var day = new Date();
+				day.setTime(day.getTime());			
+				for (i = 1; i < 300; i++){																		
+					day.setTime(day.getTime() - 24*60*60*1000);
+					var ts = day.Format("yyyy-MM-dd");
+					
+					if(localStorage.getItem('bkld' + ts) != null){	
+					
+						localStorage.removeItem('bkld' + ts); //清除缓存localStorage
+					}
+				}
+				alert('清除完成');
+			}
+		</script>
+		
+		<script>
+		var dragBox = function (drag, wrap) {
+
+		function getCss(ele, prop) {
+			return parseInt(window.getComputedStyle(ele)[prop]);
+		}
+
+		var initX,
+		initY,
+		dragable = false,
+		wrapLeft = getCss(wrap, "left"),
+		wrapRight = getCss(wrap, "top");
+
+		drag.addEventListener("mousedown", function (e) {
+			dragable = true;
+			initX = e.clientX;
+			initY = e.clientY;
+		}, false); 
+
+		document.addEventListener("mousemove", function (e) {
+			if (dragable === true ) {
+				var nowX = e.clientX,
+				nowY = e.clientY,
+				disX = nowX - initX,
+				disY = nowY - initY;
+				wrap.style.left = wrapLeft + disX + "px";
+				wrap.style.top = wrapRight + disY + "px";
+			}
+		});
+
+		drag.addEventListener("mouseup", function (e) {
+			dragable = false;
+			wrapLeft = getCss(wrap, "left");
+			wrapRight = getCss(wrap, "top");
+			}, false); 
+		};
+
+		dragBox(document.querySelector("#bar"), document.querySelector("#box"));
+    </script>
+	
+	
+	</body>
+</html>

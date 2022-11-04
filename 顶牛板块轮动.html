@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>顶牛板块轮动</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		
+		<style>		
+			.fixedBox{					
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 12px;     
+				height: 12px;				
+			}			
+					
+			.fl h2 {font-size: 12px;margin-left: 6px;padding-top: 8px; color: #d2d2d3;}				
+			ul.fl li p{width:133px;color: rgba(48, 69, 92, 0.8);position: relative;overflow: hidden;opacity: 1;transform: translate(0, 0);margin-top: 5px;z-index: 2;}  
+			ul.fl li p span{width:133px;height:22px;line-height:22px;font-size:12px;text-align:left;display:block;overflow: hidden;padding-left:6px;}
+			ul.fl {list-style: none;perspective: 900;padding: 0;margin: 0;}
+			ul.fl {margin-left: -10px;}			
+			ul.fl li {position: relative; margin-bottom: -15px; border-top: 1px dotted #dce7eb;}
+			
+			ul.fl li i {position: absolute;transform: translate(-6px, 0);margin-top: 15px;right: 0;margin-right: 16px;}
+			ul.fl li i:before, ul li i:after {content: "";position: absolute;background-color: #ff6873;width: 3px;height: 9px;}
+			ul.fl li i:before {transform: translate(-2px, 0) rotate(45deg);}
+			ul.fl li i:after {transform: translate(2px, 0) rotate(-45deg);}
+			ul.fl li input[type=checkbox] {position: absolute;cursor: pointer;width: 100%;height: 100%;z-index: 1;opacity: 0;}
+			ul.fl li input[type=checkbox]:checked ~ p {margin-top: 0;max-height: 0;opacity: 0;transform: translate(0, 50%);}
+			ul.fl li input[type=checkbox]:checked ~ i:before {transform: translate(2px, 0) rotate(45deg);}
+			ul.fl li input[type=checkbox]:checked ~ i:after {transform: translate(-2px, 0) rotate(-45deg);}
+			
+			.smallbox_sort{line-height: 38px;width: 155px; height: 20px;font-size:12px;padding-left:0px;}
+			.bigbox{width:134px;border: 1px dotted #dce7eb;float:left;}
+
+		</style>
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource();
+			changeStyle();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+						
+			function changeStyle() {
+				var obj = document.getElementById("towrite");	
+				obj.style.left= "0px"; 				
+				obj.style.width= "750px";	
+				obj.style.height= "330px";										  			 
+			}					
+						
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp1 = new XMLHttpRequest();				
+				} else {
+				xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}
+			}
+			
+			function getSource() {	    							
+				var url1 = "http://www.dingniugu.com/bankuailundong.html"; 
+				createXmlHttp();				
+				xmlHttp1.onreadystatechange = writeSource;
+				xmlHttp1.open("GET", url1, true);
+				//resp.setContentType("text/json; charset=utf-8");
+				//resp.setHeader("Access-Control-Allow-Origin", "*");
+
+				//xmlHttp1.setRequestHeader("contentType","application/x-www-form-urlencoded");
+				//xmlHttp1.setRequestHeader("Content-Type","text/html");
+				//xmlHttp1.setRequestHeader("Content-Encoding","gzip");
+				//xmlHttp1.setRequestHeader("Vary","Accept-Encoding");
+				//xmlHttp1.setRequestHeader("Access-Control-Allow-Origin","*");				
+				xmlHttp1.send(null);				
+			}
+			
+			
+			function writeSource() { 
+				if (xmlHttp1.readyState == 4) { 					
+					div1 = document.getElementById('towrite');					
+					var data1 = xmlHttp1.responseText
+					//document.write(data1);
+					
+					data1 = data1.substring(data1.indexOf('<div style="width:100%;text-align:right;">热门概念板块轮动</div>'),data1.indexOf('<!--数据结束-->'));
+					data1 = data1.replace('text-align:right;">热门概念板块轮动','text-align:left;">热门概念板块轮动');
+					data1 = data1.replace(/\"\/newskin/g,'\"newskin');
+					data1 = data1.replace(/<a href=\"\/dde\//g,'<a href=\"http:\/\/www.treeid\/code_').replace(/.html/g,'').replace(/target=\"_blank\"/g,'');
+					data1 = data1.replace(/(<p>).*?(<\/span>)/g,function(word){ return '<p>';});
+					//document.write(data1);
+					
+					//div1.innerText = data1;	
+					ss = data1.split('<h2>');
+					var	bk = "";				
+					for (i = 11; i < ss.length; i++)
+					{
+						var t = ss[i].split('</h2>');
+						bk += t[0] + ",";
+					}
+					for (j = 1; j < 11; j++)
+					{
+						var t = ss[j].split('</h2>');
+						rd = bk.split(t[0]);
+						//if(bk.indexOf(t[0]) > -1)
+						if(rd.length > 2)
+						{							
+							data1 = data1.replace(new RegExp('<h2>' + t[0] + '</h2>','g'),"<h2 style='color:#FF1493;'>" + t[0] + "</h2>");
+						}
+						else if(rd.length == 2)
+						{
+							data1 = data1.replace(new RegExp('<h2>' + t[0] + '</h2>','g'),"<h2 style='color:#FFB6C1;'>" + t[0] + "</h2>");
+						}						
+					}
+					div1.innerHTML = data1;
+					//alert(bk);
+				}				
+			}
+			
+			
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox">			
+	</body>
+</html>

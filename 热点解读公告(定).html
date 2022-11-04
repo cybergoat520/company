@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>热点解读公告</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">							
+			
+			.fixedBox::-webkit-scrollbar {
+				width: 12px;     
+				height: 12px;				
+			}			
+		</style>				
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script> 
+		<script>			
+			var tt = "";
+			var gt = "";
+			var jt = "";
+			var dt = "";
+			var k = "0";			
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();			
+			jt = Math.round(gt/1000);
+			//dt = jt;
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+			dt = tt;			
+			getSource();
+			changeStyle();
+			}
+								
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			function changeStyle() {				
+				var obj = document.getElementById("towrite");
+				obj.style.left= "0px";   //右侧左边位置
+				obj.style.width= "500px";  //右侧宽度
+				obj.style.fontSize="12px";	//右侧字体					
+			}
+			
+		function createXmlHttp() {
+			if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();				
+			} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");				
+			}
+		}
+		
+		function getSource() {
+			div = document.getElementById('towrite');		
+			div.innerHTML = '<font size="3">热点解读-公告&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';		
+			var url1 = "https://flash-api.xuangubao.cn/api/surge_stock/stocks?normal=true&uplimit=true"; 
+			var url2 = "https://flash-api.xuangubao.cn/api/surge_stock/stocks?date=" + tt.replace(/-/g,"") + "&normal=true&uplimit=true";		
+			var url = url1;
+			if(k == "1" )
+			{
+			  url = url2;
+			}				
+			createXmlHttp();
+			xmlHttp.onreadystatechange = writeSource;				
+			xmlHttp.open("GET", url, true);
+			xmlHttp.send(null);				
+		}
+		
+		function cDayFunc(dp) 
+		{ 
+			var date = dp.cal.getNewDateStr();            
+			BookingRmk(date);//调用其它函数并带上参数                
+		}
+		
+		function BookingRmk(date)
+		{         
+			tt = date;
+			gt = new Date(tt).getTime();
+			jt = Math.round(gt/1000);
+			k = 0;
+			if(dt != tt)
+			{			
+				k = 1;
+			}				
+			getSource();
+		}
+		
+		function changeCss(obj,id){				
+			var alist = document.getElementById(id).getElementsByTagName("a");					
+			for(var i = 0; i < alist.length; i++){				
+				if(alist[i] == undefined){
+					break;
+				}
+				alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+			}
+			obj.style.color = "#00FFFF"; //令当前标签高亮				
+		}
+		
+		function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+		};
+			
+		function writeSource() { 			
+			if (xmlHttp.readyState == 4) {                  	
+				var data = xmlHttp.responseText
+				//document.write(data);
+				data = data.replace(/ /g,"").replace(/(.SZ")|(.SS")/g,"\"");						
+				data = data.replace(/(\[\[).*?(?=\],\[)/g,
+				function(word){ 
+					str = word.match(/\[\[(\S*)/)[1];
+					if(str.indexOf('"id":-1,"name":"公告"') > -1)
+					{
+						ss = str.replace(/\[\{.*?\}\]/,"");
+						return '[{' + '"code":' + ss.split(',')[0] + ',"prod_name":' + ss.split(',')[1] + ',"zf":' + ss.split(',')[3] + ',"xq":' + '"' + ss.split(',"')[2].match(/(\S*)\",/)[1] + '"' + ',"lb":' + '"' + ss.split(',"')[3].match(/(\S*)\",/)[1] + '"';
+					}
+					else
+					{
+						return "";
+					}
+				});
+				
+				data = data.replace(/(\],\[).*?((?=\],\[)|(?=\]\]))/g,
+				function(word){ 
+					str = word.match(/\[(\S*)/)[1];
+					if(str.indexOf('"id":-1,"name":"公告"') > -1)
+					{
+						ss = str.replace(/\[\{.*?\}\]/,"");						
+						return '},{' + '"code":' + ss.split(',')[0] + ',"prod_name":' + ss.split(',')[1] + ',"zf":' + ss.split(',')[3] + ',"xq":' + '"' + ss.split(',"')[2].match(/(\S*)\",/)[1] + '"' + ',"lb":' + '"' + ss.split(',"')[3].match(/(\S*)\",/)[1] + '"';					
+					}
+					else
+					{
+						return "";
+					}
+				});
+				data = data.replace(/\]\]\}\}/g,"}]}}").replace(/:\},/g,":[");
+				
+				//涨幅				
+				data = data.replace(/(\"zf\":).*?(?=,)/g, function(word){ 				
+					str = word.match(/\"zf\":(\S*)/)[1]; 					
+					return '\"zf\":"' + keepTwoDecimal(str*100) + '"';
+				});  							
+				//document.write(data2);
+				
+				var transform_aa = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb));}}
+				];
+				
+				var transform_bb = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.items, transform_cc));}}
+				];
+				
+				var transform_cc = [
+				{"tag":"ul", children:[				
+				{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' onclick='changeCss(this,\"towrite\")'>${code} ${prod_name}&nbsp;&nbsp;涨幅：${zf}% &nbsp;&nbsp;${lb}</a>"}, 					
+				{"tag": "p", "html":"${xq}"},				
+				]}];
+				
+				var html = json2html.transform(data, transform_aa);		
+				div = document.getElementById('towrite');
+				div.innerHTML = div.innerHTML + html;
+								
+			}
+			document.getElementById("PriceDate").value = tt;
+		}
+		</script>
+
+	</head>
+
+	<body>
+		<!-- <div id="towrite"></div> -->
+		<!-- overflow:auto;  -->
+		<div id="towrite" class="fixedBox"></div>
+		<!-- <div id="towrite2" style="width:65%;height:600px; float:right"></div> -->
+		<!-- <div id="towrite2" class="fixedBox"></div>         -->
+	</body>
+</html>

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>基本面</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">	
+			p {margin:1px;}					
+			ul {margin:1px;}			
+			b {margin:0px}	
+			.fixedBox{					
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 12px;     
+				height: 12px;				
+			}
+			
+			#f10{
+				color: #FFD700;		<!-- 公司概况、大事提醒 标题颜色-->
+			}
+			
+			#f11{
+				color: #FFFFE0;		<!-- 公司概况、大事提醒 详情颜色-->
+			}
+			
+			#title{
+				color: #FFFF00;		<!-- 标题颜色 -->
+			}  
+			table{
+				width:460px; 
+				border-collapse:collapse; 
+				text-align:center;		
+			}
+			td,th{
+				border:1px solid #696969;
+				color:#FFFFE0;       <!-- 表格文字颜色 -->
+			}
+			#thead{
+				color: #FFA500;		<!-- 表格标题颜色 -->
+			} 
+			
+			#box {
+				position: absolute;
+				top: 50px;
+				left: 20px;
+				width: 80%;
+				height: 80%;
+				padding: 5px;
+				display: none;
+				border:2px solid #696969;
+				box-sizing: border-box;
+			}
+			
+			#bar {
+				padding-top: 1px;
+				height: 25px;								
+				background-color: #666;
+				cursor: move;				
+			}
+			#content {								
+				width: calc(100% - 15px);
+				height: calc(100% - 50px);
+				background-color: #252528;  <!-- 弹出框背景色 -->
+				white-space: nowrap;
+				overflow:auto;
+				border:2px solid #696969;
+			}
+			#content::-webkit-scrollbar {
+				width: 12px;     
+				height: 12px;
+				scrollbar-arrow-color:white;
+				background-color: #F5F5F5;		
+			}
+			#content::-webkit-scrollbar-thumb {
+				border-radius: 5px;
+				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+				background: rgba(0,0,0,0.2);
+				scrollbar-arrow-color:#555;
+			}
+			#content::-webkit-scrollbar-track {
+				-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+				border-radius: 0;
+				background: rgba(0,0,0,0.1);
+			}				
+		</style>		
+		
+		
+	</head>
+	<body>
+		
+		<div id="towrite" class="fixedBox">
+			<!-- <a href="javascript:location.reload();" style="float:right;color:#fff">刷新</a> -->
+			<div id="tbar" style="white-space: normal;"></div>		
+			<div id="towrites" style="position:relative; float:left;">
+				<div id="towrite1" class="fixedBox" style="position:relative; float:left;"></div>
+				<div id="towrite2" class="fixedBox" style="position:relative; float:left;"></div>			
+				<div id="towrite3" class="fixedBox" style="position:relative; float:left;"></div>
+				<div id="towrite4" class="fixedBox" style="position:relative; float:left;"></div>			
+				<div id="towrite5" class="fixedBox" style="position:relative; float:left;"></div>
+				<div id="towrite6" class="fixedBox" style="position:relative; float:left;"></div>					
+				<div id="towrite7" class="fixedBox" style="position:relative; float:left;"></div>
+			</div>					
+		</div>
+		<div id="box">
+			<div id="bar"></div>
+			<div id="content"></div>
+		</div>	
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		
+		<script>
+			//div设置
+			var div1 = "towrite1";	//公司概况
+			var div2 = "towrite6";	//主要指标：
+			var div3 = "towrite7";	//股东人数
+			var div4 = "towrite5";	//十大流通股东
+			var div5 = "towrite2";	//大事提醒
+			var div6 = "towrite3";	//扫雷
+			var div7 = "towrite4";	//相关板块
+			window.onload = function() {
+				//dt = day.Format("yyyy-MM-dd");			
+				getSource();				
+				changeStyle();					
+			}
+			
+			$(function() {
+				setInterval(function() {					
+					getSource();																	
+				},
+				500);
+			})					
+			
+			function changeStyle() {				
+				var obj = document.getElementById("towrite");
+				obj.style.border = "none"; 
+				obj.style.left= "0px"; 				
+				obj.style.width= "98%";						
+				//obj.style.height= "630px";		
+				obj.style.fontSize="12px";					
+				
+				var obj1 = document.getElementById("towrites");	
+				obj1.style.border = "1px solid #696969"; 
+				obj1.style.left= "0px";
+				obj1.style.width= "97%";	
+				//obj1.style.width= "420px";
+				//obj1.style.height= "600px"; 										
+				
+				var obj11 = document.getElementById("towrite1");	
+				obj11.style.left= "0px";
+				obj11.style.width= "96%";								
+				obj11.style.height= "200px"; 
+				
+				var obj12 = document.getElementById("towrite2");	
+				obj12.style.left= "0px";
+				obj12.style.width= "96%";								
+				obj12.style.height= "200px";
+									
+				var obj21 = document.getElementById("towrite3");	
+				obj21.style.left= "0px";
+				obj21.style.width= "96%";								
+				obj21.style.height= "200px"; 
+				
+				var obj22 = document.getElementById("towrite4");	
+				obj22.style.left= "0px";
+				obj22.style.width= "96%";								
+				obj22.style.height= "200px";
+				
+				var obj31 = document.getElementById("towrite5");	
+				obj31.style.left= "0px";
+				obj31.style.width= "96%";								
+				obj31.style.height= "200px";
+				
+				var obj32 = document.getElementById("towrite6");	
+				obj32.style.left= "0px";
+				obj32.style.width= "96%";								
+				obj32.style.height= "200px";
+
+				var obj33 = document.getElementById("towrite7");	
+				obj33.style.left= "0px";
+				obj33.style.width= "96%";								
+				obj33.style.height= "200px";	
+			}			
+						
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {                     
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			}		
+			
+			function NumberTransform(num) { 
+				var result = num;
+               if(Math.abs(num) > 100000000)
+			   {
+			    result = num / 100000000;
+				result = result.toFixed(2) + "亿";
+			   }
+				else if(Math.abs(num) > 10000)
+			   {
+			    result = num/10000;
+				result = result.toFixed(2) + "万";
+			   }				   
+               return result;  
+			};	
+			
+		
+			var gpdm = "";
+			var gpmc = "";
+			var dm = "";
+			var ds = 0;
+			var dms = "";
+			function getSource() {
+				var u = decodeURI(window.location.href);					
+				if(u.indexOf("##") > -1){
+					var gp = u.split('##');				
+					dm = gp[1];
+					gpmc = gp[3];					
+					//alert(dm);
+					dm == gpdm ? ds = 0: ds = 1;					
+				}else{
+					dm = "600000";
+					gpmc = "浦发银行";
+				}
+				
+				if(dm != gpdm){					
+					gpdm = dm;
+									
+					if(dm.substr(0,1)=="6"){
+						dms = dm + ".SS";					
+					}else{
+						dms = dm + ".SZ";					
+					}
+										
+					var div = document.getElementById("tbar");
+					div.innerHTML = '<span style="color:#FFA500; font-size:16px;">基本面</span><span style="color:#F5F5F5; font-size:14px;">（'+ gpdm + '&nbsp;&nbsp;' + gpmc+'）</span>';	
+					
+					//个股亮点
+					var url = "https://flash-api.xuangubao.cn/api/stock_spotlight?symbol=" + dms;
+					xmlHttp = new XMLHttpRequest();							
+					xmlHttp.onreadystatechange = writeSource;
+					xmlHttp.open("GET", url, true);
+					xmlHttp.send(null);
+					
+					//公司概况
+					var url11 = "https://flash-api.xuangubao.cn/api/f10/company_overview?symbol=" + dms; 																														
+					xmlHttp11 = new XMLHttpRequest();							
+					xmlHttp11.onreadystatechange = writeSource1;
+					xmlHttp11.open("GET", url11, true);
+					xmlHttp11.send(null);
+					
+					//主要指标：
+					//var url12 = "https://flash-api.xuangubao.cn/api/f10/main_indicators?symbol=" + dms;
+					var url12 = "https://apparticle.longhuvip.com/w1/api/index.php?a=GetFinanceInfo&apiv=w30&Type=0&c=StockF10Basic&State=1&StockID=" + dm;
+					xmlHttp12 = new XMLHttpRequest();							
+					xmlHttp12.onreadystatechange = writeSource2;
+					xmlHttp12.open("GET", url12, true);
+					xmlHttp12.send(null);
+					
+					//股东人数
+					var url21 = "https://flash-api.xuangubao.cn/api/f10/shareholders_number?symbol=" + dms; 																														
+					xmlHttp21 = new XMLHttpRequest();							
+					xmlHttp21.onreadystatechange = writeSource3;
+					xmlHttp21.open("GET", url21, true);
+					xmlHttp21.send(null);
+					
+					//十大流通股东
+					var url22 = "https://flash-api.xuangubao.cn/api/f10/ten_tradable_shareholders?symbol=" + dms; 																														
+					xmlHttp22 = new XMLHttpRequest();							
+					xmlHttp22.onreadystatechange = writeSource4;
+					xmlHttp22.open("GET", url22, true);
+					xmlHttp22.send(null);
+					
+					//大事提醒
+					var url31 = "https://flash-api.xuangubao.cn/api/f10/great_events?symbol=" + dms; 																														
+					xmlHttp31 = new XMLHttpRequest();							
+					xmlHttp31.onreadystatechange = writeSource5;
+					xmlHttp31.open("GET", url31, true);
+					xmlHttp31.send(null);
+					
+					//个股标签
+					var url30 = "https://flash-api.xuangubao.cn/api/stock_label/labels?symbols=" + dms;				 																													
+					xmlHttp30 = new XMLHttpRequest();							
+					xmlHttp30.onreadystatechange = writeSource5;
+					xmlHttp30.open("GET", url30, true);
+					xmlHttp30.send(null);
+					
+					//扫雷
+					//var iframe = document.getElementById('saolei');
+					//iframe.src = "http://page1.tdx.com.cn:7615/site/pcwebcall_static/bxb/bxb.html?code=" + gpdm + "&color=0";
+					var url32 = "https://api-ddc-wscn.xuangubao.cn/extract/stock_risk/full_desc?stock_code=" + dms; 																														
+					xmlHttp32 = new XMLHttpRequest();							
+					xmlHttp32.onreadystatechange = writeSource6;
+					xmlHttp32.open("GET", url32, true);
+					xmlHttp32.send(null);
+					
+					//相关板块
+					var url33 = "https://flash-api.xuangubao.cn/api/stage2/plates_by_any_stock?symbol=" + dms + "&fields=plate_name%2Creason";
+					xmlHttp33 = new XMLHttpRequest();							
+					xmlHttp33.onreadystatechange = writeSource7;
+					xmlHttp33.open("GET", url33, true);
+					xmlHttp33.send(null);
+					
+					//回到顶部					
+					document.getElementsByClassName('fixedBox')[0].scrollTop = 0;
+				}
+			} 			
+			
+			function writeSource() { 
+				if (xmlHttp.readyState == 4) { 					
+					var data = xmlHttp.responseText;
+					data = data.replace(/ /g,"")									
+					//document.write(data);
+					if(data.indexOf('"text":"') > -1){
+					//data11 = "[" + data11.match(/"data":(\S*)}}/)[1] + "}]";	
+						var gsld = data.match(/"text":"(\S*)"}}/)[1]
+						var div = document.getElementById("tbar");
+						div.innerHTML += '<p style="color:#00FFFF;font-size:14px;">个股亮点：' + gsld;
+					}
+				}
+			}
+			
+			function writeSource1() { 
+				if (xmlHttp11.readyState == 4) { 					
+					var data11 = xmlHttp11.responseText;
+					data11 = data11.replace(/ /g,"")
+					//data11 = "[" + data11.match(/"data":(\S*)}}/)[1] + "}]";						
+					//document.write(data11);
+					
+					var transform_aa1 = [           
+						{"tag":"ul id=f10", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+					];
+					
+					var transform_bb1= 
+						{"tag":"p", children:[ 											
+						{"tag":"p", "html":"公司全称：<font id=f11>${chi_name}</font>"},
+						{"tag":"p", "html":"注册地址：<font id=f11>${reg_addr}</font>"}, 
+						{"tag":"p", "html":"所属行业：<font id=f11>${indu_csrc}</font>"},
+						{"tag":"p", "html":"董事长：<font id=f11>${leader_name}</font>"},
+						{"tag":"p", "html":"董秘：<font id=f11>${secretary_bd}</font>"},
+						//{"tag":"p", "html":"控股股东：<font color=#FFD700>${msh_name}（持有${msh_percentage}*100%）</font>"},
+						{"tag": "p", "html": function(){
+							var kggd = "";
+							if(this.msh_name != undefined){
+								var bl = this.msh_percentage;
+								bl = keepTwoDecimal(bl*100);
+								var kggd = this.msh_name + "（" + bl + "%）";
+							}
+							return('控股股东：<font id=f11>' + kggd + "</font>");					
+						}},
+						{"tag":"p", "html":"实际控制人：<font id=f11>${actual_controller}</font>"},
+						{"tag":"p style=white-space:normal;", "html":"主营业务：<font id=f11>${business_major}</font>"},					
+					]};
+					
+					var html1 = json2html.transform(data11, transform_aa1);					 
+					var div = document.getElementById(div1);
+					
+					//div.innerHTML = "<b id=title>公司概况：</b>";																
+					div.innerHTML = "<a href='javascript:void(0)' id='title' onclick='showInform(" + "\"" + div1 + "\"" + ")'>公司概况</a>";
+					div.innerHTML += html1;	
+					div.scrollTop = 0; //回到顶部
+				}
+			}
+			
+			function showInform(id){
+				//alert(ss)				
+				var div = document.getElementById('box');
+				div.style.display = 'block';
+				div.style.fontSize = "15px";
+				
+				var title = "";
+				if(id == div1){
+					title = "公司概况";					
+				}else if(id == div2){
+					title = "主要指标";	
+					div.style.fontSize = "12px";
+				}else if(id == div3){
+					title = "股东人数";	
+					div.style.fontSize = "12px";
+				}else if(id == div4){
+					title = "十大流通股东";	
+				}else if(id == div5){
+					title = "大事提醒";	
+				}else if(id == div6){
+					title = "扫雷";	
+				}else if(id == div7){
+					title = "相关板块";	
+				}
+				var div1 = document.getElementById('bar');							
+				var gb = '<a href="javascript:close();"  style="float:right; color:#fff">关闭</a>';							
+				div1.innerHTML = "<b style='color:#FFF;margin:5px;font-size:14px'>" + title + gb +"</b>";
+				
+				var div2 = document.getElementById("content");
+				div2.style.whiteSpace = "nowrap"; 
+				//div.style.fontSize="12px";
+				div2.scrollTop = 0; //回到顶部	
+				div2.innerHTML = document.getElementById(id).innerHTML;
+				var table = div2.getElementsByTagName("table")[0];
+				table.style.width = div2.offsetWidth - 35 + 'px';
+			}
+			
+			function close() { 
+				var div = document.getElementById("box");						
+				div.style.display = "none";				
+			}
+			
+			function writeSource2() { 
+				if (xmlHttp12.readyState == 4) { 
+					var div = document.getElementById(div2); 
+					//div.innerHTML = "<b id=title>主要指标：</b>";
+					div.innerHTML = "<a href='javascript:void(0)' id='title' onclick='showInform(" + "\"" + div2 + "\"" + ")'>主要指标</a>";
+					
+					var data = xmlHttp12.responseText;
+					data = data.replace(/ /g,"")
+					//document.write(data);					
+					var list = data.match(/{"List":\[\[(\S*)]],"TBList"/)[1];					
+					var tblist = data.match(/"TBList":\[\[(\S*)]],"key"/)[1];
+					var key = data.match(/"key":\[(\S*)],"errcode"/)[1];
+					//document.write(key);
+					var ss = "";
+					var cc = key.split(",");					
+					for(var i = 1; i < 14; i++){
+						var dd = list.split("],[");
+						var tb = tblist.split("],[");
+						var aa = "";
+						var bb = "";
+						var p = dd.length;
+						if(p > 10){
+							p = 10;
+						}
+						for(var j = 0; j < p; j++){
+							var zb = dd[j].split(",");	
+							var tbz = tb[j].split(",");
+							var rq = zb[17];							
+							aa +=  rq + ":" + zb[i] + ',';
+							bb +=  rq + ":" + tbz[i] + ',';
+						}
+						ss += '"bt":' + cc[i] + ',' + aa + '},{' + '"bt":' + cc[i] + 'TB,' + bb + '},{';
+					}
+					ss = "[{" + ss.replace(/"TB/g,'TB"').replace(/,},{/g,'},{') + "]";
+					ss = ss.replace('},{]','}]').replace("GJZB_YYSRTB","营业收入同比").replace("GJZB_YYSR","营业收入").replace("GJZB_JLRTB","净利润同比").replace("GJZB_JLR","净利润");
+					ss = ss.replace("GJZB_KFJLRTB","扣非净利润同比").replace("GJZB_KFJLR","扣非净利润").replace("MGZB_MGSYTB","每股收益同比").replace("MGZB_MGSY","每股收益");
+					ss = ss.replace("MGZB_MGJZCTB","每股净资产同比").replace("MGZB_MGJZC","每股净资产").replace("MGZB_MGZBGJJTB","每股资本公积金同比").replace("MGZB_MGZBGJJ","每股资本公积金");
+					ss = ss.replace("MGZB_MGWFPLRTB","每股未分配利润同比").replace("MGZB_MGWFPLR","每股未分配利润").replace("MGZB_MGJYXJLTB","每股经营现金流同比").replace("MGZB_MGJYXJL","每股经营现金流");
+					ss = ss.replace("YLNL_JZCSYLTB","净资产收益率同比").replace("YLNL_JZCSYL","净资产收益率").replace("YLNL_JZCSYLTBTB","净资产收益率-摊薄同比").replace("YLNL_JZCSYLTB","净资产收益率-摊薄");
+					ss = ss.replace("YLNL_XSMLLTB","销售毛利率同比").replace("YLNL_XSMLL","销售毛利率").replace("YLNL_CHZZLTB","存货周转率同比").replace("YLNL_CHZZL","存货周转率");
+					ss = ss.replace("ZBJG_ZCFZLTB","资产负债率同比").replace("ZBJG_ZCFZL","资产负债率");
+					
+					
+					//document.write(ss);
+					
+					var json = JSON.parse(ss);				
+					//创建table					
+					var table=document.createElement("table");										
+					var thead=document.createElement("thead");
+					table.appendChild(thead);					
+					var tr=document.createElement("tr");
+					
+					thead.appendChild(tr);										
+					for(var key in json[0]){
+						key = key.replace('bt','报告期');						
+						var th=document.createElement("th");						
+						th.innerHTML=key;	
+						th.id = "thead";
+						tr.appendChild(th);	
+						
+					}									
+					var tbody=document.createElement("tbody");					
+					table.appendChild(tbody);
+					
+					
+					var k = 0;
+					var m = 0;						
+					for(var i = 0; i < json.length; i++){					
+						var tr=document.createElement("tr");
+						var p = 1;
+						for(var key in json[i]){
+							var td=document.createElement("td");							
+							var rc = json[i][key];
+							if(p == 1){
+								td.id = "thead";
+							}							
+							td.innerHTML = rc;							
+							tr.appendChild(td);							
+							p++;
+						}												
+						if(i%4 == 0 || i%4 == 1){
+							tr.style.background="#555";
+						}
+						tbody.appendChild(tr);
+					}																		
+					div.appendChild(table);
+					div.scrollTop = 0; //回到顶部
+				}	
+			}
+			
+			
+			function writeSource3() { 
+				if (xmlHttp21.readyState == 4) { 
+					var div = document.getElementById(div3); 
+					//div.innerHTML = "<b id=title>股东人数：</b>";
+					div.innerHTML = "<a href='javascript:void(0)' id='title' onclick='showInform(" + "\"" + div3 + "\"" + ")'>股东人数</a>";
+					
+					var data = xmlHttp21.responseText;
+					data = data.replace(/ /g,"")														
+					data = data.match(/"data":(\S*)/)[1];
+					
+					data = data.replace(/({").*?(?=})/g,function(word){ 
+						str = word.match(/{(\S*)/)[1];	
+						return "{" + str.split(',')[4] + "," + str.split(',')[5] + "," + str.split(',')[48] + "," + str.split(',')[47];							
+					});
+					data = data.replace(/T00\:00\:00\+08\:00/g,"").replace("}]}","}]");
+					//document.write(data);
+					
+					var json = JSON.parse(data);				
+					//创建table					
+					var table=document.createElement("table");										
+					var thead=document.createElement("thead");
+					table.appendChild(thead);					
+					var tr=document.createElement("tr");
+					thead.appendChild(tr);					
+										
+					for(var key in json[0]){  //表头
+						key = key.replace('end_date','变动时间').replace('ash_num_qoq','环比').replace('sh_num','股东人数').replace('af_hold_prop_ta','人均持股');						
+						var th=document.createElement("th");						
+						th.innerHTML=key;
+						th.id = "thead";
+						tr.appendChild(th);						
+					}										
+					var tbody=document.createElement("tbody");					
+					table.appendChild(tbody);
+					
+					//遍历json
+					for(var i = 0; i < json.length; i++){					
+						var tr=document.createElement("tr");
+						var p = 1;						
+						for(var key in json[i]){ //行元素遍历						
+							var td=document.createElement("td");							
+							var rc = json[i][key];							
+							td.innerHTML = rc;
+							if(p == 3){
+								td.innerHTML = keepTwoDecimal(rc*100) + "%";
+							}
+							tr.appendChild(td);	
+							p++;
+						}						
+						tbody.appendChild(tr);
+					}
+					table.style.width = div.offsetWidth - 35 + 'px';
+					div.appendChild(table);	
+					div.scrollTop = 0; //回到顶部					
+				}	
+			}
+
+			function writeSource4() { 
+				if (xmlHttp22.readyState == 4) { 
+					var div = document.getElementById(div4); 					
+					var data = xmlHttp22.responseText;
+					//document.write(data);
+					data = data.replace(/ /g,"")														
+					//data = data.match(/"data":(\S*)/)[1];
+					var aa = data.match(/"dates":\[(\S*)\]/)[1];
+					var bb = data.match(/"details":(\S*)}}}/)[1];
+					//document.write(aa);
+					var rq = aa.split(",")[0].replace("]","");
+					//div.innerHTML = "<b id=title>十大流通股东：<font size='1'>" + rq.replace(/"/g,"") + "</font></b>";
+					div.innerHTML = "<a href='javascript:void(0)' id='title' onclick='showInform(" + "\"" + div4 + "\"" + ")'>十大流通股东（" + rq.replace(/"/g,"") + "）</a>";
+					
+					var ss = bb.split(rq + ':{"shareholders":')[1].split(',"exited_shareholders"')[0];
+					ss = ss.replace(/unchange/g,"未变").replace(/new/g,"新进").replace(/down/g,"减少").replace(/up/g,"增加");					
+					//document.write(ss);
+					
+					var json = JSON.parse(ss);				
+					//创建table					
+					var table=document.createElement("table");										
+					var thead=document.createElement("thead");
+					table.appendChild(thead);					
+					var tr=document.createElement("tr");
+					thead.appendChild(tr);					
+										
+					for(var key in json[0]){  //表头
+						key = key.replace('sh_list','名称').replace('hold_sum_change','增减').replace('hold_sum','持股').replace('percent_of_floats','占比').replace('hold_change_status','增减情况');
+						
+						var th=document.createElement("th");						
+						th.innerHTML=key;
+						th.id = "thead";						
+						tr.appendChild(th);						
+					}										
+					var tbody=document.createElement("tbody");					
+					table.appendChild(tbody);
+					
+					//遍历json
+					for(var i = 0; i < json.length; i++){					
+						var tr=document.createElement("tr");
+						var p = 1;						
+						for(var key in json[i]){ //行元素遍历						
+							var td=document.createElement("td");							
+							var rc = json[i][key];							
+							td.innerHTML = rc;
+							if(p == 1){
+								td.id = "thead";
+								td.style.whiteSpace = "normal";
+							}
+							if(p == 2 || p == 4){
+								td.innerHTML = NumberTransform(rc);
+							}
+							if(p == 3){							
+								if(rc != null){
+									td.innerHTML = keepTwoDecimal(rc) + "%";
+								}else{
+									td.innerHTML = "";
+								}
+							}
+							tr.appendChild(td);	
+							p++;
+						}						
+						tbody.appendChild(tr);
+					}
+					table.style.width = div.offsetWidth - 35 + 'px';					
+					div.appendChild(table);	
+					div.scrollTop = 0; //回到顶部
+				}
+			}
+			
+			function writeSource5() { 
+				if (xmlHttp31.readyState == 4 && xmlHttp30.readyState == 4) { 
+					var div = document.getElementById(div5); 					
+					//div.innerHTML = "<b id=title>大事提醒：</b>";
+					div.innerHTML = "<a href='javascript:void(0)' id='title' onclick='showInform(" + "\"" + div5 + "\"" + ")'>大事提醒</a>";
+					
+					var data = xmlHttp31.responseText;
+					data = data.replace(/ /g,"")					
+					//document.write(data);
+										
+					var data1 = xmlHttp30.responseText.replace(new RegExp(dms,'g'),"items")  //对变量进行全文替换														
+					//document.write(data1);					
+					if (data1.indexOf('"data":{}') == -1){ 	
+						var transform_aa1 = [           
+						{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+						];  
+						
+						var transform_bb1 = [
+						{"tag":"p", children:[ 		
+						{"tag": "p style=color:#00FFFF;", "html":"个股标签"},		
+						{"tag":"ul", children:function(){return(json2html.transform(this.items, transform_cc1));}}]}
+						];  
+						
+						var transform_cc1= 
+						{"tag":"li style=color:#ADFF2F;", children:[   	
+						{"tag":"p", "html":"${label_name}"}, 
+						{"tag":"p style=color:#FF6347;white-space:normal;", "html":"${description}"},                   
+						]};						
+					}
+				
+					var transform_aa = [           
+						{"tag":"ul style=color:#FFD700;", children:function(){return(json2html.transform(this.data, transform_bb));}}
+					];
+					
+					var transform_bb= 
+						{"tag":"li", children:[ 																	
+						{"tag": "p id=f10", "html": function(){
+							var rq = this.Date.split("T")[0];							
+							return(rq + '&nbsp;&nbsp;' + this.Title);					
+						}},
+						{"tag":"p id=f11 style=white-space:normal;margin-bottom:10px;", "html":"${Description}"}, 										
+					]};
+					
+					var html = json2html.transform(data, transform_aa);
+					var html1 = json2html.transform(data1, transform_aa1);
+					div.innerHTML += html1 + html;
+					div.scrollTop = 0; //回到顶部
+				}
+			}
+			
+			function writeSource6() { 
+				if (xmlHttp32.readyState == 4) { 
+					var div = document.getElementById(div6); 
+					//div.innerHTML = "<b id=title>扫雷：</b>";
+					div.innerHTML = "<a href='javascript:void(0)' id='title' onclick='showInform(" + "\"" + div6 + "\"" + ")'>扫雷</a>";
+					
+					var data = xmlHttp32.responseText;
+					//document.write(data);
+					data = data.replace(/ /g,"")														
+					//data = data.match(/"data":(\S*)/)[1];
+					
+					var transform_aa = [                         		
+						{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb));}}			
+					]; 
+					
+					var transform_bb = [ 
+						{"tag": "ul style=color:#00FFFF;",children:[ 							
+						{"tag": "b", "html":"安全项：" + "${safe_count}" + "&nbsp;&nbsp;&nbsp;危险项：" + "${risk_count}"},			
+						{"tag":"ul style=color:#FFD700;", children:function(){return(json2html.transform(this.items, transform_cc));}}]}
+					];  
+					
+					var transform_cc =             
+						{"tag":"li", children:[                  						
+						{"tag": "p", "html": function(){	
+						var stars = this.stars;
+						if(stars == 0){
+							return("<span id=f10>" + this.risk_name + '：' + "<span id=f11>" + this.title);	
+						}else{
+							return("<span style=color:#FF4500;>" + this.risk_name + '：' + "<span style=color:#ADFF2F;>" + this.title);
+						}												
+					}},				
+					]};
+					
+					var html = json2html.transform(data, transform_aa);
+					div.innerHTML += html;	
+					div.scrollTop = 0; //回到顶部
+				}
+			}
+
+			function writeSource7() { 
+				if (xmlHttp33.readyState == 4) { 
+					var div = document.getElementById(div7); 
+					//div.innerHTML = "<b id=title>相关板块：</b>";
+					div.innerHTML = "<a href='javascript:void(0)' id='title' onclick='showInform(" + "\"" + div7 + "\"" + ")'>相关板块</a>";
+					
+					var data = xmlHttp33.responseText;					
+					data = data.replace(/\"+(\d{4,10})+\":/g,"").replace(/:{{/g,":[{").replace(/}}}/g,"}]}");
+					//document.write(data);																		
+					if (!data.match('\"' + 'data' + '\"' + ':{}')) { 	
+						var transform_aa = [ 											
+						{"tag":"ul style=margin:5px;color:#FFD700;", children:function(){return(json2html.transform(this.data, transform_bb));}}
+						];  	
+						
+						var transform_bb =		                     	
+						{"tag":"li", children:[                 			
+						{"tag":"b id=f10", "html":"${plate_name}"},
+						{"tag": "p id=f11 style=white-space:normal;margin-bottom:10px;", "html":"${reason}"}, 				
+						]};			
+					}
+					
+					var html = json2html.transform(data, transform_aa);
+					div.innerHTML += html;
+					div.scrollTop = 0; //回到顶部
+				}
+			}		
+		</script>
+		
+		<script>
+		var dragBox = function (drag, wrap) {
+
+		function getCss(ele, prop) {
+			return parseInt(window.getComputedStyle(ele)[prop]);
+		}
+
+		var initX, initY
+		dragable = false,
+		wrapLeft = getCss(wrap, "left"),
+		wrapTop = getCss(wrap, "top");
+
+		drag.addEventListener("mousedown", function (e) {
+			dragable = true;
+			initX = e.clientX;
+			initY = e.clientY;
+		}, false); 
+
+		document.addEventListener("mousemove", function (e) {
+			if (dragable === true ) {
+				var nowX = e.clientX,
+				nowY = e.clientY,
+				disX = nowX - initX,
+				disY = nowY - initY;
+				wrap.style.left = wrapLeft + disX + "px";
+				wrap.style.top = wrapTop + disY + "px";
+			}
+		});
+
+		drag.addEventListener("mouseup", function (e) {
+			dragable = false;
+			wrapLeft = getCss(wrap, "left");
+			wrapTop = getCss(wrap, "top");
+			}, false); 
+		};
+
+		dragBox(document.querySelector("#bar"), document.querySelector("#box"));
+    </script>	
+	</body>
+</html>

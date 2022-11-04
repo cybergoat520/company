@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>开盘啦</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {	
+			getSource();
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp1 = new XMLHttpRequest();
+				xmlHttp2 = new XMLHttpRequest();
+				xmlHttp3 = new XMLHttpRequest();
+				xmlHttp4 = new XMLHttpRequest();
+				xmlHttp5 = new XMLHttpRequest();
+				} else {
+				xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp3 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp4 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp5 = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			gp = window.location.href.split('##');
+			dm = gp[1];
+			function getSource() {		    
+				var url1 = "https://apparticle.longhuvip.com/w1/api/index.php?a=GetCompanyInfo&apiv=w24&c=StockF10Basic&StockID=" + dm; 
+				var url2 = "https://apphq.longhuvip.com/w1/api/index.php?a=GetKLineZhangTing&apiv=w24&c=StockLineData&StockID=" + dm;
+				var url3 = "https://apparticle.longhuvip.com/w1/api/index.php?a=GetConceptJXBKw23&apiv=w24&c=StockF10Basic&StockID=" + dm;
+				var url4 = "https://apparticle.longhuvip.com/w1/api/index.php?a=GetConceptw23&apiv=w24&c=StockF10Basic&StockID=" + dm; 
+				var url5 = "https://apparticle.longhuvip.com/w1/api/index.php?a=GetConceptTopic&apiv=w24&c=StockF10Basic&StockID=" + dm; 
+				//alert(url5);
+				createXmlHttp();
+				xmlHttp1.onreadystatechange = writeSource;
+				xmlHttp1.open("GET", url1, true);
+				xmlHttp1.send(null);
+				
+				xmlHttp2.onreadystatechange = writeSource;
+				xmlHttp2.open("GET", url2, true);
+				xmlHttp2.send(null);
+				
+				xmlHttp3.onreadystatechange = writeSource;
+				xmlHttp3.open("GET", url3, true);
+				xmlHttp3.send(null);
+				
+				xmlHttp4.onreadystatechange = writeSource;
+				xmlHttp4.open("GET", url4, true);
+				xmlHttp4.send(null);
+				
+				xmlHttp5.onreadystatechange = writeSource;
+				xmlHttp5.open("GET", url5, true);
+				xmlHttp5.send(null);
+			}
+			
+			function writeSource() { 
+				if (xmlHttp5.readyState == 4) {         
+				var data1 = xmlHttp1.responseText
+				var data2 = xmlHttp2.responseText
+				var data3 = xmlHttp3.responseText
+				//document.write(data3);
+				var data4 = xmlHttp4.responseText		
+				var data5 = xmlHttp5.responseText
+				var transform_aa1 = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_bb1));}}
+				];
+				
+				var transform_bb1= 
+				{"tag":"ul", children:[				
+				{"tag": "h3", "html":"公司资料"},				
+				{"tag":"ul", children:function(){return(json2html.transform(this.XXList, transform_cc1));}}			                            
+				]};
+				
+				var transform_cc1= 
+				{"tag":"li", children:[ 
+				{"tag":"b", "html":"公司名称"}, 			
+				{"tag":"p", "html":"${CName}"},
+				{"tag":"li", children:[ 				
+				{"tag":"b", "html":"主营业务"}, 	
+				{"tag":"p", "html":"${MainSale}"},
+				{"tag":"li", children:[ 
+				{"tag":"b", "html":"控股股东"}, 
+				{"tag":"p", "html":"${TroHold}"}, 
+				{"tag":"li", children:[ 
+				{"tag":"b", "html":"实际控制人"}, 				
+				{"tag":"p", "html":"${ActHold}"},                  		
+				]}]}]}]};
+				
+				var transform_aa2 = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_bb2));}}
+				];  
+				
+				var transform_bb2 = [
+				{"tag":"ul", children:[ 		
+				{"tag": "h3", "html":"涨停原因"},		
+				{"tag":"ul", children:[   	
+				{"tag":"p", "html":"${Reason}【${SCLT}】"}, 				                
+				]}]}];
+				
+				var transform_aa3 = [ 
+				{"tag":"ul", children:[ 
+				{"tag":"ul", children:[ 			
+				{"tag": "h3", "html":"精选题材"},			
+				{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_bb3));}}
+				]}]}];  	
+				
+				var transform_bb3 =		                     	
+				{"tag":"li", children:[                 			
+				{"tag":"b", "html":"${CName}"},
+				{"tag": "p", "html":"${Analysis}"}, 				
+				]};			
+				
+				
+				var transform_aa4 = [ 
+				{"tag":"ul", children:[ 
+				{"tag":"ul", children:[ 			
+				{"tag": "h3", "html":"常规板块"},			
+				{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_bb4));}}
+				]}]}];  	
+				
+				var transform_bb4 =		                     	
+				{"tag":"li", children:[                 			
+				{"tag":"b", "html":"${CName}"},
+				{"tag": "p", "html":"${Analysis}"}, 				
+				]};	
+				
+				var transform_aa5 = [ 
+				{"tag":"ul", children:[ 
+				{"tag":"ul", children:[ 			
+				{"tag": "h3", "html":"题材要点"},			
+				{"tag":"ul", children:function(){return(json2html.transform(this.List, transform_bb5));}}
+				]}]}];  	
+				
+				var transform_bb5 =		                     	
+				{"tag":"li", children:[                 			
+				{"tag":"b", "html":"${CName}"},
+				{"tag": "p", "html":"${Analysis}"}, 				
+				]};	
+				
+				var html1 = json2html.transform(data1, transform_aa1);
+				var html2 = json2html.transform(data2, transform_aa2);				  
+				var html3 = json2html.transform(data3, transform_aa3);				  
+				var html4 = json2html.transform(data4, transform_aa4); 
+				var html5 = json2html.transform(data5, transform_aa5);                   
+				div=document.getElementById('towrite');                 
+				div.innerHTML = '<h1>题材概念</h1>' + html1 + html2 + html3 + html4 + html5;      				 
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite"></div>
+	</body>
+</html>

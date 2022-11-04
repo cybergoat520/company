@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>公司亮点</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource();
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			
+			function getSource() {	    
+				gp = window.location.href.split('##');								
+				var url = "https://eq.10jqka.com.cn/stockViewPoints/v2/homePage?stockCode=" + gp[1]; 
+				//alert(gp[1]);
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+				}
+				
+				function writeSource() { 
+				if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText
+				var transform_aa = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.result, transform_bb));}}
+				];
+				
+				var transform_bb= 
+				{"tag":"p", children:[
+				{"tag": "h2", "html":"${stockName}"},                           
+				{"tag":"ul", children:function(){return(json2html.transform(this.company, transform_cc));}},    
+				{"tag":"ul", children:function(){return(json2html.transform(this.viewpoints, transform_ee));}}
+				]};
+				
+				var transform_cc= //强相关概念
+				{"tag":"h3", children:[
+				{"tag": "span", "html":"${concept}"},
+				{"tag": "h3", "html":"强相关概念"},                                        
+				{"tag":"ul", children:function(){return(json2html.transform(this.board, transform_dd));}},
+				]};  
+				
+				var transform_dd= 
+				{"tag":"li", children:[
+				{"tag": "b", "html":"${plateName}"},
+				{"tag": "p", "html":"${desc}"},
+				]};   
+				
+				var transform_ee=   //短期亮点
+				{"tag":"p", children:[
+				{"tag": "h3", "html":"${name}"},                        
+				{"tag":"ul", children:function(){return(json2html.transform(this.points, transform_ff));}}
+				]};
+				
+				var transform_ff=   
+				{"tag":"li", children:[                
+				{"tag":"b", children:function(){return(json2html.transform(this.labelMap, transform_gg));}},                            
+				{"tag": "p", "html":"${desc}"},
+				]};  
+				
+				var transform_gg=   
+				{"tag":"b", children:[
+				{"tag": "b", "html":"${label}"},                                                        
+				]};         
+				
+				var html = json2html.transform(data, transform_aa);
+				//document.write('<h1>公司亮点</h1>' + html);
+				div=document.getElementById('towrite');
+				div.innerHTML = '<h1>公司亮点</h1>' + html;
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite"></div>
+	</body>
+</html>

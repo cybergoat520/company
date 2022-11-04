@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>同花顺速递</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">	
+			p {margin:0px;}					
+			ul {margin:5px;}			
+			h4 {margin:0px}	
+			.fixedBox{
+				border: 5px solid #555555;				
+				
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource();
+			changeStyle();
+			}
+						
+			
+			function changeStyle() {
+				var obj = document.getElementById("towrite");				
+				obj.style.left = "0px"; 				
+				obj.style.width = "90%";	
+				//obj.style.height = "620px";		
+				obj.style.fontSize ="12px";					
+			}
+			
+			
+			$(function() {
+				setInterval(function() {
+					getSource();
+				},
+				500);
+			})
+			
+			var gpdm = "";
+			var gpmc = "";
+			var dm ="";			
+			function getSource() {				
+				var gp = decodeURI(window.location.href).split('##');					
+				gpdm = gp[1];
+				gpmc = gp[2];		
+				//alert(gpdm)
+				if(dm != gpdm){
+					dm = gpdm;
+					var sc = "";
+					if(gpdm.substr(0 , 1) == "6"){				
+						sc = "17";
+					}else{					
+						sc = "33";
+					}			
+					var url = "https://eq.10jqka.com.cn/stockCourier/api/courier/eventData/" + sc + "/" + gpdm + ".txt";							
+					xmlHttp = new XMLHttpRequest();
+					xmlHttp.onreadystatechange = writeSource;
+					xmlHttp.open("GET", url, true);
+					xmlHttp.send(null);
+				}
+			}
+				
+			function writeSource() { 
+				if (xmlHttp.readyState == 4) { 
+					div = document.getElementById('towrite');
+					//div.innerHTML = "<h4 style=color:#FFFF00;>同花顺速递：</h4>";
+					div.innerHTML = "<font size='3' style=color:#FFFF00;>同花顺速递：<font size='2' color=#fff>&nbsp;&nbsp;&nbsp;&nbsp;" + gpdm + "&nbsp;&nbsp;" + gpmc + "</font></font>";
+					var data = xmlHttp.responseText													
+					//document.write(data);
+					//div.innerHTML += data;
+					data = data.replace(/\s+/g,"；");
+					data = data.match(/"events":(\S*)}]/)[1] + "}]";
+					
+					var result = JSON.parse(data); //JSON字符串转换为对象
+					function up(a,b){
+						var aa = a.ctime;
+						var bb = b.ctime;					
+						if(a.catename == "涨停分析"){
+							aa = 0;
+						}
+						if(b.catename == "涨停分析"){
+							bb = 0;
+						}					
+						return aa - bb					
+					}
+					result.sort(up);
+					result = JSON.stringify( result );						
+					data= '{\"data\":' + result + "}";
+																
+					var transform_aa1 = [           
+					{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+					];
+					
+					var transform_bb1=												
+					{"tag":"ul style=color:#FFA500;", children:[									
+					//{"tag": "li style=color:#00FFFF;", "html":"${catename}： ${date}"},
+					{"tag": "li style=color:#00FFFF;", "html":function(){
+						if(this.catename == "龙虎榜"){							
+							var url = "http://www.treeid/dlghttp://page.tdx.com.cn:7615/site/kggx/tk_ygzl_lhb.html?info=xxxxxx&amp;pageId=dpyd&amp;color=0&amp;bkcolor=000000"
+							var lhb = "<a href='" + url + "' style='color:#FF00FF;'>" + this.catename + "：" + this.date + "</a>";							
+							return(lhb);
+						}else{
+							return(this.catename + "：" + this.date);
+						}
+					
+					}},
+					{"tag": "p", "html": function(){
+						if(this.catename == "涨停分析"){
+							return(this.title.replace("涨停分析:","").replace("｜","：<br>"));
+						}else{
+							return(this.content);
+						}
+					}},					
+					{"tag": "p style=color:#FFF5EE;", "html":"${desc}"}, 						
+					]};
+					
+					var html = json2html.transform(data, transform_aa1);	
+					div.innerHTML += html;
+					div.scrollTop = 0; //回到顶部
+				}
+			}
+			
+			
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>		
+	</body>
+</html>

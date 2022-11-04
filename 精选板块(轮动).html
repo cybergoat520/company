@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>精选板块</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">						
+			#towriter{
+				margin-top:-15px;
+				border: 1px solid #555555;
+				white-space: normal;											
+			}
+			.fixedBox{					
+				white-space: nowrap;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 8px;     
+				height: 8px;				
+			}
+			//p {padding-bottom:0px}
+			p {margin-top:0px;margin-bottom:5px}				
+			/*#towrite1 {margin-top:3px}
+			towrite2 {margin:-10px}			
+			p {margin:0px}
+			ul {margin:0px}			
+			h4 {margin-top:0px}*/
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+		
+			var day = new Date();
+			var gt = "";
+			var tt = "";
+			var tt1 = "";
+			var tt2 = "";
+			var tt3 = "";
+			var tt4 = "";
+			var tt5 = "";
+			window.onload = function() {								
+			getSource();
+			changeStyle();					
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {					
+				time_range("9:00","24:15")																
+				},
+				60000);
+			})
+			
+			function changeStyle() {
+				var obj = document.getElementById("towriter");				
+				obj.style.left= "0px"; 				
+				//obj.style.width= "1200px";	
+				obj.style.height= "630px";		
+				
+				var obj1 = document.getElementById("towrite1");
+				obj1.style.left= "0px"; 				
+				obj1.style.width= "150px";	
+				obj1.style.fontSize="12px";	
+				//obj1.style.height= "230px";
+				
+				var obj2 = document.getElementById("towrite2");
+				obj2.style.left= "160px";   
+				obj2.style.width= "150px";  
+				obj2.style.fontSize="12px";	
+				
+				var obj3 = document.getElementById("towrite3");
+				obj3.style.left= "320px";  
+				obj3.style.width= "150px";  
+				obj3.style.fontSize="12px";	
+				
+				var obj4 = document.getElementById("towrite4");
+				obj4.style.left= "480px";  
+				obj4.style.width= "150px";  
+				obj4.style.fontSize="12px";
+				
+				var obj5 = document.getElementById("towrite5");
+				obj5.style.left= "640px";  
+				obj5.style.width= "150px";  
+				obj5.style.fontSize="12px";						
+			}					
+			
+			var y = 0;
+			function updatex() {	
+				var obj1 = document.getElementById("towrite1");
+				var obj2 = document.getElementById("towrite2");
+				var obj3 = document.getElementById("towrite3");
+				var obj4 = document.getElementById("towrite4");
+				var obj5 = document.getElementById("towrite5");
+				
+				aObj = document.getElementById('sx');
+				if(aObj.innerText == "+")
+				{	
+					y = 1				;
+					aObj.innerText = "-";								
+					obj1.style.width= "400px";
+					obj2.style.left= "410px";
+					obj3.style.left= "570px";
+					obj4.style.left= "730px"; 
+					obj5.style.left= "890px";   					
+					<!-- obj2.style = "display:none; "; -->
+					<!-- obj3.style = "display:none; "; -->
+					<!-- obj4.style = "display:none; "; -->
+					<!-- obj5.style = "display:none; "; -->
+				}
+				else if(aObj.innerText == "-")
+				{	
+					y = 0;
+					aObj.innerText = "+";					
+					<!-- obj1.style.width= "150px";	 -->
+					<!-- obj2.style = "display:block; "; -->
+					<!-- obj3.style = "display:block; "; -->
+					<!-- obj4.style = "display:block; "; -->
+					<!-- obj5.style = "display:block; ";	 -->
+					changeStyle();					
+				}
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp1 = new XMLHttpRequest();
+				xmlHttp2 = new XMLHttpRequest();				
+				} else {
+				xmlHttp1 = new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp2 = new ActiveXObject("Microsoft.XMLHTTP");				
+				}
+			}
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+			
+			function getSource() {
+				dm1 = "";
+				var url = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w21&Type=1&c=ZhiShuRanking&PhoneOSNew=1&ZSType=7&"; 				
+				createXmlHttp();				
+				xmlHttp1.onreadystatechange = writeSource11;
+				xmlHttp1.open("GET", url, true);
+				xmlHttp1.send(null);				
+			}
+			
+			var dm1 = "";
+			function writeSource11() { 
+				if (xmlHttp1.readyState == 4) { 
+					div1 = document.getElementById('towrite1');																
+					var data1 = xmlHttp1.responseText
+					
+					if(tt1 == ""){
+						//tt1 = data1.match(/\"Day\":\[\"(\S*)\"\],/)[1];
+						tt1 = data1.match(/"Day":\["(\S*)/)[1].split('"]')[0];
+						t = tt1.split("-");
+						day = new Date(t[0], t[1]-1, t[2]);												
+					}
+					
+					var sx ="";					
+					if(y == 0){
+						sx = "<a style='float:right;font-Size:22px; margin-top:-8px; color:#FAFAFA;'  href='javascript:void(0)' id='sx' onclick='updatex()'>+</a>";
+					}else{
+						sx = "<a style='float:right;font-Size:22px; margin-top:-8px; color:#FAFAFA;'  href='javascript:void(0)' id='sx' onclick='updatex()'>-</a>";					
+					}
+					div1.innerHTML = "<span style='color:#FAFAFA'>" + tt1 + "</span>" + sx;
+													
+					//document.write(data1);
+					if(data1.indexOf("MYSQL数据库链接出错!") == -1)	{
+						data1 = data1.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data1 = data1.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+str.split(',')[3];});
+						data1 = data1.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]}");
+						//document.write(data1);
+						ss = data1.split('},{');
+						var n = 0;						
+						for (i = 0; i < ss.length; i++){
+							var code = ss[i].match(/\"code\":\"(\S*)\",\"name/)[1];							
+							var name = ss[i].match(/\"name\":\"(\S*)\",\"qd/)[1];
+							name = UnUnicode(name); 
+							var qd = ss[i].match(/\"qd\":(\S*),\"zf/)[1];
+							var zf = ss[i].match(/\"zf\":(\S*)/)[1].replace("}]}","");	
+							if(name.indexOf("ST") == -1){								
+								n++;
+								if(n == 11){
+									break;
+								}
+								dm1 +=  code + ",";
+								var bks = "<a style='color:#E6E6E6' href='javascript:void(0)' id='" + code + "' name='bk1' onclick='update(" + "\"" +
+									tt1 + "\"+\"#\"+" + "\"" +
+									code + "\"+\"#\"+" + "\"" + 
+									name + "\"" + ")'>" + n + "." +
+									 "&nbsp;" + name + "&nbsp;强度：" + 
+									qd + "&nbsp;涨幅：" + keepTwoDecimal(zf) + "%" + "</a>"	;
+							
+								var bkdm = code;																								
+								div1.innerHTML = div1.innerHTML + "<p>" + bks + "</p>";	
+								
+								//添加分类Div
+								var newDiv = document.createElement("div");
+								newDiv.id = tt1 + bkdm;
+								newDiv.style.display = "none";
+								document.getElementById("towrite1").appendChild(newDiv);
+								//div2 = document.getElementById(bkdm);
+								//div2.innerHTML = div2.innerHTML + name;
+								if (i == 0){
+									temp = code + ";";								
+								}
+							}
+						}
+					}
+					if(tt == ""){  //刷新才执行					
+						gethis(); //交易日推算						
+					}else{					
+						rdbj();
+					}
+				}				
+				
+			}
+			
+			var p = "";
+			function gethis() {						
+				for (j = 1; j < 5; j++){		
+					p = j;									
+					gethisdate();					
+				}				
+			}
+									
+			function gethisdate() {				
+				day.setTime(day.getTime());
+				for (i = 1; i < 100; i++){																				
+					day.setTime(day.getTime() - 24*60*60*1000);
+					tt = day.Format("yyyy-MM-dd");
+					//alert(tt);
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w26&Type=1&c=ZhiShuRanking&ZSType=7&Date=" + tt + "&"; 							
+					var xhr = new XMLHttpRequest();	
+					xhr.open("GET", url, false);//同步 
+					xhr.send(null)																										
+					var data = xhr.responseText;					
+					if(data.indexOf("MYSQL数据库链接出错!") == -1 && data.indexOf("\"list\":\[\]") == -1)	
+					{						
+						if(p == 1){
+							tt2 = tt;
+						}
+						if(p == 2){
+							tt3 = tt;
+						}
+						if(p == 3){
+							tt4 = tt;
+						}
+						if(p == 4){
+							tt5 = tt;
+						}						
+						break;						
+					}
+				}
+				getSourcehis();
+			}
+			
+			function getSourcehis() {	
+								
+				var url = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&a=RealRankingInfo&st=30&apiv=w26&Type=1&c=ZhiShuRanking&ZSType=7&Date=" + tt + "&"; 							
+				if(p == 1)
+				{
+					if (window.XMLHttpRequest) {
+					xmlHttp21 = new XMLHttpRequest();				
+					} else {
+					xmlHttp21 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp21.onreadystatechange = writeSource21;
+					xmlHttp21.open("GET", url, true);
+					xmlHttp21.send(null);
+				}
+				if(p == 2)
+				{
+					if (window.XMLHttpRequest) {
+					xmlHttp31 = new XMLHttpRequest();				
+					} else {
+					xmlHttp31 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp31.onreadystatechange = writeSource31;
+					xmlHttp31.open("GET", url, true);
+					xmlHttp31.send(null);
+				}
+				if(p == 3)
+				{
+					if (window.XMLHttpRequest) {
+					xmlHttp41 = new XMLHttpRequest();				
+					} else {
+					xmlHttp41 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp41.onreadystatechange = writeSource41;
+					xmlHttp41.open("GET", url, true);
+					xmlHttp41.send(null);
+				}				
+				if(p == 4)
+				{
+					if (window.XMLHttpRequest) {
+					xmlHttp51 = new XMLHttpRequest();				
+					} else {
+					xmlHttp51 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp51.onreadystatechange = writeSource51;
+					xmlHttp51.open("GET", url, true);
+					xmlHttp51.send(null);
+				}								
+			}
+			
+			
+			function UnUnicode(str) {
+				return unescape(str.replace(/\\/g, "%"));
+			}
+			
+			
+			
+			
+			var temp = "";
+			var bdm = "";
+			var bkm = "";				
+			function update(ss) {				
+				//alert(ss);
+				if(ss != "0")
+				{
+					var dms = ss.split('#');
+					rq = dms[0];
+					dm = dms[1];
+					bk = dms[2];
+					bdm = dm;
+					bkm = bk;
+					//alert(temp);
+					var rqdm = rq + dm;
+					if(document.getElementById(rqdm))
+					{					
+						div1 = document.getElementById(rqdm);
+						if(temp.indexOf(rqdm) == -1)
+						{
+							temp += rqdm + ";";
+							div1.style = "display:block; margin:0px;";
+						}
+						else
+						{
+							temp = temp.replace(rqdm + ";" , "");
+							div1.style.display = "none";
+						}
+					}
+					//alert(temp);
+				}
+				//alert(dm);					
+				var url = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&st=20&a=ZhiShuStockList_W8&c=ZhiShuRanking&PhoneOSNew=1&old=1&apiv=w21&Type=6&PlateID=" + dm + "&"; 												
+				
+				createXmlHttp();
+				xmlHttp2.onreadystatechange = writeSource12;				
+				xmlHttp2.open("GET", url, true);
+				xmlHttp2.send(null);
+
+				if(rq == tt2)
+				{
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?st=20&Index=0&old=1&Order=1&a=ZhiShuStockList_W8&apiv=w26&Type=6&c=ZhiShuRanking&PlateID=" + dm + "&Date=" + tt2 + "&"								
+					if (window.XMLHttpRequest) {
+					xmlHttp22 = new XMLHttpRequest();				
+					} else {
+					xmlHttp22 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp22.onreadystatechange = writeSource22;
+					xmlHttp22.open("GET", url, true);
+					xmlHttp22.send(null);
+				}
+				if(rq == tt3)
+				{
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?st=20&Index=0&old=1&Order=1&a=ZhiShuStockList_W8&apiv=w26&Type=6&c=ZhiShuRanking&PlateID=" + dm + "&Date=" + tt3 + "&"								
+					if (window.XMLHttpRequest) {
+					xmlHttp32 = new XMLHttpRequest();				
+					} else {
+					xmlHttp32 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp32.onreadystatechange = writeSource32;
+					xmlHttp32.open("GET", url, true);
+					xmlHttp32.send(null);
+				}
+				if(rq == tt4)
+				{
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?st=20&Index=0&old=1&Order=1&a=ZhiShuStockList_W8&apiv=w26&Type=6&c=ZhiShuRanking&PlateID=" + dm + "&Date=" + tt4 + "&"								
+					if (window.XMLHttpRequest) {
+					xmlHttp42 = new XMLHttpRequest();				
+					} else {
+					xmlHttp42 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp42.onreadystatechange = writeSource42;
+					xmlHttp42.open("GET", url, true);
+					xmlHttp42.send(null);
+				}				
+				if(rq == tt5)
+				{
+					var url = "https://apphis.longhuvip.com/w1/api/index.php?st=20&Index=0&old=1&Order=1&a=ZhiShuStockList_W8&apiv=w26&Type=6&c=ZhiShuRanking&PlateID=" + dm + "&Date=" + tt5 + "&"								
+					if (window.XMLHttpRequest) {
+					xmlHttp52 = new XMLHttpRequest();				
+					} else {
+					xmlHttp52 = new ActiveXObject("Microsoft.XMLHTTP");				
+					}			
+					xmlHttp52.onreadystatechange = writeSource52;
+					xmlHttp52.open("GET", url, true);
+					xmlHttp52.send(null);
+				}										
+			}
+			
+			function writeSource12() { 			
+				if (xmlHttp2.readyState == 4) {                  	
+				var data2 = xmlHttp2.responseText				
+				//document.write(data2);
+				//data2 = data2.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+				data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';	
+				//data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"zf":'+str.split(',')[6];});
+				data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+				str = word.match(/\[(\S*)/)[1]; 
+				return '{"code":' + str.split(',')[0] + 
+				',"name":' + str.split(',')[1] +
+				',"zf":'+str.split(',')[6] +
+				',"lz":'+str.split(',')[24] +
+				',"zl":'+str.split(',')[2] +
+				',"lb":'+str.split(',')[23] + 
+				',"zt":'+str.split(',')[39];});
+				
+				data2 = '{\"list\":' + data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+				//data2 = data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]");					
+				//document.write(data2);
+				
+				<!-- var result = JSON.parse(data2); //JSON字符串转换为对象 -->
+				<!-- function up(a,b){ -->
+					<!-- return b.zf-a.zf -->
+				<!-- } -->
+				<!-- result.sort(up); -->
+				<!-- result = JSON.stringify( result );						 -->
+				<!-- data2= '{\"list\":' + result + "}"; -->
+				//document.write(data2);
+				
+				var transform_aa2 = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb2));}}
+				];
+								
+				var transform_bb2= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[							
+				//{"tag": "li", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' >${code} ${name}&nbsp;&nbsp;涨幅：${zf}%</a>"}, 							
+				//{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' >${name}&nbsp;[${zt}]&nbsp;涨幅：${zf}%&nbsp;${lz}</a>"}, 
+				{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' id='" + tt1 + bdm + "' onclick='changeCss(this,this.id)'>${name}&nbsp;&nbsp;[${zt}]&nbsp;涨幅：${zf}%&nbsp;${lz}&nbsp;${zl}&nbsp;<font color=#FFA500>${lb}</font></a>"}, 
+				]}]}; 
+				
+				
+				var html2 = json2html.transform(data2, transform_aa2);		
+				div2 = document.getElementById(tt1 + bdm);
+				div2.innerHTML = div2.innerHTML + html2.replace(/\[\]/g,"");
+				div2.style.whiteSpace = "nowrap";
+				//div2.style.border = "1px solid #d2d2d3";
+				//div2.innerHTML = '<h2>板块个股</h2>' + html2;				
+				}
+			}
+						
+			function changeCss(obj,id){	
+				//alert(id);			
+				var alist = document.getElementById(id).getElementsByTagName("a");
+				//var alist = document.getElementsByTagName("a");					
+				for(var i = 0; i < alist.length; i++){				
+					if(alist[i] == undefined){
+						break;
+					}
+					alist[i].style.color = "#d2d2d3"; //给所有a标签赋原色
+				}
+				obj.style.color = "#00FFFF"; //令当前标签高亮				
+			}
+
+			var dm2 = "";
+			function writeSource21() { 
+				if (xmlHttp21.readyState == 4) { 
+					div1 = document.getElementById('towrite2');	
+					div1.innerHTML = "<span style='color:#FAFAFA'>" + tt2 + "</span>";					
+					var data1 = xmlHttp21.responseText
+					//alert(data1);					
+					//document.write(data1);
+					if(data1.indexOf("MYSQL数据库链接出错!") == -1)	{
+						data1 = data1.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data1 = data1.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+str.split(',')[3];});
+						data1 = data1.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]}");
+						//document.write(data1);
+						ss = data1.split('},{');
+						var n = 0;						
+						for (i = 0; i < ss.length; i++)
+						//for (i = 0; i < 10; i++)
+						{
+							var code = ss[i].match(/\"code\":\"(\S*)\",\"name/)[1];							
+							var name = ss[i].match(/\"name\":\"(\S*)\",\"qd/)[1];
+							name = UnUnicode(name); 
+							var qd = ss[i].match(/\"qd\":(\S*),\"zf/)[1];
+							var zf = ss[i].match(/\"zf\":(\S*)/)[1].replace("}]}","");
+							if(name.indexOf("ST") == -1){								
+								n++;
+								if(n == 11){
+									break;
+								}
+								dm2 +=  code + ",";								
+								var bks = "<a style='color:#E6E6E6' href='javascript:void(0)' id='" + code + "' name='bk2' onclick='update(" + "\"" +
+										tt2 + "\"+\"#\"+" + "\"" +
+										code + "\"+\"#\"+" + "\"" + 
+										name + "\"" + ")'>" + n + "." +
+										 "&nbsp;" + name + "&nbsp;强度：" + 
+										qd + "&nbsp;涨幅：" + keepTwoDecimal(zf) + "%" + "</a>"	;
+								var bkdm = code;																								
+								div1.innerHTML = div1.innerHTML + "<p>" + bks + "</p>";	
+								
+								//添加分类Div
+								var newDiv = document.createElement("div");
+								newDiv.id = tt2 + bkdm;
+								newDiv.style.display = "none";
+								document.getElementById("towrite2").appendChild(newDiv);	
+								
+								if (i == 0)
+								{
+									temp = code + ";";								
+								}	
+							}							
+						}
+					}
+				}				
+			}
+			
+			function writeSource22() { 			
+				if (xmlHttp22.readyState == 4) {                  	
+				var data2 = xmlHttp22.responseText				
+				data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';					
+				data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+				str = word.match(/\[(\S*)/)[1]; 
+				return '{"code":' + str.split(',')[0] + 
+				',"name":' + str.split(',')[1] +
+				',"zf":'+str.split(',')[6] +
+				',"lz":'+str.split(',')[24] +
+				',"zl":'+str.split(',')[2] +
+				',"lb":'+str.split(',')[23] + 
+				',"zt":'+str.split(',')[39];});
+				
+				data2 = '{\"list\":' + data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+				
+				var transform_aa2 = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb2));}}
+				];
+				
+				var transform_bb2= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[											
+				{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' id='" + tt2 + bdm + "' onclick='changeCss(this,this.id)'>${name}&nbsp;&nbsp;[${zt}]&nbsp;涨幅：${zf}%&nbsp;${lz}&nbsp;${zl}&nbsp;<font color=#FFA500>${lb}</font></a>"}, 
+				]}]}; 
+				
+				
+				var html2 = json2html.transform(data2, transform_aa2);		
+				div2 = document.getElementById(tt2 + bdm);
+				div2.innerHTML = div2.innerHTML + html2.replace(/\[\]/g,"");
+				div2.style.whiteSpace = "nowrap";					
+				}
+			}
+			
+			var dm3 = "";
+			function writeSource31() { 
+				if (xmlHttp31.readyState == 4) { 
+					div1 = document.getElementById('towrite3');	
+					div1.innerHTML = "<span style='color:#FAFAFA'>" + tt3 + "</span>";					
+					var data1 = xmlHttp31.responseText
+					//alert(data1);					
+					//document.write(data1);
+					if(data1.indexOf("MYSQL数据库链接出错!") == -1)	{
+						data1 = data1.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data1 = data1.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+str.split(',')[3];});
+						data1 = data1.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]}");
+						//document.write(data1);
+						ss = data1.split('},{');
+						var n = 0;
+						for (i = 0; i < ss.length; i++)
+						//for (i = 0; i < 10; i++)
+						{
+							var code = ss[i].match(/\"code\":\"(\S*)\",\"name/)[1];							
+							var name = ss[i].match(/\"name\":\"(\S*)\",\"qd/)[1];
+							name = UnUnicode(name); 
+							var qd = ss[i].match(/\"qd\":(\S*),\"zf/)[1];
+							var zf = ss[i].match(/\"zf\":(\S*)/)[1].replace("}]}","");
+							if(name.indexOf("ST") == -1){
+								n++;
+								if(n == 11){
+									break;
+								}
+								dm3 +=  code + ",";								
+								var bks = "<a style='color:#E6E6E6' href='javascript:void(0)' id='" + code + "'name='bk3' onclick='update(" + "\"" +
+										tt3 + "\"+\"#\"+" + "\"" +
+										code + "\"+\"#\"+" + "\"" + 
+										name + "\"" + ")'>" + n + "." +
+										 "&nbsp;" + name + "&nbsp;强度：" + 
+										qd + "&nbsp;涨幅：" + keepTwoDecimal(zf) + "%" + "</a>"	;
+								var bkdm = code;																								
+								div1.innerHTML = div1.innerHTML + "<p>" + bks + "</p>";	
+								
+								//添加分类Div
+								var newDiv = document.createElement("div");
+								newDiv.id = tt3 + bkdm;
+								newDiv.style.display = "none";
+								document.getElementById("towrite3").appendChild(newDiv);
+								if (i == 0)
+								{
+									temp = code + ";";								
+								}
+							}								
+						}
+					}
+				}				
+			}
+			
+			function writeSource32() { 			
+				if (xmlHttp32.readyState == 4) {                  	
+				var data2 = xmlHttp32.responseText				
+				data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';					
+				data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+				str = word.match(/\[(\S*)/)[1]; 
+				return '{"code":' + str.split(',')[0] + 
+				',"name":' + str.split(',')[1] +
+				',"zf":'+str.split(',')[6] +
+				',"lz":'+str.split(',')[24] +
+				',"zl":'+str.split(',')[2] +
+				',"lb":'+str.split(',')[23] + 
+				',"zt":'+str.split(',')[39];});
+				
+				data2 = '{\"list\":' + data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+				
+				var transform_aa2 = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb2));}}
+				];
+				
+				var transform_bb2= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[											
+				{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' id='" + tt3 + bdm + "' onclick='changeCss(this,this.id)'>${name}&nbsp;&nbsp;[${zt}]&nbsp;涨幅：${zf}%&nbsp;${lz}&nbsp;${zl}&nbsp;<font color=#FFA500>${lb}</font></a>"}, 
+				]}]}; 
+				
+				
+				var html2 = json2html.transform(data2, transform_aa2);		
+				div2 = document.getElementById(tt3 + bdm);
+				div2.innerHTML = div2.innerHTML + html2.replace(/\[\]/g,"");
+				div2.style.whiteSpace = "nowrap";					
+				}
+			}
+			
+			dm4 = "";
+			function writeSource41() { 
+				if (xmlHttp41.readyState == 4) { 
+					div1 = document.getElementById('towrite4');	
+					div1.innerHTML = "<span style='color:#FAFAFA'>" + tt4 + "</span>";					
+					var data1 = xmlHttp41.responseText
+					//alert(data1);					
+					//document.write(data1);
+					if(data1.indexOf("MYSQL数据库链接出错!") == -1)	{
+						data1 = data1.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data1 = data1.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+str.split(',')[3];});
+						data1 = data1.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]}");
+						//document.write(data1);
+						ss = data1.split('},{');
+						var n = 0;
+						for (i = 0; i < ss.length; i++)
+						//for (i = 0; i < 10; i++)
+						{
+							var code = ss[i].match(/\"code\":\"(\S*)\",\"name/)[1];							
+							var name = ss[i].match(/\"name\":\"(\S*)\",\"qd/)[1];
+							name = UnUnicode(name); 
+							var qd = ss[i].match(/\"qd\":(\S*),\"zf/)[1];
+							var zf = ss[i].match(/\"zf\":(\S*)/)[1].replace("}]}","");
+							if(name.indexOf("ST") == -1){
+								n++;
+								if(n == 11){
+									break;
+								}
+								dm4 +=  code + ",";					
+								var bks = "<a style='color:#E6E6E6' href='javascript:void(0)' id='" + code + "'name='bk4' onclick='update(" + "\"" +
+										tt4 + "\"+\"#\"+" + "\"" +
+										code + "\"+\"#\"+" + "\"" + 
+										name + "\"" + ")'>" + n + "." +
+										 "&nbsp;" + name + "&nbsp;强度：" + 
+										qd + "&nbsp;涨幅：" + keepTwoDecimal(zf) + "%" + "</a>"	;
+								var bkdm = code;																								
+								div1.innerHTML = div1.innerHTML + "<p>" + bks + "</p>";	
+								
+								//添加分类Div
+								var newDiv = document.createElement("div");
+								newDiv.id = tt4 + bkdm;
+								newDiv.style.display = "none";
+								document.getElementById("towrite4").appendChild(newDiv);
+
+								if (i == 0)
+								{
+									temp = code + ";";								
+								}	
+							}							
+						}
+					}
+				}				
+			}
+			
+			function writeSource42() { 			
+				if (xmlHttp42.readyState == 4) {                  	
+				var data2 = xmlHttp42.responseText				
+				data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';					
+				data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+				str = word.match(/\[(\S*)/)[1]; 
+				return '{"code":' + str.split(',')[0] + 
+				',"name":' + str.split(',')[1] +
+				',"zf":'+str.split(',')[6] +
+				',"lz":'+str.split(',')[24] +
+				',"zl":'+str.split(',')[2] +
+				',"lb":'+str.split(',')[23] + 
+				',"zt":'+str.split(',')[39];});
+				
+				data2 = '{\"list\":' + data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+				
+				var transform_aa2 = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb2));}}
+				];
+				
+				var transform_bb2= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[											
+				{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' id='" + tt4 + bdm + "' onclick='changeCss(this,this.id)'>${name}&nbsp;&nbsp;[${zt}]&nbsp;涨幅：${zf}%&nbsp;${lz}&nbsp;${zl}&nbsp;<font color=#FFA500>${lb}</font></a>"}, 
+				]}]}; 
+				
+				
+				var html2 = json2html.transform(data2, transform_aa2);		
+				div2 = document.getElementById(tt4 + bdm);
+				div2.innerHTML = div2.innerHTML + html2.replace(/\[\]/g,"");
+				div2.style.whiteSpace = "nowrap";					
+				}
+			}
+			
+			var dm5 = "";
+			function writeSource51() { 
+				if (xmlHttp51.readyState == 4) { 
+					div = document.getElementById('towrite5');	
+					div.innerHTML = "<span style='color:#FAFAFA'>" + tt5 + "</span>";					
+					var data1 = xmlHttp51.responseText
+					//alert(data1);					
+					//document.write(data1);
+					if(data1.indexOf("MYSQL数据库链接出错!") == -1)	{
+						data1 = data1.replace(/ /g,"").match(/(\S*)\]\],\"/)[1] + ']]';	
+						data1 = data1.replace(/(\[\").*?(?=\])/g,function(word){ str = word.match(/\[(\S*)/)[1]; return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1]+',"qd":'+str.split(',')[2]+',"zf":'+str.split(',')[3];});
+						data1 = data1.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]}");
+						//document.write(data1);
+						var n = 0;
+						ss = data1.split('},{');				
+						for (i = 0; i < ss.length; i++)
+						//for (i = 0; i < 10; i++)
+						{
+							var code = ss[i].match(/\"code\":\"(\S*)\",\"name/)[1];
+							var name = ss[i].match(/\"name\":\"(\S*)\",\"qd/)[1];
+							name = UnUnicode(name); 
+							var qd = ss[i].match(/\"qd\":(\S*),\"zf/)[1];
+							var zf = ss[i].match(/\"zf\":(\S*)/)[1].replace("}]}","");	
+							if(name.indexOf("ST") == -1){
+								n++;
+								if(n == 11){
+									break;
+								}
+								dm5 +=  code + ",";						
+								var bks = "<a style='color:#E6E6E6' href='javascript:void(0)' id='" + code + "'name='bk5' onclick='update(" + "\"" +
+										tt5 + "\"+\"#\"+" + "\"" +
+										code + "\"+\"#\"+" + "\"" + 
+										name + "\"" + ")'>" + n + "." +
+										 "&nbsp;" + name + "&nbsp;强度：" + 
+										qd + "&nbsp;涨幅：" + keepTwoDecimal(zf) + "%" + "</a>"	;
+								var bkdm = code;																								
+								div.innerHTML = div.innerHTML + "<p>" + bks + "</p>";	
+								
+								//添加分类Div
+								var newDiv = document.createElement("div");
+								newDiv.id = tt5 + bkdm;
+								newDiv.style.display = "none";
+								document.getElementById("towrite5").appendChild(newDiv);
+
+								if (i == 0)
+								{
+									temp = code + ";";								
+								}
+							}
+						}
+					}
+				}
+				rdbj();					
+			}
+			
+			function writeSource52() { 			
+				if (xmlHttp52.readyState == 4) {                  	
+				var data2 = xmlHttp52.responseText				
+				data2 = data2.replace(/ /g,"").match(/{"list":(\S*)/)[1].split("]]")[0] + ']]';					
+				data2 = data2.replace(/(\[\").*?(?=\])/g,function(word){ 
+				str = word.match(/\[(\S*)/)[1]; 
+				return '{"code":' + str.split(',')[0] + 
+				',"name":' + str.split(',')[1] +
+				',"zf":'+str.split(',')[6] +
+				',"lz":'+str.split(',')[24] +
+				',"zl":'+str.split(',')[2] +
+				',"lb":'+str.split(',')[23] + 
+				',"zt":'+str.split(',')[39];});
+				
+				data2 = '{\"list\":' + data2.replace(/\],\{/g,"},{").replace(/\]\]/g,"}]") + "}";
+				
+				var transform_aa2 = [           
+				{"tag":"p", children:function(){return(json2html.transform(this.list, transform_bb2));}}
+				];
+				
+				var transform_bb2= 
+				{"tag":"p", children:[
+				{"tag":"p", children:[											
+				{"tag": "p", "html":"<a href='https://m.10jqka.com.cn/stockpage/hs_${code}/' target='_blank' id='" + tt5 + bdm + "' onclick='changeCss(this,this.id)'>${name}&nbsp;&nbsp;[${zt}]&nbsp;涨幅：${zf}%&nbsp;${lz}&nbsp;${zl}&nbsp;<font color=#FFA500>${lb}</font></a>"}, 
+				]}]}; 
+				
+				
+				var html2 = json2html.transform(data2, transform_aa2);		
+				div2 = document.getElementById(tt5 + bdm);
+				div2.innerHTML = div2.innerHTML + html2.replace(/\[\]/g,"");
+				div2.style.whiteSpace = "nowrap";					
+				}				
+			}
+			
+			function rdbj() { 			
+				var div = document.getElementById('towriter');
+				var alist = div.getElementsByTagName("a");
+				for(var i = 0; i < alist.length; i++){									
+					alist[i].style.border = "none"; 
+				}
+				var dmh = dm2 + dm3 + dm4 + dm5;
+				var ss = dm1.split(",");				
+				for (i = 0; i < ss.length; i++){
+					var dm = ss[i];					
+					var t = dmh.split(dm);								
+					if(t.length > 1){					
+						for(var j = 0; j < alist.length; j++){
+							var dms = alist[j].id;							
+							if(dm == dms){							
+								if(t.length == 5){																								
+									alist[j].style.border = "2px solid #FF0000";
+								}else if(t.length == 4){									
+									alist[j].style.border = "2px solid #FF00FF";
+								}else if(t.length == 3){									
+									alist[j].style.border = "2px solid #FF8040";
+								}else if(t.length  == 2){									
+									alist[j].style.border = "2px solid #FFC4FF";
+								} 
+							}
+						}
+					}
+				}
+			}
+			
+			
+		</script>
+	</head>
+	<body>		
+		<div id="towriter" class="fixedBox">			
+			<div id="towrite1" class="fixedBox"></div>		
+			<div id="towrite2" class="fixedBox" ></div>
+			<div id="towrite3" class="fixedBox" ></div>
+			<div id="towrite4" class="fixedBox" ></div>
+			<div id="towrite5" class="fixedBox" ></div>
+		</div>
+	</body>
+</html>

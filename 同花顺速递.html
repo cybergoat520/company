@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>同花顺速递</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">	
+			p {margin:0px;}					
+			ul {margin:5px;}			
+			h4 {margin:0px}	
+			.fixedBox{
+				border: 5px solid #555555;				
+				
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 10px;     
+				height: 10px;				
+			}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource();
+			changeStyle();
+			}
+						
+			function replaceDoc() {
+				var url = encodeURI("http://www.treeid/dlglocalurl##homepath##company/同花顺速递.html##xxxxxx####STOCKNAME##");				
+				window.location.replace(url)  //同花顺速递.html文件地址				
+			}
+			
+			$(function() {
+				setInterval(function() {
+					if(isMinStatus()==false){					
+						replaceDoc();										
+					}					
+				},
+				500);
+			})			
+			
+			//最小化
+			function isMinStatus() {
+			  var isMin = false;
+			  if (window.outerWidth != undefined) {
+				 isMin = window.outerWidth <= 160 && window.outerHeight <= 27;
+			  } else {
+				 isMin = window.screenTop < -30000 && window.screenLeft < -30000;
+			  }
+			 
+				 return isMin;
+			}
+			
+			function changeStyle() {
+				var obj = document.getElementById("towrite");				
+				obj.style.left = "0px"; 				
+				obj.style.width = "95%";	
+				obj.style.height = "90%";		
+				obj.style.fontSize ="15px";					
+			}
+							
+			var gpdm = "";
+			var gpmc = "";
+			var dm ="";			
+			function getSource() {				
+				var gp = decodeURI(window.location.href).split('##');					
+				gpdm = gp[1];
+				gpmc = gp[2];		
+				//alert(gpdm)
+				if(dm != gpdm){
+					dm = gpdm;
+					var sc = "";
+					if(gpdm.substr(0 , 1) == "6"){				
+						sc = "17";
+					}else{					
+						sc = "33";
+					}			
+					var url = "https://eq.10jqka.com.cn/stockCourier/api/courier/eventData/" + sc + "/" + gpdm + ".txt";							
+					xmlHttp = new XMLHttpRequest();
+					xmlHttp.onreadystatechange = writeSource;
+					xmlHttp.open("GET", url, true);
+					xmlHttp.send(null);
+				}
+			}
+			
+			function Top(){
+				document.getElementsByClassName('fixedBox')[0].scrollTop = 0;
+			}
+						
+			function writeSource() { 
+				if (xmlHttp.readyState == 4) { 
+					div = document.getElementById('towrite');
+					//div.innerHTML = "<h4 style=color:#FFFF00;>同花顺速递：</h4>";
+					div.innerHTML = "<font size='3' style=color:#FFFF00;>同花顺速递：<font size='2' color=#fff>&nbsp;&nbsp;&nbsp;&nbsp;" + gpdm + "&nbsp;&nbsp;" + gpmc + "</font></font>";
+					var data = xmlHttp.responseText													
+					//document.write(data);
+					//div.innerHTML += data;
+					data = data.replace(/\s+/g,"；");
+					data = data.match(/"events":(\S*)}]/)[1] + "}]";
+					
+					var result = JSON.parse(data); //JSON字符串转换为对象
+					function up(a,b){
+						var aa = a.ctime;
+						var bb = b.ctime;					
+						if(a.catename == "涨停分析"){
+							aa = 0;
+						}
+						if(b.catename == "涨停分析"){
+							bb = 0;
+						}					
+						return aa - bb					
+					}
+					result.sort(up);
+					result = JSON.stringify( result );						
+					data= '{\"data\":' + result + "}";
+																
+					var transform_aa1 = [           
+					{"tag":"p", children:function(){return(json2html.transform(this.data, transform_bb1));}}
+					];
+					
+					var transform_bb1=												
+					{"tag":"ul style=color:#FFA500;", children:[									
+					{"tag": "li style=color:#00FFFF;", "html":"${catename}： ${date}"},
+					{"tag": "p", "html": function(){
+						if(this.catename == "涨停分析"){
+							return(this.title.replace("涨停分析:","").replace("｜","：<br>"));
+						}else{
+							return(this.content);
+						}
+					}},					
+					{"tag": "p style=color:#FFF5EE;", "html":"${desc}"}, 						
+					]};
+					
+					var html = json2html.transform(data, transform_aa1);	
+					div.innerHTML += html;
+				}
+			}
+			
+			
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>		
+	</body>
+</html>

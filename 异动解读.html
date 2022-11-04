@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>异动解读</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">			
+			#towrite {margin:-10px}					
+			p {margin:2px}
+			ul {margin-top:0px}	
+			h4 {margin-top:0px}			
+		</style>		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {
+			getSource();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			Date.prototype.Format = function (fmt) {
+				var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+				};
+				if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function getLocalTime(nS) {			          
+			return new Date(parseInt(nS) * 1000).Format("hh:mm:ss")}
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			function getSource() {	    							
+				var url = "https://flash-api.xuangubao.cn/api/pool/detail?pool_name=limit_up"; 	
+                //var url = "file:///C:/TDXdate/company/abc.json";				
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+			
+			function writeSource() { 
+			if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText	
+				data = data.replace("{\"code\":20000,\"message\":\"OK\",\"data\":","");	
+				data = data.substring(0 , data.length - 1);
+				data = data.replace(/.SS"/g,"\"").replace(/.SZ"/g,"\"");				
+				
+                //涨幅				
+				data = data.replace(/(\"change_percent\":).*?(?=,)/g, function(word){ 				
+					str = word.match(/\"change_percent\":(\S*)/)[1]; 					
+					return '\"change_percent\":"' + keepTwoDecimal(str*100) + '"';
+				});  					
+				//document.write(data);
+
+				var result = JSON.parse(data); //JSON字符串转换为对象
+				function up(a,b){
+					return b.last_limit_up - a.last_limit_up
+				}
+				result.sort(up);
+				result = JSON.stringify( result );
+				//时间					
+				result = result.replace(/(\"last_limit_up\":).*?(?=,)/g, function(word){ 				
+					str = word.match(/\"last_limit_up\":(\S*)/)[1]; 					
+					return '\"last_limit_up\":"' + getLocalTime(str) + '"';
+				});  						
+				data= "{\"code\":20000,\"message\":\"OK\",\"data\":" + result + "}";
+				//data = data.replace(/\"surge_reason\":/g,"\"surge_reason\":[").replace(/}]},\"symbol\"/g,"}]}],\"symbol\"");
+				data = data.replace(/\"surge_reason\":null/g,"\"surge_reason\":[{\"stock_reason\":\"\"}]");
+				//data = data.replace(/\"surge_reason\":null/g,"\"surge_reason\":{\"symbol\":\"\",\"stock_reason\":\"\",\"related_plates\":[{\"plate_name\":\"\",\"plate_reason\":\"\"}]}");
+				//document.write(data);
+				
+				var transform_aa = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.data, transform_bb));}}
+				];
+				
+				var transform_bb= 
+				{"tag":"p", children:[				
+				{"tag":"b", children:[
+				{"tag":"li", children:function(){				
+					    var bk = "";  
+						return(
+						"<a href=https://m.10jqka.com.cn/stockpage/hs_" + 
+						this.symbol + "/ target=_blank>" + 
+						"【" + this.last_limit_up + "】" + 
+						this.symbol + "&nbsp;&nbsp;" + 
+						this.stock_chi_name + "&nbsp;&nbsp;" + bk + 
+						"&nbsp;&nbsp;涨幅：" + this.change_percent + "%" + 
+						"&nbsp;&nbsp;" + this.m_days_n_boards_days + "天" + 
+						this.m_days_n_boards_boards + "板" + "</a><a style='color:#FFA500' href='ggxqa.html##" +
+							this.symbol + "##" + 
+							this.stock_chi_name + "'>亮点</a>" 
+						);
+				}}]},					
+				{"tag":"ul", children:function(){return(json2html.transform(this.surge_reason, transform_cc));}}
+				]};  
+				
+				var transform_cc = 
+				{"tag":"p", children:[					
+				{"tag": "p","html":"${stock_reason}"},							
+				{"tag":"ul", children:function(){return(json2html.transform(this.related_plates, transform_dd));}}
+				]};
+
+				var transform_dd= 				
+				{"tag":"p", children:[				
+				{"tag": "li","html":"${plate_name}"},	
+				{"tag": "p","html":"${plate_reason}"},
+				]}
+				
+				
+				var html = json2html.transform(data, transform_aa);		
+				div=document.getElementById('towrite');
+				div.innerHTML = '<h2>异动解读</h2>' + html.replace(/0天0板/g,"");
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="towrite"></div>
+	</body>
+</html>

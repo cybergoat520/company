@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>公司亮点</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">	
+			h4 {margin-top:0px;}		
+			p {margin:2px}
+			ul {margin:2px}			
+			.fixedBox{
+				border: 1px solid #555555;				
+				white-space: normal;	
+			}
+			.fixedBox::-webkit-scrollbar {
+				width: 12px;     
+				height: 12px;				
+			}			
+		</style>	
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			window.onload = function() {			
+			getSource();
+			changeStyle();
+			}
+						
+			$(function() {
+				setInterval(function() {					
+					getSource();																	
+				},
+				500);
+			})
+			
+			function changeStyle() {
+				var obj = document.getElementById("towrite");								
+				obj.style.left= "0px"; 
+				obj.style.width= "95%";				
+				//obj.style.width= "280px";	
+				//obj.style.height= "620px";		
+				obj.style.fontSize="12px";		
+			}
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+			
+			var dm = "";
+			function getSource() {	    
+				gp = window.location.href.split('##');
+				if(gp[1] != dm){
+					dm = gp[1];
+					var url = "https://eq.10jqka.com.cn/stockViewPoints/v2/homePage?stockCode=" + dm; 
+					//alert(gp[1]);
+					createXmlHttp();
+					xmlHttp.onreadystatechange = writeSource;
+					xmlHttp.open("GET", url, true);
+					xmlHttp.send(null);
+				}
+			}
+				
+			function writeSource() { 
+			if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText
+				var transform_aa = [           
+				{"tag":"ul", children:function(){return(json2html.transform(this.result, transform_bb));}}
+				];
+				
+				var transform_bb= 
+				{"tag":"p", children:[
+				{"tag": "h4 style=margin-top:-15px;", "html":"${stockName}"},                           
+				{"tag":"ul", children:function(){return(json2html.transform(this.company, transform_cc));}},    
+				{"tag":"ul", children:function(){return(json2html.transform(this.viewpoints, transform_ee));}}
+				]};
+				
+				var transform_cc= //强相关概念
+				{"tag":"h4", children:[
+				{"tag": "p style='color:#FFA500;'", "html":"${concept}"},
+				{"tag": "h4 style='color:#E1FFFF;'", "html":"强相关概念"},                                        
+				{"tag":"ul", children:function(){return(json2html.transform(this.board, transform_dd));}},
+				]};  
+				
+				var transform_dd= 
+				{"tag":"li", children:[
+				{"tag": "b style='color:#FFD700;'", "html":"${plateName}"},
+				{"tag": "p", "html":"${desc}"},
+				]};   
+				
+				var transform_ee=   //短期亮点
+				{"tag":"p", children:[
+				{"tag": "h4 style='color:#E1FFFF;'", "html":"${name}"},                        
+				{"tag":"ul", children:function(){return(json2html.transform(this.points, transform_ff));}}
+				]};
+				
+				var transform_ff=   
+				{"tag":"li", children:[                
+				{"tag":"b style='color:#FFD700;'", children:function(){return(json2html.transform(this.labelMap, transform_gg));}},                            
+				{"tag": "p", "html":"${desc}"},
+				]};  
+				
+				var transform_gg=   
+				{"tag":"b", children:[
+				{"tag": "b", "html":"${label}"},                                                        
+				]};         
+				
+				var html = json2html.transform(data, transform_aa);				
+				div=document.getElementById('towrite');
+				div.innerHTML = '<h3>公司亮点</h3>' + html;
+			}
+		}
+		</script>
+	</head>
+	<body>
+		<div id="towrite" class="fixedBox"></div>
+	</body>
+</html>

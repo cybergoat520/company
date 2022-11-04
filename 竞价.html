@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>竞价</title>
+		<link href="css/text.css" rel="stylesheet" type="text/css" />		
+		<script type="text/javascript" src="js/json2html.js"></script>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="DatePicker/WdatePicker.js"> </script>
+		<script>
+			var dt = "";
+			var tt = "";
+			var gt = "";
+			var k = "0";
+			window.onload = function() {
+			var day = new Date();
+			gt = day.getTime();
+			mymonth = day.getMonth()+1;
+			myday = day.getDate();
+			if(mymonth >= 10){mymonth = mymonth;}else{mymonth = "0" + mymonth;}
+			if(myday >= 10){myday = myday;}else{myday = "0" + myday;}
+			tt = day.getFullYear() + "-" + mymonth + "-" + myday;
+			dt = tt;
+			getSource();
+			}
+						
+			function time_range(beginTime, endTime) {
+				var strb = beginTime.split(":");
+				if (strb.length != 2) {
+					return false;
+				}
+
+				var stre = endTime.split(":");
+				if (stre.length != 2) {
+					return false;
+				}
+
+				var b = new Date();
+				var e = new Date();
+				var n = new Date();
+
+				b.setHours(strb[0]);
+				b.setMinutes(strb[1]);
+				e.setHours(stre[0]);
+				e.setMinutes(stre[1]);
+
+				if (n.getTime() - b.getTime() > 0 && n.getTime() - e.getTime() < 0) {
+					getSource();					
+					console.log(true)　　　　　　
+					return true;				
+				} else {
+					console.log(false)
+				    return false;     
+				}
+			}　　　
+   　　　
+			$(function() {
+				setInterval(function() {
+				time_range("9:00","15:15")						
+				},
+				60000);
+			})
+			
+			Date.prototype.Format = function (fmt) {
+			var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"h+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+			};			
+			if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+				for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+				return fmt;
+			};
+			
+			function keepTwoDecimal(num) {  
+               var result = parseFloat(num);  
+               if (isNaN(result)) {  
+                   //alert('传递参数错误，请检查！');  
+                   return false;  
+               }  
+               result = Math.round(num * 100) / 100;  
+               return result;  
+			};
+			
+			function createXmlHttp() {
+				if (window.XMLHttpRequest) {
+				xmlHttp = new XMLHttpRequest();
+				} else {
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+			}
+						
+			function cDayFunc(dp) 
+			{ 
+				var date = dp.cal.getNewDateStr();            
+				BookingRmk(date);//调用其它函数并带上参数                
+			}
+			
+			function BookingRmk(date)
+			{         
+				tt = date;				
+				k = 0;
+				if(dt != tt)
+				{			
+					k = 1;
+				}				
+				getSource();
+			}
+			
+			function getSource() {
+				div = document.getElementById('towrite');
+				div.innerHTML = '<font size="4">竞价涨停委买&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><input style="width: 120px;" type="text" id="PriceDate" name="PriceDate" class="Wdate" onFocus="WdatePicker({ onpicking: cDayFunc})" />';						
+							
+				var url1 = "https://apphq.longhuvip.com/w1/api/index.php?Order=1&a=DaBanList&st=5000&apiv=w26&Type=18&c=HomeDingPan&PidType=8&"; 				
+				var url2 = "https://apphis.longhuvip.com/w1/api/index.php?Order=1&st=5000&a=HisDaBanList&c=HisHomeDingPan&Index=0&Is_st=1&PidType=8&apiv=w26&Type=18&Day=" + tt + "&"; 				
+				url = url1;
+				if(k == "1" )
+				{
+				  url = url2;
+				}
+				createXmlHttp();
+				xmlHttp.onreadystatechange = writeSource;
+				xmlHttp.open("GET", url, true);
+				xmlHttp.send(null);
+			}
+			
+			function writeSource() { 
+			if (xmlHttp.readyState == 4) {         
+				var data = xmlHttp.responseText	
+				//document.write(data);
+				if(k == 0){
+					tt = data.match(/"day":"(\S*)","/)[1];
+					dt = tt;
+				}			
+				data = data.replace(/ /g,"").replace(/(\[\").*?(?=\])/g,function(word){ 
+					str = word.match(/\[(\S*)/)[1]; 
+					return '{"code":' + str.split(',')[0] + ',"name":' + str.split(',')[1] + ',"zl":'+str.split(',')[3] + ',"zf":'+str.split(',')[4] + ',"wme":'+str.split(',')[18] + ',"lb":'+str.split(',')[9]+ ',"zt":'+str.split(',')[16]+ ',"je":'+str.split(',')[20]+ ',"jjzf":'+str.split(',')[19]+ ',"sszf":'+str.split(',')[4];
+				});
+				data = data.replace(/\],\{/g,"},{").replace(/\]\],/g,"}],");	
+
+				//委买额				
+				data = data.replace(/(\"wme\":).*?(?=,)/g, function(word){ 						
+				str = word.match(/\"wme\":(\S*)/)[1]; 					
+				if(keepTwoDecimal(str/100000000) >= 1)
+					{
+						return '\"wme\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+					}
+					else
+					{
+						return '\"wme\":\"' + Math.round(str/10000) + '万\"';
+					}						
+				}); 
+				//净额				
+				data = data.replace(/(\"je\":).*?(?=,)/g, function(word){ 						
+				str = word.match(/\"je\":(\S*)/)[1]; 					
+				if(keepTwoDecimal(Math.abs(str/100000000)) >= 1)
+				{
+					return '\"je\":\"' + keepTwoDecimal(str/100000000) + '亿\"';
+				}
+				else
+				{
+					return '\"je\":\"' + Math.round(str/10000) + '万\"';
+				}								
+				});  	 								
+				//document.write(data);
+
+				var transform_aa = [  
+				{"tag":"ul", children:[
+				{"tag":"ul", children:[					
+				{"tag":"ul", children:function(){return(json2html.transform(this.list, transform_bb));}}
+				]}]}];
+				
+				var transform_bb= 
+				{"tag":"p", children:[				
+				{"tag":"p", children:function(){				
+					if(this.name.indexOf("ST") == -1)
+						{
+						return("<li><a href=https://m.10jqka.com.cn/stockpage/hs_" + 
+						this.code + ">" + 						
+						this.code + "&nbsp;" + 
+						this.name + "&nbsp;" + 
+						"实时涨幅：" + this.zf + "%&nbsp;" +
+						"委买额：" + this.wme + "&nbsp;" +
+						"净额：" + this.je + "&nbsp;" +
+						"主题：" + this.zt + "&nbsp;" +
+						this.lb + "&nbsp;" +
+						this.zl + "&nbsp;" +
+						"</a>");							
+						}
+				}}]};	
+				
+				var html = json2html.transform(data, transform_aa);	
+				div.innerHTML = div.innerHTML + html;											
+				}
+				document.getElementById("PriceDate").value = tt;
+			}
+			
+		</script>
+	</head>
+	<body>
+		<div id="towrite"></div>
+	</body>
+</html>
